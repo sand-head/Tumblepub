@@ -13,7 +13,7 @@ table! {
     user_blogs (user_id, blog_id) {
         user_id -> Int8,
         blog_id -> Int8,
-        is_admin -> Nullable<Bool>,
+        is_admin -> Bool,
     }
 }
 

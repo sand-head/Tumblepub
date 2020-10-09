@@ -21,7 +21,7 @@ CREATE TABLE user_blogs (
   user_id BIGINT REFERENCES users (id) NOT NULL,
   blog_id BIGINT REFERENCES blogs (id) NOT NULL,
 
-  is_admin BOOLEAN DEFAULT 'f',
+  is_admin BOOLEAN NOT NULL DEFAULT 'f',
 
   PRIMARY KEY (user_id, blog_id)
 );
