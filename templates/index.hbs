@@ -2,6 +2,9 @@
 <html>
   <head>
     <title>{{Title}}</title>
+    {{#if Description}}
+    <meta name="description" content="{{Description}}" />
+    {{/if}}
   </head>
   <body>
     {{Content}}
