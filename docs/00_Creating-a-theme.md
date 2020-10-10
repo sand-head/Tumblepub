@@ -30,3 +30,9 @@ Variable | Description
 Variable | Description
 --- | ---
 `{{Content}}` | Your blog's content.
+
+## Custom Handlebars helpers
+
+Helper | Description
+--- | ---
+`{{url ...}}` | URL-encodes a given variable.

@@ -4,9 +4,7 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 use activitypub::webfinger;
-use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use database::establish_pool;
-use diesel::{PgConnection, r2d2};
+use actix_web::{web, App, HttpServer};
 use env::load_dotenv;
 use handlebars::Handlebars;
 
@@ -14,28 +12,18 @@ mod activitypub;
 mod database;
 mod env;
 pub mod models;
+mod routes;
 pub mod schema;
 mod theme;
 
-type DbPool = r2d2::Pool<r2d2::ConnectionManager<PgConnection>>;
-
-struct AppState<'hbs> {
+pub struct AppState<'hbs> {
   hbs: Handlebars<'hbs>,
-  pool: DbPool
+  pool: database::DbPool
 }
 
-embed_migrations!();
-
-fn run_migrations(pool: &DbPool) {
-  let connection = pool.get()
-    .expect("Could not retrieve connection from pool");
-  embedded_migrations::run(&connection)
-    .expect("Could not run migrations");
-}
-
-fn get_data(content: String) -> theme::ThemeVariables {
+pub fn get_data(content: String) -> theme::ThemeVariables {
   theme::ThemeVariables {
-    title: "schweigert.dev".to_string(),
+    title: "bloq".to_string(),
     description: None,
     content,
 
@@ -44,29 +32,14 @@ fn get_data(content: String) -> theme::ThemeVariables {
   }
 }
 
-#[get("/")]
-async fn hello(data: web::Data<AppState<'_>>) -> impl Responder {
-  let body = data.hbs.render("index", &get_data("hello world!".to_string())).unwrap();
-  HttpResponse::Ok().body(body)
-}
-
-async fn not_found(data: web::Data<AppState<'_>>) -> impl Responder {
-  let body = data.hbs.render("index", &get_data("not found :(".to_string())).unwrap();
-  HttpResponse::NotFound().body(body)
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
   load_dotenv();
-  let pool = establish_pool();
-  run_migrations(&pool);
-
-  let mut registry = Handlebars::new();
-  registry.register_template_file("index", "./templates/index.hbs")
-    .expect("./templates/index.hbs not found");
+  let pool = database::establish_pool();
+  database::run_migrations(&pool);
 
   let state = web::Data::new(AppState {
-    hbs: registry,
+    hbs: theme::create_handlebars(),
     pool: pool.clone()
   });
 
@@ -76,8 +49,8 @@ async fn main() -> std::io::Result<()> {
       // ActivityPub services:
       .service(webfinger)
       // Other services:
-      .service(hello)
-      .default_service(web::route().to(not_found))
+      .service(routes::hello)
+      .default_service(web::route().to(routes::not_found))
   })
     .bind("127.0.0.1:8080")?
     .run()
