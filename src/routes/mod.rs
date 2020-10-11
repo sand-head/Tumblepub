@@ -1,14 +1,7 @@
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_files as fs;
 
-use crate::{AppState, get_data};
+mod blog;
 
-#[get("/")]
-pub async fn hello(data: web::Data<AppState<'_>>) -> impl Responder {
-  let body = data.hbs.render("index", &get_data("hello world!".to_string())).unwrap();
-  HttpResponse::Ok().body(body)
-}
-
-pub async fn not_found(data: web::Data<AppState<'_>>) -> impl Responder {
-  let body = data.hbs.render("index", &get_data("not found :(".to_string())).unwrap();
-  HttpResponse::NotFound().body(body)
+pub async fn index() -> std::io::Result<fs::NamedFile> {
+  Ok(fs::NamedFile::open("./build/index.html")?)
 }

@@ -4,7 +4,8 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 use activitypub::webfinger;
-use actix_web::{web, App, HttpServer};
+use actix_files as fs;
+use actix_web::{App, HttpServer, middleware::Logger, web};
 use env::load_dotenv;
 use handlebars::Handlebars;
 
@@ -34,8 +35,12 @@ pub fn get_data(content: String) -> theme::ThemeVariables {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+  println!("Loading environment variables...");
   load_dotenv();
+  database::create_database_if_not_exists().await;
+  println!("Establishing database pool...");
   let pool = database::establish_pool();
+  println!("Running migrations...");
   database::run_migrations(&pool);
 
   let state = web::Data::new(AppState {
@@ -43,14 +48,18 @@ async fn main() -> std::io::Result<()> {
     pool: pool.clone()
   });
 
+  println!("Starting webserver on port 8080...");
   HttpServer::new(move || {
     App::new()
       .app_data(state.clone())
+      .wrap(Logger::default())
       // ActivityPub services:
       .service(webfinger)
       // Other services:
-      .service(routes::hello)
-      .default_service(web::route().to(routes::not_found))
+      // .service(routes::hello)
+      // Static files
+      .service(fs::Files::new("/", "./build").index_file("index.html"))
+      .default_service(web::resource("").route(web::get().to(routes::index)))
   })
     .bind("127.0.0.1:8080")?
     .run()
