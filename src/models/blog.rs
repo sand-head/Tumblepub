@@ -9,5 +9,5 @@ pub struct Blog {
   pub domain: Option<String>,
 
   pub title: Option<String>,
-  pub description: Option<String>
+  pub description: Option<String>,
 }

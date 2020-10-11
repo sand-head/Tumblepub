@@ -3,13 +3,11 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_migrations;
 
-use activitypub::webfinger;
 use actix_files as fs;
-use actix_web::{App, HttpServer, middleware::Logger, web};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use env::load_dotenv;
 use handlebars::Handlebars;
 
-mod activitypub;
 mod database;
 mod env;
 pub mod models;
@@ -19,7 +17,7 @@ mod theme;
 
 pub struct AppState<'hbs> {
   hbs: Handlebars<'hbs>,
-  pool: database::DbPool
+  pool: database::DbPool,
 }
 
 pub fn get_data(content: String) -> theme::ThemeVariables {
@@ -29,7 +27,7 @@ pub fn get_data(content: String) -> theme::ThemeVariables {
     content,
 
     previous_page: None,
-    next_page: None
+    next_page: None,
   }
 }
 
@@ -45,7 +43,7 @@ async fn main() -> std::io::Result<()> {
 
   let state = web::Data::new(AppState {
     hbs: theme::create_handlebars(),
-    pool: pool.clone()
+    pool: pool.clone(),
   });
 
   println!("Starting webserver on port 8080...");
@@ -54,14 +52,14 @@ async fn main() -> std::io::Result<()> {
       .app_data(state.clone())
       .wrap(Logger::default())
       // ActivityPub services:
-      .service(webfinger)
+      .service(routes::well_known::webfinger)
       // Other services:
       // .service(routes::hello)
       // Static files
       .service(fs::Files::new("/", "./build").index_file("index.html"))
       .default_service(web::resource("").route(web::get().to(routes::index)))
   })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
+  .bind("127.0.0.1:8080")?
+  .run()
+  .await
 }

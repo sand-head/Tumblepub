@@ -6,7 +6,7 @@ pub struct User {
   pub id: i64,
   pub email: String,
   pub encrypted_password: String,
-  pub primary_blog: i64
+  pub primary_blog: i64,
 }
 
 /// Represents a many-to-many relationship between users and blogs.
@@ -16,5 +16,5 @@ pub struct User {
 pub struct UserBlogs {
   pub user_id: i64,
   pub blog_id: i64,
-  pub is_admin: bool
+  pub is_admin: bool,
 }
