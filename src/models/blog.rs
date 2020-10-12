@@ -1,3 +1,5 @@
+use diesel::prelude::*;
+
 use crate::schema::blogs;
 
 #[derive(Identifiable, Queryable)]
@@ -10,4 +12,21 @@ pub struct Blog {
 
   pub title: Option<String>,
   pub description: Option<String>,
+}
+
+impl Blog {
+  pub fn get_by_name<S>(conn: &PgConnection, name: S) -> QueryResult<Option<Blog>>
+  where
+    S: Into<String>,
+  {
+    use crate::schema::blogs::dsl;
+    dsl::blogs
+      .filter(
+        dsl::name
+          .ilike::<String>(name.into())
+          .and(dsl::domain.eq::<Option<String>>(None)),
+      )
+      .first::<Blog>(conn)
+      .optional()
+  }
 }

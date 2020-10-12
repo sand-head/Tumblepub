@@ -1,7 +1,17 @@
 use std::collections::HashMap;
 
 use actix_web::{get, web, HttpResponse, Responder};
+use lazy_static::lazy_static;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
+
+use crate::models::Blog;
+
+use super::AppState;
+
+lazy_static! {
+  static ref WEBFINGER_URI: Regex = Regex::new("^acct:([a-z0-9_]*)@(.*)$").unwrap();
+}
 
 #[derive(Deserialize)]
 pub struct WebfingerReq {
@@ -43,14 +53,41 @@ pub struct WebfingerRes {
 }
 
 #[get("/.well-known/webfinger")]
-pub async fn webfinger(query: web::Query<WebfingerReq>) -> impl Responder {
-  match &query.resource {
-    Some(resource) => {
-      println!("requested resource: {}", resource);
+pub async fn webfinger(
+  query: web::Query<WebfingerReq>,
+  data: web::Data<AppState<'_>>,
+) -> impl Responder {
+  let resource = match &query.resource {
+    Some(resource) => resource,
+    None => return HttpResponse::BadRequest().finish()
+  };
+  let parsed = WEBFINGER_URI.captures(resource);
+  let captures = match parsed {
+    Some(captures) => captures,
+    None => return HttpResponse::BadRequest().finish()
+  };
 
-      // todo: get from database
+  let blog_name = captures.get(0)
+    .map_or("", |c| c.as_str())
+    .to_string();
+  let domain = captures.get(1)
+    .map_or("", |c| c.as_str())
+    .to_string();
+
+  let conn = data.pool.get()
+    .expect("Could not get database connection from pool");
+  let blog = web::block(move || Blog::get_by_name(&conn, blog_name))
+    .await
+    .map_err(|e| {
+      eprintln!("{}", e);
+      HttpResponse::InternalServerError().finish()
+    })
+    .expect("Could not get blog from database");
+
+  match blog {
+    Some(blog) => {
       let res = WebfingerRes {
-        subject: resource.clone(),
+        subject: format!("acct:{}@{}", blog.name, domain),
         aliases: vec![],
         links: vec![],
       };

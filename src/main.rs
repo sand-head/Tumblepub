@@ -6,7 +6,7 @@ extern crate diesel_migrations;
 use actix_files as fs;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use env::load_dotenv;
-use handlebars::Handlebars;
+use routes::AppState;
 
 mod database;
 mod env;
@@ -14,11 +14,6 @@ pub mod models;
 mod routes;
 pub mod schema;
 mod theme;
-
-pub struct AppState<'hbs> {
-  hbs: Handlebars<'hbs>,
-  pool: database::DbPool,
-}
 
 pub fn get_data(content: String) -> theme::ThemeVariables {
   theme::ThemeVariables {
