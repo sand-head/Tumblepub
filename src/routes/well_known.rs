@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, env};
 
 use actix_web::{get, web, HttpResponse, Responder};
 use lazy_static::lazy_static;
@@ -67,12 +67,18 @@ pub async fn webfinger(
     None => return HttpResponse::BadRequest().finish()
   };
 
-  let blog_name = captures.get(0)
+  let local_domain = env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set");
+  let blog_name = captures.get(1)
     .map_or("", |c| c.as_str())
     .to_string();
-  let domain = captures.get(1)
+  let domain = captures.get(2)
     .map_or("", |c| c.as_str())
     .to_string();
+
+  // we don't gotta deal with any domains that aren't ours
+  if domain != local_domain {
+    return HttpResponse::NotFound().finish();
+  }
 
   let conn = data.pool.get()
     .expect("Could not get database connection from pool");
