@@ -10,9 +10,7 @@ use routes::AppState;
 
 mod database;
 mod env;
-pub mod models;
 mod routes;
-pub mod schema;
 mod theme;
 
 pub fn get_data(content: String) -> theme::ThemeVariables {

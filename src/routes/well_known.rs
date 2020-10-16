@@ -5,7 +5,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::models::Blog;
+use crate::database::models::Blog;
 
 use super::AppState;
 

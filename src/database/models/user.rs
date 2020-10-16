@@ -1,4 +1,4 @@
-use crate::schema::{user_blogs, users};
+use crate::database::schema::{user_blogs, users};
 
 #[derive(Identifiable, Queryable)]
 #[table_name = "users"]

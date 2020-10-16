@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-use crate::schema::blogs;
+use crate::database::schema::blogs;
 
 #[derive(Identifiable, Queryable)]
 #[table_name = "blogs"]
@@ -19,7 +19,7 @@ impl Blog {
   where
     S: Into<String>,
   {
-    use crate::schema::blogs::dsl;
+    use crate::database::schema::blogs::dsl;
     dsl::blogs
       .filter(
         dsl::name

@@ -1,5 +1,9 @@
-use diesel::{pg::PgConnection, r2d2, sql_types::Bool, Connection, RunQueryDsl};
 use std::env;
+
+use diesel::{Connection, PgConnection, RunQueryDsl, r2d2, sql_types::Bool};
+
+pub mod models;
+pub mod schema;
 
 pub type DbPool = r2d2::Pool<r2d2::ConnectionManager<PgConnection>>;
 
@@ -40,7 +44,7 @@ pub async fn create_database_if_not_exists() {
   }
 }
 
-pub fn establish_pool() -> r2d2::Pool<r2d2::ConnectionManager<PgConnection>> {
+pub fn establish_pool() -> DbPool {
   let db_user = env::var("DB_USERNAME").expect("Environment variable DB_USERNAME must be set");
   let db_pass = env::var("DB_PASSWORD").expect("Environment variable DB_PASSWORD must be set");
   let db_host = env::var("DB_HOST").expect("Environment variable DB_HOST must be set");

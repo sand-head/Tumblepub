@@ -1,5 +1,5 @@
 tab_spaces = 2
 # enable this when stable:
 # ignore = [
-#   "src/schema.rs",
+#   "src/database/schema.rs",
 # ]
