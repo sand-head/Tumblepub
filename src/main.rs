@@ -52,6 +52,8 @@ async fn main() -> std::io::Result<()> {
       .wrap(Logger::default())
       // ActivityPub services:
       .service(routes::well_known::webfinger)
+      // GraphQL:
+      .configure(routes::graphql::routes)
       // Other services:
       // .service(routes::hello)
       // Static files:

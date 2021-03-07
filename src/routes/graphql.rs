@@ -6,7 +6,7 @@ use crate::{
   graphql::{Context, Schema},
 };
 
-pub async fn graphql(
+async fn graphql(
   schema: web::Data<Schema>,
   data: web::Json<GraphQLRequest>,
   pool: web::Data<DbPool>,
@@ -16,4 +16,8 @@ pub async fn graphql(
   let json = serde_json::to_string(&response).map_err(error::ErrorInternalServerError)?;
 
   Ok(HttpResponse::Ok().json(json))
+}
+
+pub fn routes(config: &mut web::ServiceConfig) {
+  config.service(web::resource("/graphql").route(web::post().to(graphql)));
 }
