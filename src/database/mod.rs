@@ -1,11 +1,15 @@
 use std::env;
 
-use diesel::{Connection, PgConnection, RunQueryDsl, r2d2, sql_types::Bool};
+use diesel::{r2d2, sql_types::Bool, Connection, PgConnection, RunQueryDsl};
+
+use crate::errors::{ServiceError, ServiceResult};
 
 pub mod models;
 pub mod schema;
 
-pub type DbPool = r2d2::Pool<r2d2::ConnectionManager<PgConnection>>;
+type ConnectionManager = r2d2::ConnectionManager<PgConnection>;
+pub type DbPool = r2d2::Pool<ConnectionManager>;
+pub type DbConnection = r2d2::PooledConnection<ConnectionManager>;
 
 embed_migrations!();
 
@@ -55,8 +59,8 @@ pub fn establish_pool() -> DbPool {
     "postgres://{}:{}@{}:{}/{}",
     db_user, db_pass, db_host, db_port, db_name
   );
-  let manager = r2d2::ConnectionManager::<PgConnection>::new(db_url);
-  let pool = r2d2::Pool::builder().build(manager);
+  let manager = ConnectionManager::new(db_url);
+  let pool = DbPool::builder().build(manager);
   match pool {
     Ok(pool) => pool,
     Err(err) => {
@@ -68,4 +72,8 @@ pub fn establish_pool() -> DbPool {
 pub fn run_migrations(pool: &DbPool) {
   let connection = pool.get().expect("Could not retrieve connection from pool");
   embedded_migrations::run(&connection).expect("Could not run migrations");
+}
+
+pub fn connect(pool: &DbPool) -> ServiceResult<DbConnection> {
+  Ok(pool.get().map_err(|_| ServiceError::DbConnectionError)?)
 }

@@ -21,8 +21,9 @@ table! {
     users (id) {
         id -> Int8,
         email -> Varchar,
-        encrypted_password -> Varchar,
         primary_blog -> Int8,
+        hash -> Bytea,
+        salt -> Varchar,
     }
 }
 

@@ -1,6 +1,9 @@
 use diesel::prelude::*;
 
-use crate::database::schema::blogs;
+use crate::{
+  database::{connect, schema::blogs, schema::user_blogs, DbPool},
+  errors::{ServiceError, ServiceResult},
+};
 
 #[derive(Identifiable, Queryable)]
 #[table_name = "blogs"]
@@ -15,18 +18,28 @@ pub struct Blog {
 }
 
 impl Blog {
-  pub fn get_by_name<S>(conn: &PgConnection, name: S) -> QueryResult<Option<Blog>>
+  pub fn get_by_name<S>(pool: &DbPool, blog_name: S) -> ServiceResult<Option<Blog>>
   where
     S: Into<String>,
   {
-    use crate::database::schema::blogs::dsl;
-    dsl::blogs
+    use crate::database::schema::blogs::dsl::{blogs, domain, name};
+    blogs
       .filter(
-        dsl::name
-          .ilike::<String>(name.into())
-          .and(dsl::domain.eq::<Option<String>>(None)),
+        name
+          .ilike::<String>(blog_name.into())
+          .and(domain.eq::<Option<String>>(None)),
       )
-      .first::<Blog>(conn)
+      .first::<Blog>(&connect(&pool)?)
       .optional()
+      .map_err(|_| ServiceError::Unauthorized)
+  }
+
+  pub fn list_by_user_id(pool: &DbPool, user_id: i64) -> ServiceResult<Vec<Blog>> {
+    user_blogs::table
+      .filter(user_blogs::user_id.eq(user_id))
+      .inner_join(blogs::table.on(user_blogs::blog_id.eq(blogs::id)))
+      .select(blogs::all_columns)
+      .load::<Blog>(&connect(&pool)?)
+      .map_err(|_| ServiceError::Unauthorized)
   }
 }

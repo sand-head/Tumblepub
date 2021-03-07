@@ -1,13 +1,14 @@
 use std::{collections::HashMap, env};
 
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{get, web, HttpResponse};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::database::models::Blog;
-
-use super::AppState;
+use crate::{
+  database::{models::Blog, DbPool},
+  errors::{ServiceError, ServiceResult},
+};
 
 lazy_static! {
   static ref WEBFINGER_URI: Regex = Regex::new("^acct:([a-z0-9_]*)@(.*)$").unwrap();
@@ -55,34 +56,28 @@ pub struct WebfingerRes {
 #[get("/.well-known/webfinger")]
 pub async fn webfinger(
   query: web::Query<WebfingerReq>,
-  data: web::Data<AppState<'_>>,
-) -> impl Responder {
+  pool: web::Data<DbPool>,
+) -> ServiceResult<HttpResponse> {
   let resource = match &query.resource {
-    Some(resource) => resource,
-    None => return HttpResponse::BadRequest().finish()
+    Some(res) => res,
+    None => return Err(ServiceError::BadRequest("Invalid resource".to_string())),
   };
-  let parsed = WEBFINGER_URI.captures(resource);
-  let captures = match parsed {
+  let captures = match WEBFINGER_URI.captures(resource) {
     Some(captures) => captures,
-    None => return HttpResponse::BadRequest().finish()
+    None => return Err(ServiceError::BadRequest("Invalid resource".to_string())),
   };
 
-  let local_domain = env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set");
-  let blog_name = captures.get(1)
-    .map_or("", |c| c.as_str())
-    .to_string();
-  let domain = captures.get(2)
-    .map_or("", |c| c.as_str())
-    .to_string();
+  let local_domain =
+    env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set");
+  let blog_name = captures.get(1).map_or("", |c| c.as_str()).to_string();
+  let domain = captures.get(2).map_or("", |c| c.as_str()).to_string();
 
   // we don't gotta deal with any domains that aren't ours
   if domain != local_domain {
-    return HttpResponse::NotFound().finish();
+    return Ok(HttpResponse::NotFound().finish());
   }
 
-  let conn = data.pool.get()
-    .expect("Could not get database connection from pool");
-  let blog = web::block(move || Blog::get_by_name(&conn, blog_name))
+  let blog = web::block(move || Blog::get_by_name(&pool, blog_name))
     .await
     .map_err(|e| {
       eprintln!("{}", e);
@@ -90,7 +85,7 @@ pub async fn webfinger(
     })
     .expect("Could not get blog from database");
 
-  match blog {
+  Ok(match blog {
     Some(blog) => {
       let res = WebfingerRes {
         subject: format!("acct:{}@{}", blog.name, domain),
@@ -103,5 +98,5 @@ pub async fn webfinger(
         .json(res)
     }
     None => HttpResponse::NotFound().finish(),
-  }
+  })
 }
