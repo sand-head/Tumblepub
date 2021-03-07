@@ -1,11 +1,11 @@
-use crate::errors::ServiceResult;
-use crate::{
-  database::{models::Blog, DbPool},
-  errors::ServiceError,
-};
-use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode};
+use crate::database::DbPool;
+use juniper::{EmptyMutation, EmptySubscription, RootNode};
+
+use self::query::Query;
 
 pub mod models;
+pub mod mutation;
+pub mod query;
 
 #[derive(Clone)]
 pub struct Context {
@@ -18,28 +18,8 @@ impl Context {
   }
 }
 
-pub struct QueryRoot;
-#[graphql_object(context = Context)]
-impl QueryRoot {
-  pub fn blog(context: &Context, name: String) -> ServiceResult<models::blog::Blog> {
-    let blog = Blog::get_by_name(&context.db_pool, name)?;
-    if let Some(blog) = blog {
-      Ok(models::blog::Blog::from(blog))
-    } else {
-      Err(ServiceError::BadRequest("Invalid blog name".to_string()))
-    }
-  }
-}
-
-/* struct MutationRoot;
-#[graphql_object(context = Context)]
-impl MutationRoot {
-  pub fn login() -> ServiceResult {}
-  pub fn register() -> ServiceResult {}
-} */
-
-pub type Schema = RootNode<'static, QueryRoot, EmptyMutation<Context>, EmptySubscription<Context>>;
+pub type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
 
 pub fn create_schema() -> Schema {
-  Schema::new(QueryRoot {}, EmptyMutation::new(), EmptySubscription::new())
+  Schema::new(Query {}, EmptyMutation::new(), EmptySubscription::new())
 }

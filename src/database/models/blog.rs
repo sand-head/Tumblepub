@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use diesel::prelude::*;
 
 use crate::{
@@ -12,7 +13,20 @@ pub struct Blog {
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
+  pub is_public: bool,
+  pub title: Option<String>,
+  pub description: Option<String>,
+  pub created_at: NaiveDateTime,
+  pub updated_at: NaiveDateTime,
+}
 
+#[derive(Debug, Insertable)]
+#[table_name = "blogs"]
+pub struct InsertableBlog {
+  pub uri: Option<String>,
+  pub name: String,
+  pub domain: Option<String>,
+  pub is_public: bool,
   pub title: Option<String>,
   pub description: Option<String>,
 }
