@@ -1,7 +1,7 @@
 use actix_web::{HttpResponse, ResponseError};
-use diesel::result::Error as DBError;
 use juniper::{FieldError, IntoFieldError, Value};
 use serde::Serialize;
+use sqlx::Error as DBError;
 use thiserror::Error;
 
 #[derive(Debug, Error, Serialize)]
@@ -54,8 +54,8 @@ impl ResponseError for ServiceError {
 impl From<DBError> for ServiceError {
   fn from(error: DBError) -> Self {
     match error {
-      DBError::DatabaseError(_, info) => {
-        let msg = info.details().unwrap_or_else(|| info.message()).to_string();
+      DBError::Database(err) => {
+        let msg = err.to_string();
         ServiceError::BadRequest(msg)
       }
       _ => ServiceError::InternalServerError,

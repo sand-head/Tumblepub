@@ -8,17 +8,22 @@ edition = "2018"
 
 [dependencies]
 # misc:
-chrono = { version = "0.4", features = ["serde"] }
+anyhow = "1.0"
 dotenv = "0.15"
+rand = "0.8"
 thiserror = "1.0"
-uuid = { version = "0.8", features = ["serde", "v4"] }
+url = "2.2"
 # web server:
 actix-files = "0.5"
 actix-web = "3"
+juniper_actix = "0.2"
 # database:
-diesel = { version = "1.4", features = ["postgres", "uuidv07", "chrono", "r2d2"] }
-diesel_migrations = { version = "1.4", features = ["postgres"] }
-tokio-postgres = "0.7"
+# note that we can upgrade sqlx once actix_web hits 4.0
+chrono = { version = "0.4", features = ["serde"] }
+sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate"] }
+uuid = { version = "0.8", features = ["serde", "v4"] }
+# auth:
+argon2rs = "0.2"
 # GraphQL:
 juniper = "0.15"
 serde = { version = "1.0", features = ["derive"] }

@@ -1,11 +1,8 @@
-pub use blog::Blog;
-pub use post::Post;
-pub use user::User;
-pub use user_blogs::UserBlogs;
+use sqlx::PgPool;
 
-mod blog;
-mod post;
-mod user;
-mod user_blogs;
+use crate::errors::ServiceResult;
 
-trait CRUD {}
+pub mod blog;
+pub mod post;
+pub mod user;
+pub mod user_blogs;

@@ -1,13 +1,9 @@
 use chrono::NaiveDateTime;
-use diesel::prelude::*;
+use sqlx::PgPool;
 
-use crate::{
-  database::{connect, schema::blogs, schema::user_blogs, DbPool},
-  errors::{ServiceError, ServiceResult},
-};
+use crate::errors::ServiceResult;
 
-#[derive(Identifiable, Queryable)]
-#[table_name = "blogs"]
+#[derive(Debug)]
 pub struct Blog {
   pub id: i64,
   pub uri: Option<String>,
@@ -20,8 +16,6 @@ pub struct Blog {
   pub updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Insertable)]
-#[table_name = "blogs"]
 pub struct InsertableBlog {
   pub uri: Option<String>,
   pub name: String,
@@ -32,28 +26,73 @@ pub struct InsertableBlog {
 }
 
 impl Blog {
-  pub fn get_by_name<S>(pool: &DbPool, blog_name: S) -> ServiceResult<Option<Blog>>
-  where
-    S: Into<String>,
-  {
-    use crate::database::schema::blogs::dsl::{blogs, domain, name};
-    blogs
-      .filter(
-        name
-          .ilike::<String>(blog_name.into())
-          .and(domain.eq::<Option<String>>(None)),
+  /// Creates a new Blog and returns it
+  pub async fn create(pool: &PgPool, model: InsertableBlog) -> ServiceResult<Self> {
+    Ok(
+      sqlx::query_as!(
+        Blog,
+        r#"
+INSERT INTO blogs (uri, name, domain, is_public, title, description)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING *
+        "#,
+        model.uri,
+        model.name,
+        model.domain,
+        model.is_public,
+        model.title,
+        model.description
       )
-      .first::<Blog>(&connect(&pool)?)
-      .optional()
-      .map_err(|_| ServiceError::Unauthorized)
+      .fetch_one(pool)
+      .await?,
+    )
   }
 
-  pub fn list_by_user_id(pool: &DbPool, user_id: i64) -> ServiceResult<Vec<Blog>> {
-    user_blogs::table
-      .filter(user_blogs::user_id.eq(user_id))
-      .inner_join(blogs::table.on(user_blogs::blog_id.eq(blogs::id)))
-      .select(blogs::all_columns)
-      .load::<Blog>(&connect(&pool)?)
-      .map_err(|_| ServiceError::Unauthorized)
+  /// Searches for a Blog by the given name & domain tuple and returns it if found.
+  pub async fn find(pool: &PgPool, name: (String, Option<String>)) -> ServiceResult<Option<Self>> {
+    let (name, domain) = name;
+
+    if let Some(domain) = domain {
+      Ok(
+        sqlx::query_as!(
+          Blog,
+          "SELECT * FROM blogs WHERE name = $1 AND domain = $2 LIMIT 1",
+          name,
+          domain
+        )
+        .fetch_optional(pool)
+        .await?,
+      )
+    } else {
+      Ok(
+        sqlx::query_as!(
+          Blog,
+          "SELECT * FROM blogs WHERE name = $1 AND domain IS NULL LIMIT 1",
+          name
+        )
+        .fetch_optional(pool)
+        .await?,
+      )
+    }
+  }
+
+  pub async fn list(
+    pool: &PgPool,
+    limit: Option<i32>,
+    offset: Option<i32>,
+  ) -> ServiceResult<Vec<Self>> {
+    let limit = limit.unwrap_or(50) as i64;
+    let offset = offset.unwrap_or(0) as i64;
+
+    Ok(
+      sqlx::query_as!(
+        Blog,
+        "SELECT * FROM blogs LIMIT $1 OFFSET $2",
+        limit,
+        offset
+      )
+      .fetch_all(pool)
+      .await?,
+    )
   }
 }

@@ -1,79 +1,36 @@
-use std::env;
-
-use diesel::{r2d2, sql_types::Bool, Connection, PgConnection, RunQueryDsl};
-
-use crate::errors::{ServiceError, ServiceResult};
+use anyhow::Result;
+use sqlx::{Connection, PgConnection, Row};
+use url::Url;
 
 pub mod models;
-pub mod schema;
 
-type ConnectionManager = r2d2::ConnectionManager<PgConnection>;
-pub type DbPool = r2d2::Pool<ConnectionManager>;
-pub type DbConnection = r2d2::PooledConnection<ConnectionManager>;
+pub async fn create_database_if_not_exists(db_url: &str) -> Result<()> {
+  let db_url = Url::parse(db_url).expect("Could not parse DATABASE_URL");
+  let db_name = &db_url.path().clone()[1..];
+  let mut base_url = db_url.clone();
+  base_url
+    .path_segments_mut()
+    .expect("Could not get path segments")
+    .clear()
+    .push("postgres");
 
-embed_migrations!();
-
-#[derive(QueryableByName)]
-struct DbExistResult {
-  #[sql_type = "Bool"]
-  exists: bool,
-}
-
-pub async fn create_database_if_not_exists() {
-  let db_user = env::var("DB_USERNAME").expect("Environment variable DB_USERNAME must be set");
-  let db_pass = env::var("DB_PASSWORD").expect("Environment variable DB_PASSWORD must be set");
-  let db_host = env::var("DB_HOST").expect("Environment variable DB_HOST must be set");
-  let db_port = env::var("DB_PORT").expect("Environment variable DB_PORT must be set");
-  let db_name = env::var("DB_NAME").expect("Environment variable DB_NAME must be set");
-
-  let db_url = format!(
-    "postgres://{}:{}@{}:{}/postgres",
-    db_user, db_pass, db_host, db_port
-  );
-  let conn = PgConnection::establish(&db_url).expect("Could not connect to PostgreSQL database");
-
-  let query = format!(
+  let mut conn = PgConnection::connect(base_url.as_str()).await?;
+  let row = sqlx::query(&format!(
     "SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = '{}') AS exists",
     db_name
-  );
-  let result = diesel::sql_query(query)
-    .get_result::<DbExistResult>(&conn)
-    .expect("Could not retrieve database creation status from PostgreSQL");
+  ))
+  .fetch_one(&mut conn)
+  .await?;
 
-  if !result.exists {
-    match diesel::sql_query(&format!("CREATE DATABASE {}", db_name)).execute(&conn) {
+  if !row.try_get("exists")? {
+    let result = sqlx::query(&format!("CREATE DATABASE {}", db_name))
+      .execute(&mut conn)
+      .await;
+    match result {
       Ok(_) => println!("Database {} created!", db_name),
       Err(_) => panic!("Could not create database"),
     }
   }
-}
 
-pub fn establish_pool() -> DbPool {
-  let db_user = env::var("DB_USERNAME").expect("Environment variable DB_USERNAME must be set");
-  let db_pass = env::var("DB_PASSWORD").expect("Environment variable DB_PASSWORD must be set");
-  let db_host = env::var("DB_HOST").expect("Environment variable DB_HOST must be set");
-  let db_port = env::var("DB_PORT").expect("Environment variable DB_PORT must be set");
-  let db_name = env::var("DB_NAME").expect("Environment variable DB_NAME must be set");
-
-  let db_url = format!(
-    "postgres://{}:{}@{}:{}/{}",
-    db_user, db_pass, db_host, db_port, db_name
-  );
-  let manager = ConnectionManager::new(db_url);
-  let pool = DbPool::builder().build(manager);
-  match pool {
-    Ok(pool) => pool,
-    Err(err) => {
-      panic!("An error occurred: {}", err);
-    }
-  }
-}
-
-pub fn run_migrations(pool: &DbPool) {
-  let connection = pool.get().expect("Could not retrieve connection from pool");
-  embedded_migrations::run(&connection).expect("Could not run migrations");
-}
-
-pub fn connect(pool: &DbPool) -> ServiceResult<DbConnection> {
-  Ok(pool.get().map_err(|_| ServiceError::DbConnectionError)?)
+  Ok(())
 }

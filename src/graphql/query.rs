@@ -1,21 +1,25 @@
-use juniper::graphql_object;
+use juniper::{graphql_object, FieldError, FieldResult, Value};
 
-use crate::{
-  database::models::Blog,
-  errors::{ServiceError, ServiceResult},
-};
+use crate::{database::models::blog::Blog, errors::ServiceResult};
 
 use super::{models, Context};
 
 pub struct Query;
 #[graphql_object(context = Context)]
 impl Query {
-  pub fn blog(context: &Context, name: String) -> ServiceResult<models::blog::Blog> {
-    let blog = Blog::get_by_name(&context.db_pool, name)?;
-    if let Some(blog) = blog {
-      Ok(models::blog::Blog::from(blog))
-    } else {
-      Err(ServiceError::BadRequest("Invalid blog name".to_string()))
+  pub fn apiVersion() -> String {
+    "0.1".to_string()
+  }
+
+  #[graphql(arguments(name(description = "The name of the blog")))]
+  pub async fn blog(
+    context: &Context,
+    name: String,
+    domain: Option<String>,
+  ) -> ServiceResult<Option<models::blog::Blog>> {
+    match Blog::find(&context.db_pool, (name, domain)).await {
+      Ok(b) => Ok(b.map(|b| b.into())),
+      Err(e) => Err(e),
     }
   }
 }

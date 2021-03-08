@@ -15,8 +15,8 @@ pub struct Blog {
   description: Option<String>,
 }
 
-impl From<database::models::Blog> for Blog {
-  fn from(blog: database::models::Blog) -> Self {
+impl From<database::models::blog::Blog> for Blog {
+  fn from(blog: database::models::blog::Blog) -> Self {
     Self {
       name: blog.name,
       domain: blog.domain,
