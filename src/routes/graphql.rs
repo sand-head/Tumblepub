@@ -1,15 +1,13 @@
 use actix_web::{error, web, Error, HttpResponse};
 use juniper::http::GraphQLRequest;
+use sqlx::PgPool;
 
-use crate::{
-  database::DbPool,
-  graphql::{Context, Schema},
-};
+use crate::graphql::{Context, Schema};
 
 async fn graphql(
   schema: web::Data<Schema>,
   data: web::Json<GraphQLRequest>,
-  pool: web::Data<DbPool>,
+  pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, Error> {
   let context = Context::new(pool.into_inner().as_ref().clone());
   let response = data.execute(&schema, &context).await;

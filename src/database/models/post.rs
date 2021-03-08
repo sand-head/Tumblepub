@@ -1,10 +1,6 @@
-use diesel::prelude::*;
 use uuid::Uuid;
 
-use crate::database::schema::posts;
-
-#[derive(Identifiable, Queryable)]
-#[table_name = "posts"]
+#[derive(sqlx::FromRow)]
 pub struct Post {
   pub id: Uuid,
   pub blog_id: i64,

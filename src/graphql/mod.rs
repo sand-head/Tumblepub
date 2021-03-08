@@ -1,5 +1,5 @@
-use crate::database::DbPool;
 use juniper::{EmptyMutation, EmptySubscription, RootNode};
+use sqlx::PgPool;
 
 use self::query::Query;
 
@@ -9,11 +9,11 @@ pub mod query;
 
 #[derive(Clone)]
 pub struct Context {
-  pub db_pool: DbPool,
+  pub db_pool: PgPool,
 }
 impl juniper::Context for Context {}
 impl Context {
-  pub fn new(pool: DbPool) -> Self {
+  pub fn new(pool: PgPool) -> Self {
     Self { db_pool: pool }
   }
 }

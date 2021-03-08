@@ -1,13 +1,10 @@
-#[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate diesel_migrations;
-
 use std::sync::Arc;
 
 use actix_files as fs;
 use actix_web::{middleware::Logger, web, App, HttpServer};
+use anyhow::Result;
 use env::load_dotenv;
+use sqlx::PgPool;
 
 mod database;
 mod env;
@@ -28,15 +25,16 @@ pub fn get_data(content: String) -> theme::ThemeVariables {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
   println!("Loading environment variables...");
   load_dotenv();
+  let db_url = std::env::var("DATABASE_URL")?;
 
   println!("Establishing database pool...");
-  database::create_database_if_not_exists().await;
-  let pool = database::establish_pool();
+  database::create_database_if_not_exists(&db_url).await?;
+  let pool = PgPool::connect(&db_url).await?;
   println!("Running migrations...");
-  database::run_migrations(&pool);
+  sqlx::migrate!("./migrations").run(&pool).await?;
 
   println!("Creating GraphQL schema...");
   let schema = Arc::new(graphql::create_schema());
@@ -64,5 +62,7 @@ async fn main() -> std::io::Result<()> {
   .run();
 
   println!("🚀 Listening on http://127.0.0.1:8080!");
-  server.await
+  server.await?;
+
+  Ok(())
 }

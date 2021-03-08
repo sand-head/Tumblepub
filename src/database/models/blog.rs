@@ -1,13 +1,6 @@
 use chrono::NaiveDateTime;
-use diesel::prelude::*;
 
-use crate::{
-  database::{connect, schema::blogs, schema::user_blogs, DbPool},
-  errors::{ServiceError, ServiceResult},
-};
-
-#[derive(Identifiable, Queryable)]
-#[table_name = "blogs"]
+#[derive(sqlx::FromRow)]
 pub struct Blog {
   pub id: i64,
   pub uri: Option<String>,
@@ -20,8 +13,6 @@ pub struct Blog {
   pub updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Insertable)]
-#[table_name = "blogs"]
 pub struct InsertableBlog {
   pub uri: Option<String>,
   pub name: String,
@@ -30,7 +21,7 @@ pub struct InsertableBlog {
   pub title: Option<String>,
   pub description: Option<String>,
 }
-
+/*
 impl Blog {
   pub fn get_by_name<S>(pool: &DbPool, blog_name: S) -> ServiceResult<Option<Blog>>
   where
@@ -57,3 +48,4 @@ impl Blog {
       .map_err(|_| ServiceError::Unauthorized)
   }
 }
+ */

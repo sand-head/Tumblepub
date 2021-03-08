@@ -4,9 +4,10 @@ use actix_web::{get, web, HttpResponse};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 
 use crate::{
-  database::{models::Blog, DbPool},
+  database::queries,
   errors::{ServiceError, ServiceResult},
 };
 
@@ -56,7 +57,7 @@ pub struct WebfingerRes {
 #[get("/.well-known/webfinger")]
 pub async fn webfinger(
   query: web::Query<WebfingerReq>,
-  pool: web::Data<DbPool>,
+  pool: web::Data<PgPool>,
 ) -> ServiceResult<HttpResponse> {
   let resource = match &query.resource {
     Some(res) => res,
@@ -77,14 +78,7 @@ pub async fn webfinger(
     return Ok(HttpResponse::NotFound().finish());
   }
 
-  let blog = web::block(move || Blog::get_by_name(&pool, blog_name))
-    .await
-    .map_err(|e| {
-      eprintln!("{}", e);
-      HttpResponse::InternalServerError().finish()
-    })
-    .expect("Could not get blog from database");
-
+  let blog = queries::blog::get_by_name(&pool, blog_name).await?;
   Ok(match blog {
     Some(blog) => {
       let res = WebfingerRes {

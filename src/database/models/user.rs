@@ -1,12 +1,7 @@
 use chrono::NaiveDateTime;
-use diesel::prelude::*;
-
-use crate::{database::connect, database::schema::users, errors::ServiceResult};
-use crate::{database::DbPool, errors::ServiceError};
 
 /// Represents a user's data and settings.
-#[derive(Debug, Identifiable, Queryable)]
-#[table_name = "users"]
+#[derive(sqlx::FromRow, Debug)]
 pub struct User {
   pub id: i64,
   pub email: String,
@@ -18,15 +13,14 @@ pub struct User {
   pub last_login_at: NaiveDateTime,
 }
 
-#[derive(Debug, Insertable)]
-#[table_name = "users"]
+#[derive(Debug)]
 pub struct InsertableUser {
   pub email: String,
   pub primary_blog: i64,
   pub hash: Vec<u8>,
   pub salt: String,
 }
-
+/*
 impl User {
   pub fn get_by_id(pool: &DbPool, user_id: i64) -> ServiceResult<Option<User>> {
     use crate::database::schema::users::dsl::{id, users};
@@ -38,3 +32,4 @@ impl User {
       .map_err(|_| ServiceError::Unauthorized)
   }
 }
+ */

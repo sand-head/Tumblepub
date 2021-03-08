@@ -1,4 +1,3 @@
--- Your SQL goes here
 CREATE TABLE blogs (
   id BIGSERIAL PRIMARY KEY,
   uri VARCHAR,

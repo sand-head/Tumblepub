@@ -1,11 +1,6 @@
-pub use blog::Blog;
-pub use post::Post;
-pub use user::User;
-pub use user_blogs::UserBlogs;
-
-mod blog;
-mod post;
-mod user;
-mod user_blogs;
+pub mod blog;
+pub mod post;
+pub mod user;
+pub mod user_blogs;
 
 trait CRUD {}
