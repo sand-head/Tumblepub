@@ -1,7 +1,7 @@
 use juniper::{EmptyMutation, EmptySubscription, RootNode};
 use sqlx::PgPool;
 
-use self::query::Query;
+use self::{mutation::Mutation, query::Query};
 
 pub mod models;
 pub mod mutation;
@@ -18,12 +18,8 @@ impl Context {
   }
 }
 
-pub type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
+pub type Schema = RootNode<'static, Query, Mutation, EmptySubscription<Context>>;
 
 pub fn create_schema() -> Schema {
-  Schema::new(
-    Query,
-    EmptyMutation::<Context>::new(),
-    EmptySubscription::<Context>::new(),
-  )
+  Schema::new(Query, Mutation, EmptySubscription::<Context>::new())
 }
