@@ -52,8 +52,6 @@ async fn main() -> Result<()> {
       .service(routes::well_known::webfinger)
       // GraphQL:
       .configure(routes::graphql::routes)
-      // Other services:
-      // .service(routes::hello)
       // Static files:
       .service(fs::Files::new("/", "./build").index_file("index.html"))
       .default_service(web::resource("").route(web::get().to(routes::index)))
@@ -61,7 +59,7 @@ async fn main() -> Result<()> {
   .bind("127.0.0.1:8080")?
   .run();
 
-  println!("🚀 Listening on http://127.0.0.1:8080!");
+  println!("🚀 Listening on http://127.0.0.1:8080");
   server.await?;
 
   Ok(())

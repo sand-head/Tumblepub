@@ -21,5 +21,9 @@ impl Context {
 pub type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
 
 pub fn create_schema() -> Schema {
-  Schema::new(Query {}, EmptyMutation::new(), EmptySubscription::new())
+  Schema::new(
+    Query,
+    EmptyMutation::<Context>::new(),
+    EmptySubscription::<Context>::new(),
+  )
 }

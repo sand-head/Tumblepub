@@ -1,12 +1,10 @@
-use sqlx::{postgres, Connection, PgConnection, Row};
+use anyhow::Result;
+use sqlx::{Connection, PgConnection, Row};
 use url::Url;
 
 pub mod models;
-pub mod queries;
 
-// embed_migrations!();
-
-pub async fn create_database_if_not_exists(db_url: &str) -> Result<(), sqlx::Error> {
+pub async fn create_database_if_not_exists(db_url: &str) -> Result<()> {
   let db_url = Url::parse(db_url).expect("Could not parse DATABASE_URL");
   let db_name = &db_url.path().clone()[1..];
   let mut base_url = db_url.clone();
@@ -24,16 +22,13 @@ pub async fn create_database_if_not_exists(db_url: &str) -> Result<(), sqlx::Err
   .fetch_one(&mut conn)
   .await?;
 
-  match row.try_get("exists")? {
-    true => println!("Database already exists"),
-    false => {
-      let result = sqlx::query(&format!("CREATE DATABASE {}", db_name))
-        .execute(&mut conn)
-        .await;
-      match result {
-        Ok(_) => println!("Database {} created!", db_name),
-        Err(_) => panic!("Could not create database"),
-      }
+  if !row.try_get("exists")? {
+    let result = sqlx::query(&format!("CREATE DATABASE {}", db_name))
+      .execute(&mut conn)
+      .await;
+    match result {
+      Ok(_) => println!("Database {} created!", db_name),
+      Err(_) => panic!("Could not create database"),
     }
   }
 

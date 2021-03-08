@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::{
-  database::queries,
+  database::models::blog::Blog,
   errors::{ServiceError, ServiceResult},
 };
 
@@ -78,7 +78,7 @@ pub async fn webfinger(
     return Ok(HttpResponse::NotFound().finish());
   }
 
-  let blog = queries::blog::get_by_name(&pool, blog_name).await?;
+  let blog = Blog::find(&pool, (blog_name, None)).await?;
   Ok(match blog {
     Some(blog) => {
       let res = WebfingerRes {
