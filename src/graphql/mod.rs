@@ -1,4 +1,4 @@
-use juniper::{EmptyMutation, EmptySubscription, RootNode};
+use juniper::{EmptySubscription, RootNode};
 use sqlx::PgPool;
 
 use self::{mutation::Mutation, query::Query};

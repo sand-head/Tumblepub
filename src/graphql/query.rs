@@ -1,4 +1,4 @@
-use juniper::{graphql_object, FieldError, FieldResult, Value};
+use juniper::graphql_object;
 
 use crate::{database::models::blog::Blog, errors::ServiceResult};
 
