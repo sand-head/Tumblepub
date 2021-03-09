@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use sqlx::PgPool;
+use sqlx::{PgConnection, PgPool};
 
 use crate::errors::ServiceResult;
 
@@ -27,7 +27,7 @@ pub struct InsertableBlog {
 
 impl Blog {
   /// Creates a new Blog and returns it
-  pub async fn create(pool: &PgPool, model: InsertableBlog) -> ServiceResult<Self> {
+  pub async fn create(conn: &mut PgConnection, model: InsertableBlog) -> ServiceResult<Self> {
     Ok(
       sqlx::query_as!(
         Blog,
@@ -43,7 +43,7 @@ RETURNING *
         model.title,
         model.description
       )
-      .fetch_one(pool)
+      .fetch_one(conn)
       .await?,
     )
   }
