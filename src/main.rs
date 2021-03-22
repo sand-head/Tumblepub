@@ -15,7 +15,7 @@ mod theme;
 
 pub fn get_data(content: String) -> theme::ThemeVariables {
   theme::ThemeVariables {
-    title: "bloq".to_string(),
+    title: "tumblepub".to_string(),
     description: None,
     content,
 

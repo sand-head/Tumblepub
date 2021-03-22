@@ -1,7 +1,7 @@
 {
-  "name": "bloq",
+  "name": "tumblepub",
   "version": "0.1.0",
-  "repository": "https://github.com/sand-head/bloq.git",
+  "repository": "https://github.com/sand-head/tumblepub.git",
   "author": "Justin Schweigert <justin@schweigert.dev>",
   "license": "AGPL-3.0",
   "scripts": {
