@@ -58,6 +58,8 @@ async fn main() -> Result<()> {
       .configure(routes::well_known::routes)
       // GraphQL:
       .configure(routes::graphql::routes)
+      // Blog content:
+      .configure(routes::blog::routes)
       // Static files:
       .service(fs::Files::new("/", "./build").index_file("index.html"))
       .default_service(web::resource("").route(web::get().to(routes::index)))

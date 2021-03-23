@@ -1,6 +1,6 @@
 use actix_files as fs;
 
-mod blog;
+pub mod blog;
 pub mod graphql;
 pub mod well_known;
 
