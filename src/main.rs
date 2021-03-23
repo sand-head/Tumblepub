@@ -4,6 +4,7 @@ use actix_files as fs;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use anyhow::Result;
 use env::load_dotenv;
+use lazy_static::lazy_static;
 use sqlx::PgPool;
 
 mod database;
@@ -12,6 +13,11 @@ mod errors;
 mod graphql;
 mod routes;
 mod theme;
+
+lazy_static! {
+  pub static ref LOCAL_DOMAIN: String =
+    std::env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set.");
+}
 
 pub fn get_data(content: String) -> theme::ThemeVariables {
   theme::ThemeVariables {
@@ -49,7 +55,7 @@ async fn main() -> Result<()> {
       // Error logging:
       .wrap(Logger::default())
       // ActivityPub services:
-      .service(routes::well_known::webfinger)
+      .configure(routes::well_known::routes)
       // GraphQL:
       .configure(routes::graphql::routes)
       // Static files:

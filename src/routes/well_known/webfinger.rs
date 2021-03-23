@@ -1,6 +1,6 @@
-use std::{collections::HashMap, env};
+use std::collections::HashMap;
 
-use actix_web::{get, web, HttpResponse};
+use actix_web::{web, HttpResponse};
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -9,6 +9,7 @@ use sqlx::PgPool;
 use crate::{
   database::models::blog::Blog,
   errors::{ServiceError, ServiceResult},
+  LOCAL_DOMAIN,
 };
 
 lazy_static! {
@@ -54,7 +55,6 @@ pub struct WebfingerRes {
   links: Vec<WebfingerLink>,
 }
 
-#[get("/.well-known/webfinger")]
 pub async fn webfinger(
   query: web::Query<WebfingerReq>,
   pool: web::Data<PgPool>,
@@ -68,13 +68,11 @@ pub async fn webfinger(
     None => return Err(ServiceError::BadRequest("Invalid resource".to_string())),
   };
 
-  let local_domain =
-    env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set");
   let blog_name = captures.get(1).map_or("", |c| c.as_str()).to_string();
   let domain = captures.get(2).map_or("", |c| c.as_str()).to_string();
 
   // we don't gotta deal with any domains that aren't ours
-  if domain != local_domain {
+  if domain != LOCAL_DOMAIN.as_str() {
     return Ok(HttpResponse::NotFound().finish());
   }
 
