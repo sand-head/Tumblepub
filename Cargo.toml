@@ -24,6 +24,7 @@ sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 # auth:
 argon2rs = "0.2"
+jsonwebtoken = "7.2"
 # GraphQL:
 juniper = "0.15"
 serde = { version = "1.0", features = ["derive"] }

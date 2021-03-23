@@ -2,8 +2,9 @@ use argon2rs::argon2i_simple;
 use chrono::NaiveDateTime;
 use sqlx::{PgConnection, PgPool};
 
-use crate::database::models::blog::Blog;
 use crate::errors::ServiceResult;
+
+use super::blog::Blog;
 
 /// Represents a user's data and settings.
 #[derive(Debug)]
@@ -64,11 +65,43 @@ RETURNING *
     )
   }
 
+  /// Returns a user if and only if the provided credentials are valid
+  pub async fn verify(
+    conn: &mut PgConnection,
+    email: String,
+    password: String,
+  ) -> ServiceResult<Option<User>> {
+    let result = sqlx::query_as!(User, "SELECT * FROM users WHERE email = $1 LIMIT 1", email)
+      .fetch_optional(conn)
+      .await?;
+
+    if let Some(user) = result {
+      let incoming_hash = argon2i_simple(&password, &user.salt);
+      if incoming_hash == user.hash.as_ref() {
+        return Ok(Some(user));
+      }
+    }
+
+    Ok(None)
+  }
+
   pub async fn find(pool: &PgPool, user_id: i64) -> ServiceResult<Option<Self>> {
     Ok(
       sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1 LIMIT 1", user_id)
         .fetch_optional(pool)
         .await?,
+    )
+  }
+
+  pub async fn primary_blog(&self, conn: &mut PgConnection) -> ServiceResult<Blog> {
+    Ok(
+      sqlx::query_as!(
+        Blog,
+        "SELECT * FROM blogs WHERE id = $1 LIMIT 1",
+        self.primary_blog
+      )
+      .fetch_one(conn)
+      .await?,
     )
   }
 }

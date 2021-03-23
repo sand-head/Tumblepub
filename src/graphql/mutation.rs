@@ -5,21 +5,42 @@ use crate::{
     blog::{Blog, InsertableBlog},
     user::{InsertableUser, User},
   },
-  errors::ServiceResult,
+  errors::{ServiceError, ServiceResult},
 };
 
-use super::{models, Context};
+use super::{
+  models::{self, user::UserAuthPayload},
+  Context,
+};
 
 pub struct Mutation;
 #[graphql_object(context = Context)]
 impl Mutation {
-  // pub fn login(context: &Context) -> ServiceResult<models::user::User> {}
+  pub async fn login(
+    context: &Context,
+    email: String,
+    password: String,
+  ) -> ServiceResult<models::user::UserAuthPayload> {
+    let mut pool = context.db_pool.acquire().await.unwrap();
+    let user = User::verify(&mut pool, email, password).await?;
+    if let None = user {
+      return Err(ServiceError::BadRequest("user does not exist".to_string()));
+    }
+
+    let user = user.unwrap();
+    let blog = user.primary_blog(&mut pool).await?;
+
+    Ok(UserAuthPayload::new(super::models::user::User::from((
+      user, blog,
+    ))))
+  }
+
   pub async fn register(
     context: &Context,
     email: String,
     password: String,
     name: String,
-  ) -> ServiceResult<models::user::User> {
+  ) -> ServiceResult<models::user::UserAuthPayload> {
     let mut txn = context.db_pool.begin().await?;
     // step 1: create a primary blog for the new user
     let result = Blog::create(
@@ -57,10 +78,11 @@ impl Mutation {
       return Err(e);
     }
 
+    // step 3: return auth payload with JWT
     let user = result.unwrap();
-    Ok(models::user::User {
-      name: primary_blog.name,
-      joined_at: user.created_at,
-    })
+    Ok(UserAuthPayload::new(super::models::user::User::from((
+      user,
+      primary_blog,
+    ))))
   }
 }
