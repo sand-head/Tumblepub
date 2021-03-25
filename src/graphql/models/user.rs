@@ -3,7 +3,7 @@ use jsonwebtoken::{encode, EncodingKey, Header};
 use juniper::GraphQLObject;
 use serde::Serialize;
 
-use crate::database;
+use tumblepub_db::models as db_models;
 
 #[derive(GraphQLObject)]
 /// Information about a user
@@ -13,8 +13,8 @@ pub struct User {
   /// The date and time that the user first joined
   pub joined_at: NaiveDateTime,
 }
-impl From<(database::models::user::User, database::models::blog::Blog)> for User {
-  fn from((user, blog): (database::models::user::User, database::models::blog::Blog)) -> Self {
+impl From<(db_models::user::User, db_models::blog::Blog)> for User {
+  fn from((user, blog): (db_models::user::User, db_models::blog::Blog)) -> Self {
     Self {
       name: blog.name,
       joined_at: user.created_at,

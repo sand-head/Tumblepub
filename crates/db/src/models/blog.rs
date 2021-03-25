@@ -1,7 +1,6 @@
+use anyhow::Result;
 use chrono::NaiveDateTime;
 use sqlx::{PgConnection, PgPool};
-
-use crate::errors::ServiceResult;
 
 #[derive(Debug)]
 pub struct Blog {
@@ -27,7 +26,7 @@ pub struct InsertableBlog {
 
 impl Blog {
   /// Creates a new Blog and returns it
-  pub async fn create(conn: &mut PgConnection, model: InsertableBlog) -> ServiceResult<Self> {
+  pub async fn create(conn: &mut PgConnection, model: InsertableBlog) -> Result<Self> {
     Ok(
       sqlx::query_as!(
         Blog,
@@ -49,7 +48,7 @@ RETURNING *
   }
 
   /// Searches for a Blog by the given name & domain tuple and returns it if found.
-  pub async fn find(pool: &PgPool, name: (String, Option<String>)) -> ServiceResult<Option<Self>> {
+  pub async fn find(pool: &PgPool, name: (String, Option<String>)) -> Result<Option<Self>> {
     let (name, domain) = name;
 
     if let Some(domain) = domain {
@@ -76,11 +75,7 @@ RETURNING *
     }
   }
 
-  pub async fn list(
-    pool: &PgPool,
-    limit: Option<i32>,
-    offset: Option<i32>,
-  ) -> ServiceResult<Vec<Self>> {
+  pub async fn list(pool: &PgPool, limit: Option<i32>, offset: Option<i32>) -> Result<Vec<Self>> {
     let limit = limit.unwrap_or(50) as i64;
     let offset = offset.unwrap_or(0) as i64;
 

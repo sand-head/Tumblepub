@@ -2681,6 +2681,20 @@ dependencies = [
  "serde_json",
  "sqlx",
  "thiserror",
+ "tumblepub_db",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "tumblepub_db"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "argon2rs",
+ "chrono",
+ "rand 0.8.3",
+ "sqlx",
  "url",
  "uuid",
 ]

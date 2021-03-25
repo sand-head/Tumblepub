@@ -7,7 +7,6 @@ use env::load_dotenv;
 use lazy_static::lazy_static;
 use sqlx::PgPool;
 
-mod database;
 mod env;
 mod errors;
 mod graphql;
@@ -37,7 +36,7 @@ async fn main() -> Result<()> {
   let db_url = std::env::var("DATABASE_URL")?;
 
   println!("Establishing database pool...");
-  database::create_database_if_not_exists(&db_url).await?;
+  tumblepub_db::create_database_if_not_exists(&db_url).await?;
   let pool = PgPool::connect(&db_url).await?;
   println!("Running migrations...");
   sqlx::migrate!("./migrations").run(&pool).await?;
@@ -62,7 +61,7 @@ async fn main() -> Result<()> {
       .configure(routes::blog::routes)
       // Static files:
       .service(fs::Files::new("/", "./build").index_file("index.html"))
-      .default_service(web::resource("").route(web::get().to(routes::index)))
+    // .default_service(web::resource("").route(web::get().to(routes::index)))
   })
   .bind("127.0.0.1:8080")?
   .run();

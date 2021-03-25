@@ -5,9 +5,9 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use tumblepub_db::models::blog::Blog;
 
 use crate::{
-  database::models::blog::Blog,
   errors::{ServiceError, ServiceResult},
   LOCAL_DOMAIN,
 };
@@ -76,7 +76,9 @@ pub async fn webfinger(
     return Ok(HttpResponse::NotFound().finish());
   }
 
-  let blog = Blog::find(&pool, (blog_name, None)).await?;
+  let blog = Blog::find(&pool, (blog_name, None))
+    .await
+    .expect("could not find blog");
   Ok(match blog {
     Some(blog) => {
       let res = WebfingerRes {

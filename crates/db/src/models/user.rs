@@ -1,8 +1,7 @@
+use anyhow::Result;
 use argon2rs::argon2i_simple;
 use chrono::NaiveDateTime;
-use sqlx::{PgConnection, PgPool};
-
-use crate::errors::ServiceResult;
+use sqlx::PgConnection;
 
 use super::blog::Blog;
 
@@ -28,7 +27,7 @@ pub struct InsertableUser {
 
 impl User {
   /// Creates a new user and returns it
-  pub async fn create(conn: &mut PgConnection, model: InsertableUser) -> ServiceResult<User> {
+  pub async fn create(conn: &mut PgConnection, model: InsertableUser) -> Result<User> {
     // step 1: we salt our hashbrowns
     let salt: String = {
       use rand::Rng;
@@ -70,7 +69,7 @@ RETURNING *
     conn: &mut PgConnection,
     email: String,
     password: String,
-  ) -> ServiceResult<Option<User>> {
+  ) -> Result<Option<User>> {
     let result = sqlx::query_as!(User, "SELECT * FROM users WHERE email = $1 LIMIT 1", email)
       .fetch_optional(conn)
       .await?;
@@ -85,15 +84,15 @@ RETURNING *
     Ok(None)
   }
 
-  pub async fn find(pool: &PgPool, user_id: i64) -> ServiceResult<Option<Self>> {
+  pub async fn find(conn: &mut PgConnection, user_id: i64) -> Result<Option<Self>> {
     Ok(
       sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1 LIMIT 1", user_id)
-        .fetch_optional(pool)
+        .fetch_optional(conn)
         .await?,
     )
   }
 
-  pub async fn primary_blog(&self, conn: &mut PgConnection) -> ServiceResult<Blog> {
+  pub async fn primary_blog(&self, conn: &mut PgConnection) -> Result<Blog> {
     Ok(
       sqlx::query_as!(
         Blog,

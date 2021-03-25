@@ -1,12 +1,10 @@
 use juniper::graphql_object;
-
-use crate::{
-  database::models::{
-    blog::{Blog, InsertableBlog},
-    user::{InsertableUser, User},
-  },
-  errors::{ServiceError, ServiceResult},
+use tumblepub_db::models::{
+  blog::{Blog, InsertableBlog},
+  user::{InsertableUser, User},
 };
+
+use crate::errors::{ServiceError, ServiceResult};
 
 use super::{
   models::{self, user::UserAuthPayload},
@@ -22,13 +20,15 @@ impl Mutation {
     password: String,
   ) -> ServiceResult<models::user::UserAuthPayload> {
     let mut pool = context.db_pool.acquire().await.unwrap();
-    let user = User::verify(&mut pool, email, password).await?;
+    let user = User::verify(&mut pool, email, password)
+      .await
+      .expect("could not verify user");
     if let None = user {
       return Err(ServiceError::BadRequest("user does not exist".to_string()));
     }
 
     let user = user.unwrap();
-    let blog = user.primary_blog(&mut pool).await?;
+    let blog = user.primary_blog(&mut pool).await.unwrap();
 
     Ok(UserAuthPayload::new(super::models::user::User::from((
       user, blog,
@@ -59,7 +59,7 @@ impl Mutation {
       // not really sure if we *need* to manually rollback the transaction yet
       // better safe than sorry though!
       txn.rollback().await?;
-      return Err(e);
+      return Err(ServiceError::BadRequest(e.to_string()));
     }
 
     // step 2: create a new user using the created primary blog ID
@@ -75,7 +75,7 @@ impl Mutation {
     .await;
     if let Err(e) = result {
       txn.rollback().await?;
-      return Err(e);
+      return Err(ServiceError::BadRequest(e.to_string()));
     }
 
     // step 3: return auth payload with JWT

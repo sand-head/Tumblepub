@@ -1,6 +1,6 @@
 use juniper::GraphQLObject;
 
-use crate::database;
+use tumblepub_db::models as db_models;
 
 #[derive(GraphQLObject)]
 /// Information about a blog
@@ -15,8 +15,8 @@ pub struct Blog {
   description: Option<String>,
 }
 
-impl From<database::models::blog::Blog> for Blog {
-  fn from(blog: database::models::blog::Blog) -> Self {
+impl From<db_models::blog::Blog> for Blog {
+  fn from(blog: db_models::blog::Blog) -> Self {
     Self {
       name: blog.name,
       domain: blog.domain,

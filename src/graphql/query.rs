@@ -1,6 +1,7 @@
 use juniper::graphql_object;
+use tumblepub_db::models::blog::Blog;
 
-use crate::{database::models::blog::Blog, errors::ServiceResult};
+use crate::errors::{ServiceError, ServiceResult};
 
 use super::{models, Context};
 
@@ -19,7 +20,7 @@ impl Query {
   ) -> ServiceResult<Option<models::blog::Blog>> {
     match Blog::find(&context.db_pool, (name, domain)).await {
       Ok(b) => Ok(b.map(|b| b.into())),
-      Err(e) => Err(e),
+      Err(e) => Err(ServiceError::BadRequest(e.to_string())),
     }
   }
 }
