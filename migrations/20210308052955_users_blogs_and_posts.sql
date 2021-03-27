@@ -3,7 +3,7 @@ CREATE TABLE blogs (
   uri VARCHAR,
   name VARCHAR NOT NULL,
   domain VARCHAR,
-  is_public BOOLEAN NOT NULL DEFAULT 't',
+  is_public BOOLEAN NOT NULL DEFAULT true,
   title VARCHAR,
   description TEXT,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -15,6 +15,7 @@ CREATE TABLE blogs (
 CREATE TABLE posts (
   id UUID PRIMARY KEY,
   blog_id BIGINT REFERENCES blogs (id) NOT NULL
+  -- todo: add the rest of the posts table in new migration
 );
 
 CREATE TABLE users (
@@ -31,7 +32,7 @@ CREATE TABLE users (
 CREATE TABLE user_blogs (
   user_id BIGINT REFERENCES users (id) NOT NULL,
   blog_id BIGINT REFERENCES blogs (id) NOT NULL,
-  is_admin BOOLEAN NOT NULL DEFAULT 'f',
+  is_admin BOOLEAN NOT NULL DEFAULT false,
 
   PRIMARY KEY (user_id, blog_id)
 );

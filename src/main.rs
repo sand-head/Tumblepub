@@ -59,9 +59,6 @@ async fn main() -> Result<()> {
       .configure(routes::graphql::routes)
       // Blog content:
       .configure(routes::blog::routes)
-      // Static files:
-      .service(fs::Files::new("/", "./build").index_file("index.html"))
-    // .default_service(web::resource("").route(web::get().to(routes::index)))
   })
   .bind("127.0.0.1:8080")?
   .run();
