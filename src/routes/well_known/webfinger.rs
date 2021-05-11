@@ -84,7 +84,14 @@ pub async fn webfinger(
       let res = WebfingerRes {
         subject: format!("acct:{}@{}", blog.name, domain),
         aliases: vec![],
-        links: vec![],
+        links: vec![WebfingerLink {
+          rel: "self".to_string(),
+          content_type: Some("application/activity+json".to_string()),
+          href: Some(format!("https://{}/@{}.json", LOCAL_DOMAIN.as_str(), blog.name).to_string()),
+          titles: None,
+          properties: None,
+          template: None,
+        }],
       };
 
       HttpResponse::Ok()

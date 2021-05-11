@@ -1,6 +1,7 @@
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use sqlx::{PgConnection, PgPool};
+use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct Blog {
@@ -13,6 +14,11 @@ pub struct Blog {
   pub description: Option<String>,
   pub created_at: NaiveDateTime,
   pub updated_at: NaiveDateTime,
+  pub theme_id: Option<Uuid>,
+  pub is_nsfw: bool,
+  pub is_private: bool,
+  pub private_key: Option<Vec<u8>>,
+  pub public_key: Vec<u8>,
 }
 
 pub struct InsertableBlog {

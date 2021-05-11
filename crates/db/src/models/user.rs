@@ -84,6 +84,7 @@ RETURNING *
     Ok(None)
   }
 
+  /// Finds a user by their ID, or `Option::None` if none exists.
   pub async fn find(conn: &mut PgConnection, user_id: i64) -> Result<Option<Self>> {
     Ok(
       sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1 LIMIT 1", user_id)
@@ -92,6 +93,7 @@ RETURNING *
     )
   }
 
+  /// Returns the user's primary blog from the database.
   pub async fn primary_blog(&self, conn: &mut PgConnection) -> Result<Blog> {
     Ok(
       sqlx::query_as!(

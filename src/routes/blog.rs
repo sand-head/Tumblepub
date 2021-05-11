@@ -37,5 +37,5 @@ pub async fn blog(path: web::Path<BlogPath>) -> ServiceResult<impl Responder> {
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {
-  config.service(web::resource("/{blog}").route(web::get().to(blog)));
+  config.service(web::resource("/@{blog}").route(web::get().to(blog)));
 }

@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use actix_files as fs;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use anyhow::Result;
 use env::load_dotenv;
@@ -55,6 +54,7 @@ async fn main() -> Result<()> {
       .wrap(Logger::default())
       // ActivityPub services:
       .configure(routes::well_known::routes)
+      .configure(routes::activitypub::routes)
       // GraphQL:
       .configure(routes::graphql::routes)
       // Blog content:
