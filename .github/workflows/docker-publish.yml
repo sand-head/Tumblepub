@@ -6,9 +6,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  IMAGE_NAME: tumblepub
-
 jobs:
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
@@ -56,4 +53,4 @@ jobs:
           context: ./
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ $IMAGE_NAME }}:latest
+            ghcr.io/${{ github.repository_owner }}/tumblepub:latest
