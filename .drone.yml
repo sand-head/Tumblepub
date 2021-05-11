@@ -1,0 +1,30 @@
+kind: pipeline
+type: docker
+name: amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: test
+  image: rust:1.52
+  commands:
+  - cargo build --verbose --all
+  - cargo test --verbose --all
+
+---
+kind: pipeline
+type: docker
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: test
+  image: rust:1.52
+  commands:
+  - cargo build --verbose --all
+  - cargo test --verbose --all
