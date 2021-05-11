@@ -11,6 +11,6 @@ anyhow = "1.0"
 argon2rs = "0.2"
 chrono = { version = "0.4", features = ["serde"] }
 rand = "0.8"
-sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate"] }
+sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate", "offline"] }
 url = "2.2"
 uuid = { version = "0.8", features = ["serde", "v4"] }

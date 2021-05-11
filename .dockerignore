@@ -1,0 +1,10 @@
+.vscode
+docs
+target
+Dockerfile
+.dockerignore
+.git
+.gitignore
+.env
+.env.local
+.env.*.local

@@ -1,0 +1,689 @@
+{
+  "db": "PostgreSQL",
+  "177a3eff2a2789b77f296a223e89cbca31e5c6ebd7790d322d9201caea86ff20": {
+    "query": "SELECT * FROM users WHERE email = $1 LIMIT 1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "primary_blog",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "hash",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 4,
+          "name": "salt",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "last_login_at",
+          "type_info": "Timestamp"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "4698bd4e4a8606618ac95f6a056faccee3f1d68b5b023e31d2a5ffce3123c300": {
+    "query": "SELECT * FROM blogs LIMIT $1 OFFSET $2",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "uri",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "domain",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "is_public",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 5,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "description",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 7,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "theme_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 10,
+          "name": "is_nsfw",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "is_private",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 12,
+          "name": "private_key",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 13,
+          "name": "public_key",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ]
+    }
+  },
+  "52708d86172d3c55b23f29c0d5c796c6743cd2d17465bfd17247e399d2fef60b": {
+    "query": "SELECT * FROM users WHERE id = $1 LIMIT 1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "primary_blog",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "hash",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 4,
+          "name": "salt",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "last_login_at",
+          "type_info": "Timestamp"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "563df6c1be917b7536685b86320a1fdc7b1cf220b8cadc2efa36e6cdaa58b5ea": {
+    "query": "SELECT * FROM blogs WHERE id = $1 LIMIT 1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "uri",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "domain",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "is_public",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 5,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "description",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 7,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "theme_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 10,
+          "name": "is_nsfw",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "is_private",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 12,
+          "name": "private_key",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 13,
+          "name": "public_key",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ]
+    }
+  },
+  "698a7317ba0f1143d476c8f02446ec91c6397b6116815293cb68d52d66a4e022": {
+    "query": "\nINSERT INTO blogs (uri, name, domain, is_public, title, description)\nVALUES ($1, $2, $3, $4, $5, $6)\nRETURNING *\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "uri",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "domain",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "is_public",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 5,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "description",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 7,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "theme_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 10,
+          "name": "is_nsfw",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "is_private",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 12,
+          "name": "private_key",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 13,
+          "name": "public_key",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Bool",
+          "Varchar",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ]
+    }
+  },
+  "d316c8cf0e88ef5b44555d2d239b7033816db761061c6c9bf38beaa9929b28df": {
+    "query": "SELECT * FROM blogs WHERE name = $1 AND domain = $2 LIMIT 1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "uri",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "domain",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "is_public",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 5,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "description",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 7,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "theme_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 10,
+          "name": "is_nsfw",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "is_private",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 12,
+          "name": "private_key",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 13,
+          "name": "public_key",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ]
+    }
+  },
+  "d4d37c72a236b91837220b968f007d604cc1c3f9c43a8d61614befa8276d6236": {
+    "query": "SELECT * FROM blogs WHERE name = $1 AND domain IS NULL LIMIT 1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "uri",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "domain",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "is_public",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 5,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "description",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 7,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 9,
+          "name": "theme_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 10,
+          "name": "is_nsfw",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "is_private",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 12,
+          "name": "private_key",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 13,
+          "name": "public_key",
+          "type_info": "Bytea"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ]
+    }
+  },
+  "e9368286fcb476885fd3c856999a79dadabb090ef28af5a275662c2f4dddcc21": {
+    "query": "\nINSERT INTO users (email, primary_blog, hash, salt)\nVALUES ($1, $2, $3, $4)\nRETURNING *\n      ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "email",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "primary_blog",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "hash",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 4,
+          "name": "salt",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 6,
+          "name": "updated_at",
+          "type_info": "Timestamp"
+        },
+        {
+          "ordinal": 7,
+          "name": "last_login_at",
+          "type_info": "Timestamp"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8",
+          "Bytea",
+          "Varchar"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  }
+}
