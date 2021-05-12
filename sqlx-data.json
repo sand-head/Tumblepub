@@ -321,8 +321,8 @@
       ]
     }
   },
-  "698a7317ba0f1143d476c8f02446ec91c6397b6116815293cb68d52d66a4e022": {
-    "query": "\nINSERT INTO blogs (uri, name, domain, is_public, title, description)\nVALUES ($1, $2, $3, $4, $5, $6)\nRETURNING *\n        ",
+  "92c65d5043d0e8ad80733ec0e2a662911a35404ae7a202dce070700a8c637e77": {
+    "query": "\nINSERT INTO blogs (uri, name, domain, is_public, title, description, private_key, public_key)\nVALUES ($1, $2, $3, $4, $5, $6, $7, $8)\nRETURNING *\n        ",
     "describe": {
       "columns": [
         {
@@ -403,7 +403,9 @@
           "Varchar",
           "Bool",
           "Varchar",
-          "Text"
+          "Text",
+          "Bytea",
+          "Bytea"
         ]
       },
       "nullable": [
