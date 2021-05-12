@@ -134,3 +134,6 @@ dist
 
 # Snowpack build
 build
+
+# VSCode settings
+.vscode

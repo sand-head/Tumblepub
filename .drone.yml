@@ -21,12 +21,11 @@ steps:
       auto_tag: true
       auto_tag_suffix: linux-amd64
       dockerfile: ./Dockerfile
-      registry: ghcr.io
       repo: sand-head/tumblepub
       username:
-        from_secret: ghcr_username
+        from_secret: dockerhub_username
       password:
-        from_secret: ghcr_pat
+        from_secret: dockerhub_password
     when:
       branch:
         - main
@@ -58,12 +57,11 @@ steps:
       auto_tag: true
       auto_tag_suffix: linux-arm64
       dockerfile: ./Dockerfile
-      registry: ghcr.io
       repo: sand-head/tumblepub
       username:
-        from_secret: ghcr_username
+        from_secret: dockerhub_username
       password:
-        from_secret: ghcr_pat
+        from_secret: dockerhub_password
     when:
       branch:
         - main
