@@ -1,5 +1,7 @@
 # tumblepub
 
+[![Build Status](https://cloud.drone.io/api/badges/sand-head/tumblepub/status.svg)](https://cloud.drone.io/sand-head/tumblepub)
+
 an ActivityPub-federated tumbleblog hosting platform
 
 ## a quick note
