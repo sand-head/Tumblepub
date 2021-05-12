@@ -1,0 +1,72 @@
+kind: pipeline
+type: docker
+name: amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: build & test
+    image: rust:1.52
+    environment:
+      SQLX_OFFLINE: "true"
+    commands:
+      - cargo build --verbose --all
+      - cargo test --workspace --verbose --all
+
+  - name: publish Docker image
+    image: plugins/docker:18
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-amd64
+      dockerfile: ./Dockerfile
+      registry: ghcr.io
+      repo: sand-head/tumblepub
+      username:
+        from_secret: ghcr_username
+      password:
+        from_secret: ghcr_pat
+    when:
+      branch:
+        - main
+      event:
+        - push
+        - tag
+
+---
+kind: pipeline
+type: docker
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+  - name: build & test
+    image: rust:1.52
+    environment:
+      SQLX_OFFLINE: "true"
+    commands:
+      - cargo build --verbose --all
+      - cargo test --workspace --verbose --all
+
+  - name: publish Docker image
+    image: plugins/docker:18
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-arm64
+      dockerfile: ./Dockerfile
+      registry: ghcr.io
+      repo: sand-head/tumblepub
+      username:
+        from_secret: ghcr_username
+      password:
+        from_secret: ghcr_pat
+    when:
+      branch:
+        - main
+      event:
+        - push
+        - tag
