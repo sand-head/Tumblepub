@@ -52,24 +52,15 @@ pub async fn get_ap_blog(
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {
+  config.service(web::resource("/@{blog}.json").route(web::get().to(get_ap_blog)));
   config.service(
-    web::scope("/")
-      .route("/@{blog}.json", web::get().to(get_ap_blog))
-      .route(
-        "/inbox/@{blog}.json",
-        web::get().to(inbox::get_ap_blog_inbox),
-      )
-      .route(
-        "/inbox/@{blog}.json",
-        web::post().to(inbox::post_ap_blog_inbox),
-      )
-      .route(
-        "/outbox/@{blog}.json",
-        web::get().to(outbox::get_ap_blog_outbox),
-      )
-      .route(
-        "/outbox/@{blog}.json",
-        web::post().to(outbox::post_ap_blog_outbox),
-      ),
+    web::resource("/inbox/@{blog}.json")
+      .route(web::get().to(inbox::get_ap_blog_inbox))
+      .route(web::post().to(inbox::post_ap_blog_inbox)),
+  );
+  config.service(
+    web::resource("/outbox/@{blog}.json")
+      .route(web::get().to(outbox::get_ap_blog_outbox))
+      .route(web::post().to(outbox::post_ap_blog_outbox)),
   );
 }
