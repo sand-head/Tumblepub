@@ -21,7 +21,7 @@ steps:
       auto_tag: true
       auto_tag_suffix: linux-amd64
       dockerfile: ./Dockerfile
-      repo: sand-head/tumblepub
+      repo: sandhead/tumblepub
       username:
         from_secret: dockerhub_username
       password:
@@ -57,7 +57,7 @@ steps:
       auto_tag: true
       auto_tag_suffix: linux-arm64
       dockerfile: ./Dockerfile
-      repo: sand-head/tumblepub
+      repo: sandhead/tumblepub
       username:
         from_secret: dockerhub_username
       password:
