@@ -10,9 +10,10 @@ pub struct BlogPath {
 }
 
 pub async fn blog(path: web::Path<BlogPath>) -> ServiceResult<impl Responder> {
+  let default = include_str!("../../themes/default.hbs");
   let mut hbs = Handlebars::new();
   hbs
-    .register_template_file("default", "./themes/default.hbs")
+    .register_template_string("default", default)
     .expect("Could not find default theme");
 
   let vars = ThemeVariables {

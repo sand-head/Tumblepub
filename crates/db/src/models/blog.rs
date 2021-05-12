@@ -21,24 +21,26 @@ pub struct Blog {
   pub public_key: Vec<u8>,
 }
 
-pub struct InsertableBlog {
+pub struct NewBlog {
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
   pub is_public: bool,
   pub title: Option<String>,
   pub description: Option<String>,
+  pub private_key: Vec<u8>,
+  pub public_key: Vec<u8>,
 }
 
 impl Blog {
   /// Creates a new Blog and returns it
-  pub async fn create(conn: &mut PgConnection, model: InsertableBlog) -> Result<Self> {
+  pub async fn create_new(conn: &mut PgConnection, model: NewBlog) -> Result<Self> {
     Ok(
       sqlx::query_as!(
         Blog,
         r#"
-INSERT INTO blogs (uri, name, domain, is_public, title, description)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO blogs (uri, name, domain, is_public, title, description, private_key, public_key)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *
         "#,
         model.uri,
@@ -46,7 +48,9 @@ RETURNING *
         model.domain,
         model.is_public,
         model.title,
-        model.description
+        model.description,
+        model.private_key,
+        model.public_key
       )
       .fetch_one(conn)
       .await?,

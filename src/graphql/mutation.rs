@@ -1,6 +1,7 @@
 use juniper::graphql_object;
+use tumblepub_ap::crypto::KeyPair;
 use tumblepub_db::models::{
-  blog::{Blog, InsertableBlog},
+  blog::{Blog, NewBlog},
   user::{InsertableUser, User},
 };
 
@@ -43,15 +44,18 @@ impl Mutation {
   ) -> ServiceResult<models::user::UserAuthPayload> {
     let mut txn = context.db_pool.begin().await?;
     // step 1: create a primary blog for the new user
-    let result = Blog::create(
+    let keypair = KeyPair::generate().expect("Could not generate public and private keys for user");
+    let result = Blog::create_new(
       &mut *txn,
-      InsertableBlog {
+      NewBlog {
         uri: Option::<String>::None,
         name,
         domain: Option::<String>::None,
         is_public: true,
         title: Option::<String>::None,
         description: Option::<String>::None,
+        private_key: keypair.private_key,
+        public_key: keypair.public_key,
       },
     )
     .await;
