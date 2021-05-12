@@ -60,10 +60,10 @@ async fn main() -> Result<()> {
       // Blog content:
       .configure(routes::blog::routes)
   })
-  .bind("127.0.0.1:8080")?
+  .bind("0.0.0.0:8080")?
   .run();
 
-  println!("🚀 Listening on http://127.0.0.1:8080");
+  println!("🚀 Listening on http://0.0.0.0:8080");
   server.await?;
 
   Ok(())
