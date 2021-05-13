@@ -21,7 +21,8 @@ pub async fn get_ap_blog(
   path: web::Path<BlogPath>,
   pool: web::Data<PgPool>,
 ) -> ServiceResult<impl Responder> {
-  let blog = Blog::find(&pool, (path.blog.clone(), None))
+  let mut pool = pool.acquire().await.unwrap();
+  let blog = Blog::find(&mut pool, (path.blog.clone(), None))
     .await
     .expect("could not retrieve blog from db");
 

@@ -18,7 +18,8 @@ impl Query {
     name: String,
     domain: Option<String>,
   ) -> ServiceResult<Option<models::blog::Blog>> {
-    match Blog::find(&context.db_pool, (name, domain)).await {
+    let mut pool = context.db_pool.acquire().await.unwrap();
+    match Blog::find(&mut pool, (name, domain)).await {
       Ok(b) => Ok(b.map(|b| b.into())),
       Err(e) => Err(ServiceError::BadRequest(e.to_string())),
     }

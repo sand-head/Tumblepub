@@ -1,6 +1,6 @@
 use anyhow::Result;
 use chrono::NaiveDateTime;
-use sqlx::{PgConnection, PgPool};
+use sqlx::PgConnection;
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -19,6 +19,14 @@ pub struct Blog {
   pub is_private: bool,
   pub private_key: Option<Vec<u8>>,
   pub public_key: Vec<u8>,
+}
+
+#[derive(Debug)]
+pub struct BlogTheme {
+  pub id: Uuid,
+  pub hash: String,
+  pub theme: String,
+  pub created_at: NaiveDateTime,
 }
 
 pub struct NewBlog {
@@ -58,7 +66,10 @@ RETURNING *
   }
 
   /// Searches for a Blog by the given name & domain tuple and returns it if found.
-  pub async fn find(pool: &PgPool, name: (String, Option<String>)) -> Result<Option<Self>> {
+  pub async fn find(
+    conn: &mut PgConnection,
+    name: (String, Option<String>),
+  ) -> Result<Option<Self>> {
     let (name, domain) = name;
 
     if let Some(domain) = domain {
@@ -69,7 +80,7 @@ RETURNING *
           name,
           domain
         )
-        .fetch_optional(pool)
+        .fetch_optional(conn)
         .await?,
       )
     } else {
@@ -79,13 +90,17 @@ RETURNING *
           "SELECT * FROM blogs WHERE name = $1 AND domain IS NULL LIMIT 1",
           name
         )
-        .fetch_optional(pool)
+        .fetch_optional(conn)
         .await?,
       )
     }
   }
 
-  pub async fn list(pool: &PgPool, limit: Option<i32>, offset: Option<i32>) -> Result<Vec<Self>> {
+  pub async fn list(
+    conn: &mut PgConnection,
+    limit: Option<i32>,
+    offset: Option<i32>,
+  ) -> Result<Vec<Self>> {
     let limit = limit.unwrap_or(50) as i64;
     let offset = offset.unwrap_or(0) as i64;
 
@@ -96,8 +111,19 @@ RETURNING *
         limit,
         offset
       )
-      .fetch_all(pool)
+      .fetch_all(conn)
       .await?,
     )
+  }
+
+  pub async fn theme(&self, conn: &mut PgConnection) -> Result<Option<BlogTheme>> {
+    Ok(match self.theme_id {
+      Some(id) => Some(
+        sqlx::query_as!(BlogTheme, "SELECT * FROM blog_themes WHERE id = $1", id)
+          .fetch_one(conn)
+          .await?,
+      ),
+      None => None,
+    })
   }
 }

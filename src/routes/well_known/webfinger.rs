@@ -76,7 +76,8 @@ pub async fn webfinger(
     return Ok(HttpResponse::NotFound().finish());
   }
 
-  let blog = Blog::find(&pool, (blog_name, None))
+  let mut pool = pool.acquire().await.unwrap();
+  let blog = Blog::find(&mut pool, (blog_name, None))
     .await
     .expect("could not find blog");
   Ok(match blog {
