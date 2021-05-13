@@ -1,6 +1,7 @@
 # tumblepub
 
 [![Build Status](https://cloud.drone.io/api/badges/sand-head/tumblepub/status.svg)](https://cloud.drone.io/sand-head/tumblepub)
+[![Docker Pulls](https://img.shields.io/docker/pulls/sandhead/tumblepub)](https://hub.docker.com/r/sandhead/tumblepub)
 
 an ActivityPub-federated tumbleblog hosting platform
 
