@@ -687,5 +687,43 @@
         false
       ]
     }
+  },
+  "ec1eed6453aa3e69e10c91df31c777e81ed6278186e04ecf2665fde414322be8": {
+    "query": "SELECT * FROM blog_themes WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "hash",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "theme",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 3,
+          "name": "created_at",
+          "type_info": "Timestamp"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
   }
 }
