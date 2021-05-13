@@ -2,19 +2,18 @@ use actix_web::{web, HttpResponse, Responder};
 use handlebars::Handlebars;
 use serde::Deserialize;
 use sqlx::PgPool;
-use tumblepub_db::models::blog::Blog;
 
-use crate::{errors::ServiceResult, theme::ThemeVariables};
+use tumblepub_db::models::blog::Blog;
+use tumblepub_utils::errors::Result;
+
+use crate::theme::ThemeVariables;
 
 #[derive(Deserialize)]
 pub struct BlogPath {
   pub blog: String,
 }
 
-pub async fn blog(
-  path: web::Path<BlogPath>,
-  pool: web::Data<PgPool>,
-) -> ServiceResult<impl Responder> {
+pub async fn blog(path: web::Path<BlogPath>, pool: web::Data<PgPool>) -> Result<impl Responder> {
   let blog_name = &path.blog;
   let mut pool = pool.acquire().await.unwrap();
 

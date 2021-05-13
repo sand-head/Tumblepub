@@ -5,10 +5,9 @@ use anyhow::Result;
 use env::load_dotenv;
 use lazy_static::lazy_static;
 use sqlx::PgPool;
+use tumblepub_gql::{create_schema, TumblepubSchema};
 
 mod env;
-mod errors;
-mod graphql;
 mod routes;
 mod theme;
 
@@ -41,11 +40,11 @@ async fn main() -> Result<()> {
   sqlx::migrate!("./migrations").run(&pool).await?;
 
   println!("Creating GraphQL schema...");
-  let schema = Arc::new(graphql::create_schema());
+  let schema = Arc::new(create_schema(pool.clone()));
 
   println!("Starting webserver...");
   let server = HttpServer::new(move || {
-    let schema: web::Data<graphql::Schema> = schema.clone().into();
+    let schema: web::Data<TumblepubSchema> = schema.clone().into();
     App::new()
       // Database:
       .data(pool.clone())

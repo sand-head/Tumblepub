@@ -1,18 +1,10 @@
-use actix_web::{web, Error, HttpResponse};
-use juniper_actix::graphql_handler;
-use sqlx::PgPool;
+use actix_web::web;
+use async_graphql_actix_web::{Request, Response};
 
-use crate::graphql::{Context, Schema};
+use tumblepub_gql::TumblepubSchema;
 
-async fn graphql(
-  schema: web::Data<Schema>,
-  pool: web::Data<PgPool>,
-  req: web::HttpRequest,
-  payload: web::Payload,
-) -> Result<HttpResponse, Error> {
-  let context = Context::new(pool.into_inner().as_ref().clone());
-
-  graphql_handler(&schema, &context, req, payload).await
+async fn graphql(schema: web::Data<TumblepubSchema>, req: Request) -> Response {
+  schema.execute(req.into_inner()).await.into()
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {

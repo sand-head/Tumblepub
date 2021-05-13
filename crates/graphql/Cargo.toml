@@ -1,0 +1,17 @@
+[package]
+name = "tumblepub_gql"
+version = "0.1.0"
+authors = ["Justin Schweigert <justin@schweigert.dev>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tumblepub_ap = { path = "../activitypub" }
+tumblepub_db = { path = "../db" }
+tumblepub_utils = { path = "../utils" }
+async-graphql = { version = "2.0", features = ["uuid", "chrono"] }
+chrono = { version = "0.4", features = ["serde"] }
+jsonwebtoken = "7.2"
+serde = { version = "1.0", features = ["derive"] }
+sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate", "offline"] }

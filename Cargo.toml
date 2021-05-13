@@ -10,21 +10,23 @@ edition = "2018"
 members = [
     "crates/activitypub",
     "crates/db",
+    "crates/graphql",
+    "crates/utils"
 ]
 
 [dependencies]
 tumblepub_ap = { path = "./crates/activitypub" }
 tumblepub_db = { path = "./crates/db" }
+tumblepub_gql = { path = "./crates/graphql" }
+tumblepub_utils = { path = "./crates/utils" }
 # todo: reduce this into just the deps needed for the main app
 # misc:
 anyhow = "1.0"
 dotenv = "0.15"
 rand = "0.8"
-thiserror = "1.0"
 url = "2.2"
 # web server:
 actix-web = "3"
-juniper_actix = "0.2"
 # database:
 # note that we can upgrade sqlx once actix_web hits 4.0
 chrono = { version = "0.4", features = ["serde"] }
@@ -32,9 +34,8 @@ sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 # auth:
 argon2rs = "0.2"
-jsonwebtoken = "7.2"
 # GraphQL:
-juniper = "0.15"
+async-graphql-actix-web = "2.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 # ActivityPub:
