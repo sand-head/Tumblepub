@@ -12,8 +12,7 @@ steps:
     environment:
       SQLX_OFFLINE: "true"
     commands:
-      - cargo build
-      - cargo test --workspace
+      - cargo test --workspace --verbose
 
   - name: publish Docker image
     image: plugins/docker:18
@@ -48,8 +47,7 @@ steps:
     environment:
       SQLX_OFFLINE: "true"
     commands:
-      - cargo build
-      - cargo test --workspace
+      - cargo test --workspace --verbose
 
   - name: publish Docker image
     image: plugins/docker:18
