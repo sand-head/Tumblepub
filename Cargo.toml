@@ -35,7 +35,7 @@ uuid = { version = "0.8", features = ["serde", "v4"] }
 # auth:
 argon2rs = "0.2"
 # GraphQL:
-async-graphql-actix-web = "2.0"
+async-graphql-actix-web = "2.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 # ActivityPub:
