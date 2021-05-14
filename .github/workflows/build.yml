@@ -30,7 +30,7 @@ jobs:
     # Ensure test job passes before pushing image.
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v2
       - name: Configure Docker metadata
@@ -41,11 +41,10 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/tumblepub
             ghcr.io/${{ github.repository_owner }}/tumblepub
           tags: |
+            type=edge,branch=main
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-          flavor: |
-            latest=true
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
