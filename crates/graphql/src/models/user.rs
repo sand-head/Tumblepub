@@ -1,11 +1,11 @@
+use async_graphql::SimpleObject;
 use chrono::NaiveDateTime;
 use jsonwebtoken::{encode, EncodingKey, Header};
-use juniper::GraphQLObject;
 use serde::Serialize;
 
 use tumblepub_db::models as db_models;
 
-#[derive(GraphQLObject)]
+#[derive(Debug, Clone, SimpleObject)]
 /// Information about a user
 pub struct User {
   /// The user's username, based on the username of their primary blog
@@ -25,7 +25,7 @@ impl From<(db_models::user::User, db_models::blog::Blog)> for User {
 #[derive(Serialize)]
 struct UserClaims {}
 
-#[derive(GraphQLObject)]
+#[derive(Debug, Clone, SimpleObject)]
 pub struct UserAuthPayload {
   pub user: User,
   pub token: String,

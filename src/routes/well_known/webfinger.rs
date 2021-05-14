@@ -5,12 +5,11 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tumblepub_db::models::blog::Blog;
 
-use crate::{
-  errors::{ServiceError, ServiceResult},
-  LOCAL_DOMAIN,
-};
+use tumblepub_db::models::blog::Blog;
+use tumblepub_utils::errors::{Result, TumblepubError};
+
+use crate::LOCAL_DOMAIN;
 
 lazy_static! {
   static ref WEBFINGER_URI: Regex = Regex::new("^acct:([a-z0-9_]*)@(.*)$").unwrap();
@@ -58,14 +57,14 @@ pub struct WebfingerRes {
 pub async fn webfinger(
   query: web::Query<WebfingerReq>,
   pool: web::Data<PgPool>,
-) -> ServiceResult<HttpResponse> {
+) -> Result<HttpResponse> {
   let resource = match &query.resource {
     Some(res) => res,
-    None => return Err(ServiceError::BadRequest("Invalid resource".to_string())),
+    None => return Err(TumblepubError::NotFound),
   };
   let captures = match WEBFINGER_URI.captures(resource) {
     Some(captures) => captures,
-    None => return Err(ServiceError::BadRequest("Invalid resource".to_string())),
+    None => return Err(TumblepubError::NotFound),
   };
 
   let blog_name = captures.get(1).map_or("", |c| c.as_str()).to_string();

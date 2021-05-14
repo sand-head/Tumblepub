@@ -1,8 +1,8 @@
-use juniper::GraphQLObject;
+use async_graphql::SimpleObject;
 
 use tumblepub_db::models as db_models;
 
-#[derive(GraphQLObject)]
+#[derive(Debug, Clone, SimpleObject)]
 /// Information about a blog
 pub struct Blog {
   /// The blog's username

@@ -2,10 +2,11 @@ use actix_web::{web, Either, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
 use sqlx::PgPool;
+
 use tumblepub_ap::ActivityStreams;
 use tumblepub_db::models::blog::Blog;
+use tumblepub_utils::errors::TumblepubError;
 
-use crate::errors::ServiceResult;
 use crate::LOCAL_DOMAIN;
 
 mod inbox;
@@ -20,7 +21,7 @@ pub struct BlogPath {
 pub async fn get_ap_blog(
   path: web::Path<BlogPath>,
   pool: web::Data<PgPool>,
-) -> ServiceResult<impl Responder> {
+) -> Result<impl Responder, TumblepubError> {
   let mut pool = pool.acquire().await.unwrap();
   let blog = Blog::find(&mut pool, (path.blog.clone(), None))
     .await
