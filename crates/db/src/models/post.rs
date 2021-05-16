@@ -2,6 +2,7 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::types::{Json, Uuid};
 
+#[derive(Debug)]
 pub struct Post {
   pub id: Uuid,
   pub blog_id: i64,
