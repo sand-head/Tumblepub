@@ -96,6 +96,14 @@ RETURNING *
     }
   }
 
+  pub async fn get_by_id(conn: &mut PgConnection, id: i64) -> Result<Option<Self>> {
+    Ok(
+      sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE id = $1", id)
+        .fetch_optional(conn)
+        .await?,
+    )
+  }
+
   pub async fn list(
     conn: &mut PgConnection,
     limit: Option<i32>,

@@ -3,6 +3,8 @@ use argon2rs::argon2i_simple;
 use chrono::NaiveDateTime;
 use sqlx::PgConnection;
 
+use tumblepub_utils::jwt::Token;
+
 use super::blog::Blog;
 
 /// Represents a user's data and settings.
@@ -84,13 +86,22 @@ RETURNING *
     Ok(None)
   }
 
-  /// Finds a user by their ID, or `Option::None` if none exists.
-  pub async fn find(conn: &mut PgConnection, user_id: i64) -> Result<Option<Self>> {
+  /// Gets a user by their ID, or `Option::None` if none exists.
+  pub async fn get_by_id(conn: &mut PgConnection, id: i64) -> Result<Option<Self>> {
     Ok(
-      sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1 LIMIT 1", user_id)
+      sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1 LIMIT 1", id)
         .fetch_optional(conn)
         .await?,
     )
+  }
+
+  /// Gets a user by the claims in a `Token`, or `Option::None` if none exists.
+  pub async fn get_by_token(conn: &mut PgConnection, token: &Token) -> Result<Option<Self>> {
+    let claims = token.get_claims();
+    match claims {
+      None => Err(anyhow::anyhow!("could not get claims from token")),
+      Some(claims) => User::get_by_id(conn, claims.sub).await,
+    }
   }
 
   /// Returns the user's primary blog from the database.

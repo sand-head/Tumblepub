@@ -18,8 +18,8 @@ pub async fn register(
 ) -> Result<UserAuthPayload> {
   let mut txn = ctx.data::<PgPool>()?.begin().await?;
   // step 1: create a primary blog for the new user
-  let keypair = KeyPair::generate().expect("Could not generate public and private keys for user");
-  let result = Blog::create_new(
+  let keypair = KeyPair::generate().map_err(|e| TumblepubError::InternalServerError(e).extend())?;
+  let primary_blog = Blog::create_new(
     &mut *txn,
     NewBlog {
       uri: Option::<String>::None,
@@ -32,17 +32,11 @@ pub async fn register(
       public_key: keypair.public_key,
     },
   )
-  .await;
-  if let Err(e) = result {
-    // not really sure if we *need* to manually rollback the transaction yet
-    // better safe than sorry though!
-    txn.rollback().await?;
-    return Err(TumblepubError::InternalServerError(e).extend());
-  }
+  .await
+  .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
 
   // step 2: create a new user using the created primary blog ID
-  let primary_blog = result.unwrap();
-  let result = User::create(
+  let user = User::create(
     &mut *txn,
     InsertableUser {
       email,
@@ -50,13 +44,10 @@ pub async fn register(
       primary_blog: primary_blog.id,
     },
   )
-  .await;
-  if let Err(e) = result {
-    txn.rollback().await?;
-    return Err(TumblepubError::InternalServerError(e).extend());
-  }
+  .await
+  .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
 
-  // step 3: return auth payload with JWT
-  let user = result.unwrap();
+  // step 3: commit transaction and return auth payload with JWT
+  txn.commit().await?;
   Ok(UserAuthPayload::new(GqlUser::from((user, primary_blog))))
 }

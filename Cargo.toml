@@ -30,7 +30,7 @@ actix-web = "3"
 # database:
 # note that we can upgrade sqlx once actix_web hits 4.0
 chrono = { version = "0.4", features = ["serde"] }
-sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate", "offline"] }
+sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "json", "migrate", "offline"] }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 # auth:
 argon2rs = "0.2"
