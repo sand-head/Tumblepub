@@ -2,12 +2,14 @@ use std::convert::TryInto;
 
 use async_graphql::{InputObject, SimpleObject, Union};
 
+use chrono::NaiveDateTime;
 use tumblepub_db::models::post::{Post as DbPost, PostContent as DbPostContent};
 use tumblepub_utils::markdown::markdown_to_safe_html;
 
 #[derive(Debug, SimpleObject)]
 pub struct Post {
   pub content: Vec<PostContent>,
+  pub created_at: NaiveDateTime,
 }
 
 #[derive(Debug, Union)]
@@ -24,6 +26,7 @@ pub struct MarkdownContent {
 impl From<DbPost> for Post {
   fn from(post: DbPost) -> Self {
     Post {
+      created_at: post.created_at,
       content: post
         .content
         .iter()
@@ -40,6 +43,7 @@ impl From<DbPost> for Post {
 impl From<&DbPost> for Post {
   fn from(post: &DbPost) -> Self {
     Post {
+      created_at: post.created_at,
       content: post
         .content
         .iter()

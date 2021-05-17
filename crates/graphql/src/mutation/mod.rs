@@ -60,11 +60,13 @@ impl Mutation {
     let blog = Blog::find(&mut pool, (blog_name, None))
       .await
       .map_err(|e| TumblepubError::InternalServerError(e).extend())?
-      .ok_or_else(|| TumblepubError::BadRequest.extend())?;
+      .ok_or_else(|| TumblepubError::BadRequest("the given blog does not exist").extend())?;
 
     // if the user does not own the blog, bad request
-    if !UserBlogs::exists(&mut pool, user.id, blog.id).await? {
-      return Err(TumblepubError::BadRequest.extend());
+    if user.primary_blog != blog.id && !UserBlogs::exists(&mut pool, user.id, blog.id).await? {
+      return Err(
+        TumblepubError::BadRequest("the given blog does not belong to the current user").extend(),
+      );
     }
 
     // create the post in the database
@@ -77,7 +79,9 @@ impl Mutation {
       &mut pool,
       NewPost {
         blog_id: blog.id,
-        content: post_content.map_err(|_| TumblepubError::BadRequest.extend())?,
+        content: post_content.map_err(|_| {
+          TumblepubError::BadRequest("saving one or more chunks of the post failed").extend()
+        })?,
       },
     )
     .await
