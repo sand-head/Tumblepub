@@ -13,3 +13,21 @@ this is just off the top of my head right now, I'll add more to this later:
 - [ ] A well-documented GraphQL API, enabling both web and mobile clients
 - [ ] Theme support (using Handlebars as the templating engine)
 - [ ] Support for additional user-created pages
+
+## options
+
+options are read in both via environment variables (with the prefix `TUMBLEPUB_`) and an "options.yml" file. the following is an example of said file, using default values for each property.
+
+```yaml
+# Enables/disables "single user" mode
+single_user_mode: true
+# The domain name this instance exists on
+local_domain: null
+# PostgreSQL database properties
+database:
+  database: "tumblepub"
+  hostname: "localhost"
+  port: 5432
+  username: "postgres"
+  password: "mysecretpassword"
+```

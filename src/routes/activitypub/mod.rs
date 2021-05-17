@@ -5,9 +5,7 @@ use sqlx::PgPool;
 
 use tumblepub_ap::ActivityStreams;
 use tumblepub_db::models::blog::Blog;
-use tumblepub_utils::errors::TumblepubError;
-
-use crate::LOCAL_DOMAIN;
+use tumblepub_utils::{errors::TumblepubError, options::Options};
 
 mod inbox;
 mod outbox;
@@ -27,22 +25,23 @@ pub async fn get_ap_blog(
     .await
     .expect("could not retrieve blog from db");
 
+  let local_domain = Options::get().local_domain();
   if let Some(blog) = blog {
     Ok(Either::A(ActivityStreams(json!({
       "@context": "https://www.w3.org/ns/activitystreams",
       "type": "Person",
-      "id": format!("{}/@{}.json", LOCAL_DOMAIN.as_str(), blog.name),
+      "id": format!("{}/@{}.json", local_domain, blog.name),
 
-      "inbox": format!("{}/inbox/@{}.json", LOCAL_DOMAIN.as_str(), blog.name),
-      "outbox": format!("{}/outbox/@{}.json", LOCAL_DOMAIN.as_str(), blog.name),
+      "inbox": format!("{}/inbox/@{}.json", local_domain, blog.name),
+      "outbox": format!("{}/outbox/@{}.json", local_domain, blog.name),
 
       "preferredUsername": blog.name,
       "name": blog.title,
       "summary": blog.description,
 
       "publicKey": {
-        "id": format!("{}/@{}.json#main-key", LOCAL_DOMAIN.as_str(), blog.name),
-        "owner": format!("{}/@{}.json", LOCAL_DOMAIN.as_str(), blog.name),
+        "id": format!("{}/@{}.json#main-key", local_domain, blog.name),
+        "owner": format!("{}/@{}.json", local_domain, blog.name),
         "publicKeyPem": blog.public_key
       }
     }))))

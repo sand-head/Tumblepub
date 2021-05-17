@@ -137,3 +137,6 @@ build
 
 # VSCode settings
 .vscode
+
+# Tumblepub options
+options.yml

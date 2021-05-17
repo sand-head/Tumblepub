@@ -11,8 +11,12 @@ actix-web = "3"
 async-graphql = { version = "2.8", features = ["uuid", "chrono"] }
 ammonia = "3.1"
 anyhow = "1.0"
+envy = "0.4"
 jsonwebtoken = "7.2"
+merge = "0.1"
+once_cell = "1.7"
 pulldown-cmark = "0.8"
 serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.8"
 sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate", "offline"] }
 thiserror = "1.0"
