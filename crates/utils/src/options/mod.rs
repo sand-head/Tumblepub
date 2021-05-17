@@ -9,7 +9,7 @@ use self::database::DatabaseOptions;
 
 mod database;
 
-static OPTIONS_LOCATION: &str = "./options.yaml";
+static OPTIONS_LOCATION: &str = "./options.yml";
 static OPTIONS: Lazy<RwLock<Options>> =
   Lazy::new(|| RwLock::new(Options::initialize().expect("failed to initialize options")));
 
@@ -31,16 +31,19 @@ impl Default for Options {
 }
 
 impl Options {
-  /// Initialize a new `Options` using environment variables, the `options.yaml` file, and `Options::default()`.
+  /// Initialize a new `Options` using environment variables, the `options.yml` file, and `Options::default()`.
   pub fn initialize() -> Result<Self> {
     let options_path = Path::new(OPTIONS_LOCATION);
 
     // options priority:
     // 1. environment variables
     let mut options: Options = envy::prefixed("TUMBLEPUB_").from_env()?;
-    // 2. the options.yaml file
+    // 2. the options.yml file
     if options_path.is_file() {
-      options.merge(serde_yaml::from_str(&read_to_string(OPTIONS_LOCATION)?)?);
+      let maybe_options = serde_yaml::from_str::<Options>(&read_to_string(OPTIONS_LOCATION)?).ok();
+      if let Some(file_options) = maybe_options {
+        options.merge(file_options);
+      }
     };
     // 3. default values
     options.merge(Options::default());
@@ -61,20 +64,33 @@ impl Options {
 
     Ok(format!(
       "postgres://{}:{}@{}:{}/{}",
-      database.username.expect("could not get database username"),
-      database.password.expect("could not get database password"),
-      database.hostname.expect("could not get database hostname"),
-      database.port.expect("could not get database port"),
-      database.database.expect("could not get database name")
+      database
+        .username
+        .expect("could not get database username from options"),
+      database
+        .password
+        .expect("could not get database password from options"),
+      database
+        .hostname
+        .expect("could not get database hostname from options"),
+      database
+        .port
+        .expect("could not get database port from options"),
+      database
+        .database
+        .expect("could not get database name from options")
     ))
   }
 
   pub fn single_user_mode(&self) -> bool {
     self
       .single_user_mode
-      .expect("could not determine if in single user mode")
+      .expect("could not determine if in single user mode from options")
   }
   pub fn local_domain(&self) -> String {
-    self.local_domain.to_owned().unwrap()
+    self
+      .local_domain
+      .to_owned()
+      .expect("could not retrieve local domain from options")
   }
 }
