@@ -1,7 +1,11 @@
 use anyhow::Result;
 use chrono::NaiveDateTime;
+use sqlx::types::Json;
 use sqlx::PgConnection;
 use uuid::Uuid;
+
+use super::post::Post;
+use crate::models::post::PostContent;
 
 #[derive(Debug)]
 pub struct Blog {
@@ -96,6 +100,14 @@ RETURNING *
     }
   }
 
+  pub async fn get_by_id(conn: &mut PgConnection, id: i64) -> Result<Option<Self>> {
+    Ok(
+      sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE id = $1", id)
+        .fetch_optional(conn)
+        .await?,
+    )
+  }
+
   pub async fn list(
     conn: &mut PgConnection,
     limit: Option<i32>,
@@ -108,6 +120,34 @@ RETURNING *
       sqlx::query_as!(
         Blog,
         "SELECT * FROM blogs LIMIT $1 OFFSET $2",
+        limit,
+        offset
+      )
+      .fetch_all(conn)
+      .await?,
+    )
+  }
+
+  pub async fn posts(
+    &self,
+    conn: &mut PgConnection,
+    limit: Option<i32>,
+    offset: Option<i32>,
+  ) -> Result<Vec<Post>> {
+    let limit = limit.unwrap_or(25) as i64;
+    let offset = offset.unwrap_or(0) as i64;
+
+    Ok(
+      sqlx::query_as!(
+        Post,
+        r#"
+SELECT id, blog_id, content as "content: Json<Vec<PostContent>>", created_at, updated_at
+FROM posts
+WHERE blog_id = $1
+ORDER BY created_at
+LIMIT $2
+OFFSET $3"#,
+        &self.id,
         limit,
         offset
       )

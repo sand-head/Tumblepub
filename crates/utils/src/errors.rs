@@ -6,6 +6,10 @@ use thiserror::Error;
 pub enum TumblepubError {
   #[error("Not Found")]
   NotFound,
+  #[error("Bad Request: {0}")]
+  BadRequest(&'static str),
+  #[error("Unauthorized")]
+  Unauthorized,
   #[error(transparent)]
   InternalServerError(#[from] anyhow::Error),
 }
@@ -17,6 +21,8 @@ impl ErrorExtensions for TumblepubError {
   fn extend(&self) -> Error {
     self.extend_with(|err, e| match err {
       TumblepubError::NotFound => e.set("code", "NOT_FOUND"),
+      TumblepubError::BadRequest(_) => e.set("code", "BAD_REQUEST"),
+      TumblepubError::Unauthorized => e.set("code", "UNAUTHORIZED"),
       TumblepubError::InternalServerError(_) => e.set("code", "INTERNAL_SERVER_ERROR"),
     })
   }

@@ -5,6 +5,11 @@
 
 an ActivityPub-federated tumbleblog hosting platform
 
-## a quick note
+## some goals
 
-if you're adding new queries or tables or whatever, make sure to update the offline cache by running `cargo sqlx prepare --merged`.
+this is just off the top of my head right now, I'll add more to this later:
+
+- [ ] Full federation using ActivityPub and ActivityStreams
+- [ ] A well-documented GraphQL API, enabling both web and mobile clients
+- [ ] Theme support (using Handlebars as the templating engine)
+- [ ] Support for additional user-created pages
