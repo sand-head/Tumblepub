@@ -3,7 +3,7 @@ use std::sync::Arc;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use anyhow::Result;
 use env::load_dotenv;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use sqlx::PgPool;
 use tumblepub_gql::{create_schema, TumblepubSchema};
 
@@ -11,10 +11,9 @@ mod env;
 mod routes;
 mod theme;
 
-lazy_static! {
-  pub static ref LOCAL_DOMAIN: String =
-    std::env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set.");
-}
+static LOCAL_DOMAIN: Lazy<String> = Lazy::new(|| {
+  std::env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set.")
+});
 
 pub fn get_data(content: String) -> theme::ThemeVariables {
   theme::ThemeVariables {

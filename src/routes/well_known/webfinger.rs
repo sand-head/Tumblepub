@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use actix_web::{web, HttpResponse};
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -11,9 +11,7 @@ use tumblepub_utils::errors::{Result, TumblepubError};
 
 use crate::LOCAL_DOMAIN;
 
-lazy_static! {
-  static ref WEBFINGER_URI: Regex = Regex::new("^acct:([a-z0-9_]*)@(.*)$").unwrap();
-}
+static WEBFINGER_URI: Lazy<Regex> = Lazy::new(|| Regex::new("^acct:([a-z0-9_]*)@(.*)$").unwrap());
 
 #[derive(Deserialize)]
 pub struct WebfingerReq {
