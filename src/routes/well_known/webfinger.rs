@@ -7,9 +7,10 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use tumblepub_db::models::blog::Blog;
-use tumblepub_utils::errors::{Result, TumblepubError};
-
-use crate::LOCAL_DOMAIN;
+use tumblepub_utils::{
+  errors::{Result, TumblepubError},
+  options::Options,
+};
 
 static WEBFINGER_URI: Lazy<Regex> = Lazy::new(|| Regex::new("^acct:([a-z0-9_]*)@(.*)$").unwrap());
 
@@ -69,7 +70,8 @@ pub async fn webfinger(
   let domain = captures.get(2).map_or("", |c| c.as_str()).to_string();
 
   // we don't gotta deal with any domains that aren't ours
-  if domain != LOCAL_DOMAIN.as_str() {
+  let local_domain = Options::get().local_domain();
+  if domain != local_domain {
     return Ok(HttpResponse::NotFound().finish());
   }
 
@@ -85,7 +87,7 @@ pub async fn webfinger(
         links: vec![WebfingerLink {
           rel: "self".to_string(),
           content_type: Some("application/activity+json".to_string()),
-          href: Some(format!("https://{}/@{}.json", LOCAL_DOMAIN.as_str(), blog.name).to_string()),
+          href: Some(format!("https://{}/@{}.json", local_domain, blog.name).to_string()),
           titles: None,
           properties: None,
           template: None,

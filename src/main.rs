@@ -2,18 +2,12 @@ use std::sync::Arc;
 
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use anyhow::Result;
-use env::load_dotenv;
-use once_cell::sync::Lazy;
 use sqlx::PgPool;
 use tumblepub_gql::{create_schema, TumblepubSchema};
+use tumblepub_utils::options::Options;
 
-mod env;
 mod routes;
 mod theme;
-
-static LOCAL_DOMAIN: Lazy<String> = Lazy::new(|| {
-  std::env::var("LOCAL_DOMAIN").expect("Environment variable LOCAL_DOMAIN must be set.")
-});
 
 pub fn get_data(content: String) -> theme::ThemeVariables {
   theme::ThemeVariables {
@@ -28,11 +22,8 @@ pub fn get_data(content: String) -> theme::ThemeVariables {
 
 #[actix_web::main]
 async fn main() -> Result<()> {
-  println!("Loading environment variables...");
-  load_dotenv();
-  let db_url = std::env::var("DATABASE_URL")?;
-
   println!("Establishing database pool...");
+  let db_url = Options::get().database_url()?;
   tumblepub_db::create_database_if_not_exists(&db_url).await?;
   let pool = PgPool::connect(&db_url).await?;
   println!("Running migrations...");
