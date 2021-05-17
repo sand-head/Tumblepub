@@ -9,10 +9,45 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Generate the sqlx-data.json file so the jobs below can build "offline"
+  sqlx-prepare:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: tumblepub_dev
+          POSTGRES_PASSWORD: mysecretpassword
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Set up database and build data
+        env:
+          DATABASE_URL: "postgres://postgres:mysecretpassword@postgres/tumblepub_dev"
+        run: |
+          cargo install sqlx-cli --no-default-features --features postgres
+          cargo sqlx migrate run
+          cargo sqlx prepare --merged
+      - name: Upload sqlx-data.json
+        uses: actions/upload-artifact@v2
+        with:
+          name: sqlx-data
+          path: ./sqlx-data.json
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: sqlx-data
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -33,6 +68,9 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: sqlx-data
       - name: Configure Docker metadata
         id: metadata
         uses: docker/metadata-action@v3
