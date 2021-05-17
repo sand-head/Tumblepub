@@ -9,8 +9,10 @@ edition = "2018"
 [dependencies]
 actix-web = "3"
 async-graphql = { version = "2.8", features = ["uuid", "chrono"] }
+ammonia = "3.1"
 anyhow = "1.0"
 jsonwebtoken = "7.2"
+pulldown-cmark = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate", "offline"] }
 thiserror = "1.0"

@@ -1,12 +1,19 @@
+use std::convert::TryInto;
+
 use async_graphql::{Context, ErrorExtensions, Object, Result};
 use sqlx::PgPool;
 
-use tumblepub_db::models::user::User;
+use tumblepub_db::models::{
+  blog::Blog,
+  post::{NewPost, Post as DbPost, PostContent as DbPostContent},
+  user::User,
+  user_blogs::UserBlogs,
+};
 use tumblepub_utils::{errors::TumblepubError, jwt::Token};
 
 use self::{login::login, register::register};
 use super::models::user::UserAuthPayload;
-use crate::models::posts::{Post, TextPost};
+use crate::models::posts::{Post, PostInput};
 
 mod login;
 mod register;
@@ -33,21 +40,48 @@ impl Mutation {
     register(context, email, password, name).await
   }
 
-  // todo: add parameters for post creation
-  // there are no "input unions" (yet?) in GraphQL, so we'll have to find an alternative
-  // worst case: we accept JSON encoded as a string :/
-  pub async fn create_post(&self, ctx: &Context<'_>) -> Result<Post> {
+  pub async fn create_post(
+    &self,
+    ctx: &Context<'_>,
+    #[graphql(desc = "The name of the local blog.")] blog_name: String,
+    post: PostInput,
+  ) -> Result<Post> {
+    // todo: make this SO much better
+    // too many calls to the database imo
+
     let token = ctx.data::<Token>()?;
     let mut pool = ctx.data::<PgPool>()?.acquire().await.unwrap();
-    let _user = User::get_by_token(&mut pool, token)
+
+    // get both the current user and the requested blog
+    let user = User::get_by_token(&mut pool, token)
       .await
       .map_err(|_| TumblepubError::Unauthorized.extend())?
       .ok_or_else(|| TumblepubError::Unauthorized.extend())?;
+    let blog = Blog::find(&mut pool, (blog_name, None))
+      .await
+      .map_err(|e| TumblepubError::InternalServerError(e).extend())?
+      .ok_or_else(|| TumblepubError::BadRequest.extend())?;
 
-    // todo: create the post in the database
-    Ok(Post::Text(TextPost {
-      content: "# Hello world!".to_string(),
-      html_content: "<h1>Hello world!</h1>".to_string(),
-    }))
+    // if the user does not own the blog, bad request
+    if !UserBlogs::exists(&mut pool, user.id, blog.id).await? {
+      return Err(TumblepubError::BadRequest.extend());
+    }
+
+    // create the post in the database
+    let post_content: anyhow::Result<Vec<DbPostContent>> = post
+      .content
+      .iter()
+      .map(|input| -> anyhow::Result<DbPostContent> { input.try_into() })
+      .collect();
+    let post = DbPost::create_new(
+      &mut pool,
+      NewPost {
+        blog_id: blog.id,
+        content: post_content.map_err(|_| TumblepubError::BadRequest.extend())?,
+      },
+    )
+    .await
+    .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
+    Ok(post.into())
   }
 }
