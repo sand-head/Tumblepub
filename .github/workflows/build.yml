@@ -42,6 +42,7 @@ jobs:
           path: ./sqlx-data.json
 
   test:
+    needs: sqlx-prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
