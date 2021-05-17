@@ -3026,7 +3026,6 @@ dependencies = [
  "argon2rs",
  "async-graphql-actix-web",
  "chrono",
- "dotenv",
  "handlebars",
  "once_cell",
  "openssl",

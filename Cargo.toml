@@ -22,7 +22,6 @@ tumblepub_utils = { path = "./crates/utils" }
 # todo: reduce this into just the deps needed for the main app
 # misc:
 anyhow = "1.0"
-dotenv = "0.15"
 rand = "0.8"
 url = "2.2"
 # web server:
