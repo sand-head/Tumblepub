@@ -1,7 +1,7 @@
-use std::{fs::read_to_string, path::Path, sync::RwLock};
+use std::sync::RwLock;
 
 use anyhow::Result;
-use merge::Merge;
+use config::{Config, ConfigError, Environment, File, FileFormat};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
@@ -13,42 +13,42 @@ static OPTIONS_LOCATION: &str = "./options.yml";
 static OPTIONS: Lazy<RwLock<Options>> =
   Lazy::new(|| RwLock::new(Options::initialize().expect("failed to initialize options")));
 
-#[derive(Debug, Deserialize, Serialize, Clone, Merge)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Options {
-  single_user_mode: Option<bool>,
-  local_domain: Option<String>,
-  database: Option<DatabaseOptions>,
+  single_user_mode: bool,
+  local_domain: String,
+  database: DatabaseOptions,
 }
 
 impl Default for Options {
   fn default() -> Self {
     Self {
-      single_user_mode: Some(true),
-      local_domain: None,
-      database: Some(DatabaseOptions::default()),
+      single_user_mode: true,
+      local_domain: String::from("example.com"),
+      database: DatabaseOptions::default(),
     }
   }
 }
 
 impl Options {
   /// Initialize a new `Options` using environment variables, the `options.yml` file, and `Options::default()`.
-  pub fn initialize() -> Result<Self> {
-    let options_path = Path::new(OPTIONS_LOCATION);
+  pub fn initialize() -> Result<Self, ConfigError> {
+    let mut config = Config::default();
 
     // options priority:
-    // 1. environment variables
-    let mut options: Options = envy::prefixed("TUMBLEPUB_").from_env()?;
-    // 2. the options.yml file
-    if options_path.is_file() {
-      let maybe_options = serde_yaml::from_str::<Options>(&read_to_string(OPTIONS_LOCATION)?).ok();
-      if let Some(file_options) = maybe_options {
-        options.merge(file_options);
-      }
-    };
+    // the `config` crate merges on top of anything already there
+    // so we go in order of lowest priority first
     // 3. default values
-    options.merge(Options::default());
+    config.merge(File::from_str(
+      &serde_yaml::to_string(&Options::default()).unwrap(),
+      FileFormat::Yaml,
+    ))?;
+    // 2. the options.yml file
+    config.merge(File::with_name(OPTIONS_LOCATION).required(false))?;
+    // 1. environment variables
+    config.merge(Environment::with_prefix("TUMBLEPUB_"))?;
 
-    Ok(options)
+    config.try_into()
   }
 
   /// Get a cloned `Options`.
@@ -57,20 +57,12 @@ impl Options {
   }
 
   pub fn single_user_mode(&self) -> bool {
-    self
-      .single_user_mode
-      .expect("could not determine if in single user mode from options")
+    self.single_user_mode
   }
   pub fn local_domain(&self) -> String {
-    self
-      .local_domain
-      .to_owned()
-      .expect("could not retrieve local domain from options")
+    self.local_domain.to_owned()
   }
   pub fn database(&self) -> DatabaseOptions {
-    self
-      .database
-      .to_owned()
-      .expect("could not retrieve database options")
+    self.database.to_owned()
   }
 }
