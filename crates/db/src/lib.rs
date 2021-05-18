@@ -1,29 +1,24 @@
 use anyhow::Result;
-use sqlx::{Connection, PgConnection, Row};
-use url::Url;
+use sqlx::{Connection, PgConnection};
+use tumblepub_utils::options::Options;
 
 pub mod models;
 
-pub async fn create_database_if_not_exists(db_url: &str) -> Result<()> {
-  // todo: do this better now that the Options struct exists
-  let db_url = Url::parse(db_url).expect("Could not parse DATABASE_URL");
-  let db_name = &db_url.path().clone()[1..];
-  let mut base_url = db_url.clone();
-  base_url
-    .path_segments_mut()
-    .expect("Could not get path segments")
-    .clear()
-    .push("postgres");
+pub async fn create_database_if_not_exists() -> Result<()> {
+  let db_name = Options::get().database().db_name();
+  let postgres_url = Options::get()
+    .database()
+    .database_url(Some("postgres".to_string()));
 
-  let mut conn = PgConnection::connect(base_url.as_str()).await?;
-  let row = sqlx::query(&format!(
-    "SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = '{}') AS exists",
+  let mut conn = PgConnection::connect(&postgres_url).await?;
+  let row = sqlx::query!(
+    r#"SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = $1) AS "exists!""#,
     db_name
-  ))
+  )
   .fetch_one(&mut conn)
   .await?;
 
-  if !row.try_get("exists")? {
+  if !row.exists {
     let result = sqlx::query(&format!("CREATE DATABASE {}", db_name))
       .execute(&mut conn)
       .await;

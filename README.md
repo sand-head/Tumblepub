@@ -28,7 +28,7 @@ single_user_mode: true
 local_domain: null
 # PostgreSQL database properties
 database:
-  database: "tumblepub"
+  db_name: "tumblepub"
   hostname: "localhost"
   port: 5432
   username: "postgres"

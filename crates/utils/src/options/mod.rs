@@ -56,32 +56,6 @@ impl Options {
     OPTIONS.read().unwrap().to_owned()
   }
 
-  pub fn database_url(&self) -> Result<String> {
-    let database = self
-      .database
-      .to_owned()
-      .expect("could not get database options");
-
-    Ok(format!(
-      "postgres://{}:{}@{}:{}/{}",
-      database
-        .username
-        .expect("could not get database username from options"),
-      database
-        .password
-        .expect("could not get database password from options"),
-      database
-        .hostname
-        .expect("could not get database hostname from options"),
-      database
-        .port
-        .expect("could not get database port from options"),
-      database
-        .database
-        .expect("could not get database name from options")
-    ))
-  }
-
   pub fn single_user_mode(&self) -> bool {
     self
       .single_user_mode
@@ -92,5 +66,11 @@ impl Options {
       .local_domain
       .to_owned()
       .expect("could not retrieve local domain from options")
+  }
+  pub fn database(&self) -> DatabaseOptions {
+    self
+      .database
+      .to_owned()
+      .expect("could not retrieve database options")
   }
 }

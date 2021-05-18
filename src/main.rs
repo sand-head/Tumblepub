@@ -23,8 +23,8 @@ pub fn get_data(content: String) -> theme::ThemeVariables {
 #[actix_web::main]
 async fn main() -> Result<()> {
   println!("Establishing database pool...");
-  let db_url = Options::get().database_url()?;
-  tumblepub_db::create_database_if_not_exists(&db_url).await?;
+  tumblepub_db::create_database_if_not_exists().await?;
+  let db_url = Options::get().database().database_url(None);
   let pool = PgPool::connect(&db_url).await?;
   println!("Running migrations...");
   sqlx::migrate!("./migrations").run(&pool).await?;
