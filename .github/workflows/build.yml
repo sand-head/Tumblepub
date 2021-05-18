@@ -32,9 +32,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
+            ~/.target/sqlx
           key: ${{ runner.os }}-sqlx-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-sqlx-${{ hashFiles('**/Cargo.lock') }}
@@ -44,6 +42,7 @@ jobs:
           toolchain: stable
       - name: Set up database and build data
         env:
+          CARGO_TARGET_DIR: ~/.target/sqlx
           DATABASE_URL: "postgres://postgres:mysecretpassword@localhost/tumblepub_dev"
         run: |
           cargo install sqlx-cli --no-default-features --features postgres
