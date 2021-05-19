@@ -144,7 +144,7 @@ RETURNING *
 SELECT id, blog_id, content as "content: Json<Vec<PostContent>>", created_at, updated_at
 FROM posts
 WHERE blog_id = $1
-ORDER BY created_at
+ORDER BY created_at DESC
 LIMIT $2
 OFFSET $3"#,
         &self.id,

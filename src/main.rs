@@ -9,17 +9,6 @@ use tumblepub_utils::options::Options;
 mod routes;
 mod theme;
 
-pub fn get_data(content: String) -> theme::ThemeVariables {
-  theme::ThemeVariables {
-    title: "tumblepub".to_string(),
-    description: None,
-    content,
-
-    previous_page: None,
-    next_page: None,
-  }
-}
-
 #[actix_web::main]
 async fn main() -> Result<()> {
   println!("Establishing database pool...");

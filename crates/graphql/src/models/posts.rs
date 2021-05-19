@@ -80,6 +80,9 @@ impl TryInto<DbPostContent> for &PostContentInput {
       .markdown
       .as_ref()
       .ok_or_else(|| anyhow::anyhow!("no chunks were provided in input"))?;
-    Ok(DbPostContent::Markdown(chunk.to_string()))
+
+    // make all HTML just text
+    let chunk = chunk.replace("<", "&lt;").replace(">", "&rt;");
+    Ok(DbPostContent::Markdown(chunk))
   }
 }
