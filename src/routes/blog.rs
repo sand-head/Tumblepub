@@ -1,12 +1,16 @@
 use actix_web::{web, HttpResponse, Responder};
-use handlebars::Handlebars;
+use anyhow::anyhow;
+use chrono::Local;
 use serde::Deserialize;
 use sqlx::PgPool;
 
-use tumblepub_db::models::blog::Blog;
-use tumblepub_utils::errors::Result;
+use tumblepub_db::models::{blog::Blog, post::PostContent};
+use tumblepub_utils::{
+  errors::{Result, TumblepubError},
+  markdown::markdown_to_safe_html,
+};
 
-use crate::theme::ThemeVariables;
+use crate::theme::{create_handlebars, ThemePost, ThemePostContent, ThemeVariables};
 
 #[derive(Deserialize)]
 pub struct BlogPath {
@@ -17,38 +21,48 @@ pub async fn blog(path: web::Path<BlogPath>, pool: web::Data<PgPool>) -> Result<
   let blog_name = &path.blog;
   let mut pool = pool.acquire().await.unwrap();
 
+  // get blog and the 25 posts for this page
   let blog = Blog::find(&mut pool, (blog_name.clone(), None))
     .await
-    .expect("Could not retrieve blog from database");
-  if let None = blog {
-    return Ok(HttpResponse::NotFound().finish());
-  }
-  let blog = blog.unwrap();
+    .map_err(|e| TumblepubError::InternalServerError(e))?
+    .ok_or_else(|| TumblepubError::NotFound)?;
+  let posts = blog
+    .posts(&mut pool, Some(25), Some(0))
+    .await
+    .map_err(|e| TumblepubError::InternalServerError(e))?;
 
-  let mut hbs = Handlebars::new();
-  let default_theme = include_str!("../../themes/default.hbs");
-  hbs
-    .register_template_string("default", default_theme)
-    .expect("Could not find default theme");
+  let hbs = create_handlebars()
+    .map_err(|_| TumblepubError::InternalServerError(anyhow!("Could not create Handlebars")))?;
 
   let blog_title = blog.title.unwrap_or(blog.name);
   let vars = ThemeVariables {
     title: blog_title.clone(),
     description: blog.description,
-    content: format!(
-      "actually, there is no content for the blog \"{}\"",
-      blog_title
-    )
-    .to_string(),
+    posts: posts
+      .iter()
+      .map(|post| ThemePost {
+        created_at: post.created_at.with_timezone(&Local),
+        content: post
+          .content
+          .iter()
+          .map(|content| match content {
+            PostContent::Markdown(markdown) => ThemePostContent::Markdown {
+              content: markdown_to_safe_html(markdown.to_owned()),
+            },
+          })
+          .collect(),
+      })
+      .collect(),
 
     previous_page: None,
     next_page: None,
   };
+
   Ok(
     HttpResponse::Ok().body(
       hbs
         .render("default", &vars)
-        .expect("Could not render theme"),
+        .map_err(|_| TumblepubError::InternalServerError(anyhow!("Could not render blog")))?,
     ),
   )
 }

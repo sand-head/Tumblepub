@@ -1,5 +1,5 @@
 use anyhow::Result;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{
   types::{Json, Uuid},
@@ -11,8 +11,8 @@ pub struct Post {
   pub id: Uuid,
   pub blog_id: i64,
   pub content: Json<Vec<PostContent>>,
-  pub created_at: NaiveDateTime,
-  pub updated_at: NaiveDateTime,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

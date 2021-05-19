@@ -1,6 +1,6 @@
 use anyhow::Result;
 use argon2rs::argon2i_simple;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use sqlx::PgConnection;
 
 use tumblepub_utils::jwt::Token;
@@ -15,9 +15,9 @@ pub struct User {
   pub primary_blog: i64,
   pub hash: Vec<u8>,
   pub salt: String,
-  pub created_at: NaiveDateTime,
-  pub updated_at: NaiveDateTime,
-  pub last_login_at: NaiveDateTime,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+  pub last_login_at: DateTime<Utc>,
 }
 
 #[derive(Debug)]

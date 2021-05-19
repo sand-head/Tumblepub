@@ -23,6 +23,7 @@ tumblepub_utils = { path = "./crates/utils" }
 # misc:
 anyhow = "1.0"
 rand = "0.8"
+timeago = "0.3"
 url = "2.2"
 # web server:
 actix-web = "3"

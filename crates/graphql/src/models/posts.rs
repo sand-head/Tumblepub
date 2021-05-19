@@ -2,14 +2,14 @@ use std::convert::TryInto;
 
 use async_graphql::{InputObject, SimpleObject, Union};
 
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use tumblepub_db::models::post::{Post as DbPost, PostContent as DbPostContent};
 use tumblepub_utils::markdown::markdown_to_safe_html;
 
 #[derive(Debug, SimpleObject)]
 pub struct Post {
   pub content: Vec<PostContent>,
-  pub created_at: NaiveDateTime,
+  pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Union)]
@@ -80,6 +80,9 @@ impl TryInto<DbPostContent> for &PostContentInput {
       .markdown
       .as_ref()
       .ok_or_else(|| anyhow::anyhow!("no chunks were provided in input"))?;
-    Ok(DbPostContent::Markdown(chunk.to_string()))
+
+    // make all HTML just text
+    let chunk = chunk.replace("<", "&lt;").replace(">", "&rt;");
+    Ok(DbPostContent::Markdown(chunk))
   }
 }

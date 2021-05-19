@@ -1,12 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8" />
     <title>{{Title}}</title>
     {{#if Description}}
     <meta name="description" content="{{Description}}" />
     {{/if}}
+    <style type="text/css">
+      html {
+        --accent: #8B42CD;
+        --secondary: #36B7C3;
+        --tertiary: #FF7245;
+        --header-text: #fff;
+        --body-text: #000;
+        --background-0: #222024;
+        --background-1: #BD8DE9;
+      }
+      body {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        margin: 0;
+        color: var(--body-text);
+        background-color: var(--background-0);
+      }
+
+      header, footer {
+        color: var(--header-text);
+        text-align: center;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .post {
+        background-color: #fff;
+        border-bottom: 8px solid var(--secondary);
+        margin: 16px 0;
+        padding: 4px 6px;
+        max-width: 720px;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
-    {{Content}}
+    <header>
+      <h1>{{Title}}</h1>
+      {{#if Description}}
+      <p>{{Description}}</p>
+      {{/if}}
+    </header>
+    <main>
+      {{#each Posts}}
+      <section class="post" data-created-at="{{this.CreatedAt}}">
+        {{#each this.Content}}
+          {{#if (eq this.Type "Markdown")}}
+            {{this.Content}}
+          {{/if}}
+        {{/each}}
+        <div class="post-footer">
+          <div class="post-footer-section">
+            <span title="{{formatDate this.CreatedAt "%A, %B %-d, %Y %-I:%M %p %Z"}}">{{timeAgo this.CreatedAt}}</span>
+          </div>
+          <div class="post-footer-section">
+            <!-- like/reblog buttons go here -->
+          </div>
+        </div>
+      </section>
+      {{/each}}
+    </main>
+    <footer>
+      {{#if PreviousPage}}
+      <a href="{{PreviousPage}}">Previous</a>
+      {{/if}}
+      {{#if (and PreviousPage NextPage)}}
+      &mdash;
+      {{/if}}
+      {{#if NextPage}}
+      <a href="{{NextPage}}">Next</a>
+      {{/if}}
+    </footer>
   </body>
 </html>

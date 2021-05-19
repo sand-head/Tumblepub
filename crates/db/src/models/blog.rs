@@ -1,5 +1,5 @@
 use anyhow::Result;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use sqlx::types::Json;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -16,8 +16,8 @@ pub struct Blog {
   pub is_public: bool,
   pub title: Option<String>,
   pub description: Option<String>,
-  pub created_at: NaiveDateTime,
-  pub updated_at: NaiveDateTime,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
   pub theme_id: Option<Uuid>,
   pub is_nsfw: bool,
   pub is_private: bool,
@@ -30,7 +30,7 @@ pub struct BlogTheme {
   pub id: Uuid,
   pub hash: String,
   pub theme: String,
-  pub created_at: NaiveDateTime,
+  pub created_at: DateTime<Utc>,
 }
 
 pub struct NewBlog {
@@ -144,7 +144,7 @@ RETURNING *
 SELECT id, blog_id, content as "content: Json<Vec<PostContent>>", created_at, updated_at
 FROM posts
 WHERE blog_id = $1
-ORDER BY created_at
+ORDER BY created_at DESC
 LIMIT $2
 OFFSET $3"#,
         &self.id,
