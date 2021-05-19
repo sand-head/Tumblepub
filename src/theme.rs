@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use handlebars::{handlebars_helper, no_escape, Handlebars, TemplateError};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::Serialize;
@@ -17,7 +17,7 @@ pub enum ThemePostContent {
 #[derive(Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ThemePost {
-  pub created_at: NaiveDateTime,
+  pub created_at: DateTime<Utc>,
   pub content: Vec<ThemePostContent>,
 }
 
