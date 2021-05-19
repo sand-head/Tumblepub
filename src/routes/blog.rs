@@ -1,5 +1,6 @@
 use actix_web::{web, HttpResponse, Responder};
 use anyhow::anyhow;
+use chrono::Local;
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -40,7 +41,7 @@ pub async fn blog(path: web::Path<BlogPath>, pool: web::Data<PgPool>) -> Result<
     posts: posts
       .iter()
       .map(|post| ThemePost {
-        created_at: post.created_at,
+        created_at: post.created_at.with_timezone(&Local),
         content: post
           .content
           .iter()

@@ -36,6 +36,10 @@
         color: var(--accent);
         text-decoration: none;
       }
+      a:hover {
+        text-decoration: underline;
+      }
+
       .post {
         background-color: #fff;
         border-bottom: 8px solid var(--secondary);
@@ -63,7 +67,7 @@
         {{/each}}
         <div class="post-footer">
           <div class="post-footer-section">
-            {{formatDate this.CreatedAt "%A, %B %-d, %Y %I:%M %p"}}
+            <span title="{{formatDate this.CreatedAt "%A, %B %-d, %Y %-I:%M %p %Z"}}">{{timeAgo this.CreatedAt}}</span>
           </div>
           <div class="post-footer-section">
             <!-- like/reblog buttons go here -->
@@ -73,7 +77,15 @@
       {{/each}}
     </main>
     <footer>
-      copyright now bitch
+      {{#if PreviousPage}}
+      <a href="{{PreviousPage}}">Previous</a>
+      {{/if}}
+      {{#if (and PreviousPage NextPage)}}
+      &mdash;
+      {{/if}}
+      {{#if NextPage}}
+      <a href="{{NextPage}}">Next</a>
+      {{/if}}
     </footer>
   </body>
 </html>

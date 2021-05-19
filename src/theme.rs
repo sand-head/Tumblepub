@@ -1,13 +1,21 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local, Utc};
 use handlebars::{handlebars_helper, no_escape, Handlebars, RenderError, TemplateError};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::Serialize;
+use timeago::Formatter;
 
 handlebars_helper!(url_encode: |v: str| utf8_percent_encode(v, NON_ALPHANUMERIC).to_string());
 handlebars_helper!(date_format: |iso_8601: str, format_str: str| {
   let date = DateTime::parse_from_rfc3339(&iso_8601)
     .map_err(|_| RenderError::new("Could not parse first parameter as RFC3339 date."))?;
   format!("{}", date.format(format_str))
+});
+handlebars_helper!(time_ago: |iso_8601: str| {
+  let date = DateTime::parse_from_rfc3339(&iso_8601)
+    .map_err(|_| RenderError::new("Could not parse first parameter as RFC3339 date."))?;
+  let now = Utc::now();
+  let formatter = Formatter::new();
+  format!("{}", formatter.convert_chrono(date, now))
 });
 
 #[derive(Serialize)]
@@ -22,7 +30,7 @@ pub enum ThemePostContent {
 #[derive(Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ThemePost {
-  pub created_at: DateTime<Utc>,
+  pub created_at: DateTime<Local>,
   pub content: Vec<ThemePostContent>,
 }
 
@@ -43,6 +51,7 @@ pub fn create_handlebars() -> Result<Handlebars<'static>, TemplateError> {
   hbs.register_template_string("default", default_theme)?;
   hbs.register_helper("url", Box::new(url_encode));
   hbs.register_helper("formatDate", Box::new(date_format));
+  hbs.register_helper("timeAgo", Box::new(time_ago));
   hbs.register_escape_fn(no_escape);
   hbs.set_strict_mode(true);
   Ok(hbs)
