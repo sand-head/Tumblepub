@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="utf-8" />
     <title>{{Title}}</title>
     {{#if Description}}
     <meta name="description" content="{{Description}}" />
@@ -27,29 +28,47 @@
         text-align: center;
       }
       main {
-        display: grid;
-        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
       }
       .post {
         background-color: #fff;
+        border-bottom: 8px solid var(--secondary);
         margin: 16px 0;
         padding: 4px 6px;
-        border-bottom: 8px solid var(--secondary);
+        max-width: 720px;
+        width: 100%;
       }
     </style>
   </head>
   <body>
     <header>
       <h1>{{Title}}</h1>
+      {{#if Description}}
+      <p>{{Description}}</p>
+      {{/if}}
     </header>
     <main>
       {{#each Posts}}
       <section class="post" data-created-at="{{this.CreatedAt}}">
         {{#each this.Content}}
           {{#if (eq this.Type "Markdown")}}
-          <p>{{this.Content}}</p>
+            {{this.Content}}
           {{/if}}
         {{/each}}
+        <div class="post-footer">
+          <div class="post-footer-section">
+            {{formatDate this.CreatedAt "%A, %B %-d, %Y %I:%M %p"}}
+          </div>
+          <div class="post-footer-section">
+            <!-- like/reblog buttons go here -->
+          </div>
+        </div>
       </section>
       {{/each}}
     </main>

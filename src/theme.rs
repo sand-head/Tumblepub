@@ -1,9 +1,14 @@
 use chrono::{DateTime, Utc};
-use handlebars::{handlebars_helper, no_escape, Handlebars, TemplateError};
+use handlebars::{handlebars_helper, no_escape, Handlebars, RenderError, TemplateError};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::Serialize;
 
 handlebars_helper!(url_encode: |v: str| utf8_percent_encode(v, NON_ALPHANUMERIC).to_string());
+handlebars_helper!(date_format: |iso_8601: str, format_str: str| {
+  let date = DateTime::parse_from_rfc3339(&iso_8601)
+    .map_err(|_| RenderError::new("Could not parse first parameter as RFC3339 date."))?;
+  format!("{}", date.format(format_str))
+});
 
 #[derive(Serialize)]
 #[serde(rename_all = "PascalCase", tag = "Type")]
@@ -37,6 +42,7 @@ pub fn create_handlebars() -> Result<Handlebars<'static>, TemplateError> {
   let default_theme = include_str!("../themes/default.hbs");
   hbs.register_template_string("default", default_theme)?;
   hbs.register_helper("url", Box::new(url_encode));
+  hbs.register_helper("formatDate", Box::new(date_format));
   hbs.register_escape_fn(no_escape);
   hbs.set_strict_mode(true);
   Ok(hbs)

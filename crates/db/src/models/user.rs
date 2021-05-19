@@ -1,6 +1,6 @@
 use anyhow::Result;
 use argon2rs::argon2i_simple;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 use sqlx::PgConnection;
 
 use tumblepub_utils::jwt::Token;
