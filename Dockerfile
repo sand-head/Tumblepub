@@ -11,6 +11,11 @@ FROM debian:buster-slim as runtime
 RUN apt-get update && \
     apt-get install libssl1.1 -y --no-install-recommends
 
-COPY --from=builder /usr/app/target/release/tumblepub /usr/local/bin
+WORKDIR /usr/app
+RUN groupadd -g 999 tumblepub && \
+    useradd -r -u 999 -g tumblepub tumblepub
+COPY --chown=tumblepub:tumblepub --from=builder /usr/app/target/release/tumblepub .
+
+USER tumblepub
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/tumblepub"]
+ENTRYPOINT ["/usr/app/tumblepub"]
