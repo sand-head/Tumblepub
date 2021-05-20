@@ -9,7 +9,7 @@ use tumblepub_db::models::{
   user::User,
   user_blogs::UserBlogs,
 };
-use tumblepub_utils::{errors::TumblepubError, jwt::Token};
+use tumblepub_utils::{errors::TumblepubError, jwt::Token, options::Options};
 
 use self::{login::login, register::register};
 use super::models::user::UserAuthPayload;
@@ -37,6 +37,10 @@ impl Mutation {
     password: String,
     name: String,
   ) -> Result<UserAuthPayload> {
+    if Options::get().single_user_mode {
+      return Err(TumblepubError::BadRequest("Registration has been disabled.").extend());
+    }
+
     let pool = context.data::<PgPool>()?;
     register(pool, email, password, name).await
   }

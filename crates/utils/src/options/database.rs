@@ -1,3 +1,4 @@
+use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -28,7 +29,7 @@ impl DatabaseOptions {
     format!(
       "postgres://{}:{}@{}:{}/{}",
       database.username,
-      database.password,
+      utf8_percent_encode(&database.password, NON_ALPHANUMERIC).to_string(),
       database.hostname,
       database.port,
       db_name.unwrap_or(database.db_name,)
