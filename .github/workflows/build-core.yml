@@ -1,15 +1,27 @@
-name: Build
+name: Build (Core)
 
 on:
   push:
     branches: [ main ]
     tags: [ 'v*.*.*' ]
-    paths-ignore: [ '**/README.md' ]
+    paths:
+      - '.github/workflows/build-core.yml'
+      - 'core-server/**'
+      - 'crates/**'
+      - '!**/README.md'
   pull_request:
     branches: [ main ]
+    paths:
+      - '.github/workflows/build-core.yml'
+      - 'core-server/**'
+      - 'crates/**'
+      - '!**/README.md'
   workflow_dispatch:
 
 jobs:
+  # ---
+  # Tumblepub Core jobs:
+  # ---
   # Generate the sqlx-data.json file so the jobs below can build "offline"
   sqlx-prepare:
     runs-on: ubuntu-latest
@@ -46,8 +58,8 @@ jobs:
           DATABASE_URL: "postgres://postgres:mysecretpassword@localhost/tumblepub_dev"
         run: |
           cargo install sqlx-cli --no-default-features --features postgres
-          cargo sqlx migrate run
-          cargo sqlx prepare --merged
+          cd core-server && cargo sqlx migrate run
+          cd .. && cargo sqlx prepare --merged
       - name: Upload sqlx-data.json
         uses: actions/upload-artifact@v2
         with:
@@ -127,6 +139,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          file: ./core-server/Dockerfile
           context: ./
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.metadata.outputs.tags }}
