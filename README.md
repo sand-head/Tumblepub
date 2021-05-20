@@ -23,6 +23,12 @@ Options are read in both via environment variables (with the prefix `TUMBLEPUB_`
 
 ```yaml
 # Enables/disables "single user" mode
+# If set to true, single_user options must also be set
+# Example:
+# single_user:
+#   username: "bob"
+#   email: "bob@example.com"
+#   password: "password"
 single_user_mode: true
 # The domain name this instance exists on
 local_domain: null

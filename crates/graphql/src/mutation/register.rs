@@ -1,22 +1,22 @@
-use async_graphql::{Context, ErrorExtensions, Result};
+use async_graphql::{ErrorExtensions, Result};
 
 use sqlx::PgPool;
 use tumblepub_ap::crypto::KeyPair;
 use tumblepub_db::models::{
   blog::{Blog, NewBlog},
-  user::{InsertableUser, User},
+  user::{NewUser, User},
 };
 use tumblepub_utils::errors::TumblepubError;
 
 use crate::models::user::{User as GqlUser, UserAuthPayload};
 
 pub async fn register(
-  ctx: &Context<'_>,
+  pool: &PgPool,
   email: String,
   password: String,
   name: String,
 ) -> Result<UserAuthPayload> {
-  let mut txn = ctx.data::<PgPool>()?.begin().await?;
+  let mut txn = pool.begin().await?;
   // step 1: create a primary blog for the new user
   let keypair = KeyPair::generate().map_err(|e| TumblepubError::InternalServerError(e).extend())?;
   let primary_blog = Blog::create_new(
@@ -38,7 +38,7 @@ pub async fn register(
   // step 2: create a new user using the created primary blog ID
   let user = User::create(
     &mut *txn,
-    InsertableUser {
+    NewUser {
       email,
       password,
       primary_blog: primary_blog.id,

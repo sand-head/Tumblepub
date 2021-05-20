@@ -3,20 +3,43 @@ use std::sync::Arc;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use anyhow::Result;
 use sqlx::PgPool;
-use tumblepub_gql::{create_schema, TumblepubSchema};
+use tumblepub_db::models::user::User;
+use tumblepub_gql::{create_schema, mutation::register::register, TumblepubSchema};
 use tumblepub_utils::options::Options;
 
 mod routes;
 mod theme;
 
+async fn single_user_init(pool: &PgPool) -> Result<()> {
+  let mut conn = pool.acquire().await.unwrap();
+  if Options::get().single_user_mode && User::count(&mut conn).await? == 0 {
+    // there are no users, so let's create the provided single user
+    let single_user = Options::get().single_user.ok_or_else(|| {
+      anyhow::anyhow!(r#"could not get "single_user" options, please set them before running"#)
+    })?;
+    register(
+      &pool,
+      single_user.email,
+      single_user.password,
+      single_user.username.to_owned(),
+    )
+    .await
+    .map_err(|_| anyhow::anyhow!("could not register single user"))?;
+    println!("Created user {:?}!", single_user.username);
+  }
+  Ok(())
+}
+
 #[actix_web::main]
 async fn main() -> Result<()> {
   println!("Establishing database pool...");
   tumblepub_db::create_database_if_not_exists().await?;
-  let db_url = Options::get().database().database_url(None);
+  let db_url = Options::get().database.database_url(None);
   let pool = PgPool::connect(&db_url).await?;
-  println!("Running migrations...");
+
+  println!("Running migrations and performing database setup...");
   sqlx::migrate!("./migrations").run(&pool).await?;
+  single_user_init(&pool).await?;
 
   println!("Creating GraphQL schema...");
   let schema = Arc::new(create_schema(pool.clone()));

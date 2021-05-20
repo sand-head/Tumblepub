@@ -5,9 +5,10 @@ use config::{Config, ConfigError, Environment, File, FileFormat};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
-use self::database::DatabaseOptions;
+use self::{database::DatabaseOptions, single_user::SingleUserOptions};
 
 mod database;
+mod single_user;
 
 static OPTIONS_LOCATION: &str = "./options.yml";
 static OPTIONS: Lazy<RwLock<Options>> =
@@ -15,9 +16,10 @@ static OPTIONS: Lazy<RwLock<Options>> =
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Options {
-  single_user_mode: bool,
-  local_domain: String,
-  database: DatabaseOptions,
+  pub single_user_mode: bool,
+  pub local_domain: String,
+  pub database: DatabaseOptions,
+  pub single_user: Option<SingleUserOptions>,
 }
 
 impl Default for Options {
@@ -26,6 +28,7 @@ impl Default for Options {
       single_user_mode: true,
       local_domain: String::from("example.com"),
       database: DatabaseOptions::default(),
+      single_user: None,
     }
   }
 }
@@ -54,15 +57,5 @@ impl Options {
   /// Get a cloned `Options`.
   pub fn get() -> Self {
     OPTIONS.read().unwrap().to_owned()
-  }
-
-  pub fn single_user_mode(&self) -> bool {
-    self.single_user_mode
-  }
-  pub fn local_domain(&self) -> String {
-    self.local_domain.to_owned()
-  }
-  pub fn database(&self) -> DatabaseOptions {
-    self.database.to_owned()
   }
 }

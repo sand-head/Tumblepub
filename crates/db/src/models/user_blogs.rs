@@ -22,4 +22,25 @@ SELECT EXISTS(SELECT 1 FROM user_blogs WHERE user_id = $1 AND blog_id = $2) AS "
 
     Ok(record.exists)
   }
+
+  pub async fn create_new(
+    conn: &mut PgConnection,
+    user_id: i64,
+    blog_id: i64,
+    is_admin: Option<bool>,
+  ) -> Result<()> {
+    sqlx::query!(
+      r#"
+INSERT INTO user_blogs (user_id, blog_id, is_admin)
+VALUES ($1, $2, $3)
+      "#,
+      user_id,
+      blog_id,
+      is_admin
+    )
+    .execute(conn)
+    .await?;
+
+    Ok(())
+  }
 }

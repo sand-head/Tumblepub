@@ -70,7 +70,7 @@ pub async fn webfinger(
   let domain = captures.get(2).map_or("", |c| c.as_str()).to_string();
 
   // we don't gotta deal with any domains that aren't ours
-  let local_domain = Options::get().local_domain();
+  let local_domain = Options::get().local_domain;
   if domain != local_domain {
     return Ok(HttpResponse::NotFound().finish());
   }

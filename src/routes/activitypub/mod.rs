@@ -25,7 +25,7 @@ pub async fn get_ap_blog(
     .await
     .expect("could not retrieve blog from db");
 
-  let local_domain = Options::get().local_domain();
+  let local_domain = Options::get().local_domain;
   if let Some(blog) = blog {
     Ok(Either::A(ActivityStreams(json!({
       "@context": "https://www.w3.org/ns/activitystreams",
