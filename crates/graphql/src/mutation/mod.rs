@@ -16,7 +16,7 @@ use super::models::user::UserAuthPayload;
 use crate::models::posts::{Post, PostInput};
 
 mod login;
-mod register;
+pub mod register;
 
 pub struct Mutation;
 #[Object]
@@ -37,7 +37,8 @@ impl Mutation {
     password: String,
     name: String,
   ) -> Result<UserAuthPayload> {
-    register(context, email, password, name).await
+    let pool = context.data::<PgPool>()?;
+    register(pool, email, password, name).await
   }
 
   pub async fn create_post(

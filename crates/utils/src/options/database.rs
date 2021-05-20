@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct DatabaseOptions {
-  db_name: String,
-  hostname: String,
-  port: i32,
-  username: String,
-  password: String,
+  pub db_name: String,
+  pub hostname: String,
+  pub port: i32,
+  pub username: String,
+  pub password: String,
 }
 
 impl Default for DatabaseOptions {
@@ -33,9 +33,5 @@ impl DatabaseOptions {
       database.port,
       db_name.unwrap_or(database.db_name,)
     )
-  }
-
-  pub fn db_name(&self) -> String {
-    self.db_name.to_owned()
   }
 }

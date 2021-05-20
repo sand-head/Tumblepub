@@ -21,15 +21,23 @@ pub struct User {
 }
 
 #[derive(Debug)]
-pub struct InsertableUser {
+pub struct NewUser {
   pub email: String,
   pub password: String,
   pub primary_blog: i64,
 }
 
 impl User {
+  pub async fn count(conn: &mut PgConnection) -> Result<i64> {
+    let record = sqlx::query!(r#"SELECT COUNT(*) as "count!" FROM users"#)
+      .fetch_one(conn)
+      .await?;
+
+    Ok(record.count)
+  }
+
   /// Creates a new user and returns it
-  pub async fn create(conn: &mut PgConnection, model: InsertableUser) -> Result<User> {
+  pub async fn create(conn: &mut PgConnection, model: NewUser) -> Result<User> {
     // step 1: we salt our hashbrowns
     let salt: String = {
       use rand::Rng;

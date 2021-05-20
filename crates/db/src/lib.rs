@@ -5,10 +5,9 @@ use tumblepub_utils::options::Options;
 pub mod models;
 
 pub async fn create_database_if_not_exists() -> Result<()> {
-  let db_name = Options::get().database().db_name();
-  let postgres_url = Options::get()
-    .database()
-    .database_url(Some("postgres".to_string()));
+  let database_opts = Options::get().database;
+  let db_name = database_opts.db_name.to_owned();
+  let postgres_url = database_opts.database_url(Some("postgres".to_string()));
 
   let mut conn = PgConnection::connect(&postgres_url).await?;
   let row = sqlx::query!(
