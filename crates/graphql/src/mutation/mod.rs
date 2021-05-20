@@ -3,8 +3,9 @@ use std::convert::TryInto;
 use async_graphql::{Context, ErrorExtensions, Object, Result};
 use sqlx::PgPool;
 
+use tumblepub_ap::crypto::KeyPair;
 use tumblepub_db::models::{
-  blog::Blog,
+  blog::{Blog as DbBlog, NewBlog},
   post::{NewPost, Post as DbPost, PostContent as DbPostContent},
   user::User,
   user_blogs::UserBlogs,
@@ -13,7 +14,10 @@ use tumblepub_utils::{errors::TumblepubError, jwt::Token, options::Options};
 
 use self::{login::login, register::register};
 use super::models::user::UserAuthPayload;
-use crate::models::posts::{Post, PostInput};
+use crate::models::{
+  blog::Blog,
+  posts::{Post, PostInput},
+};
 
 mod login;
 pub mod register;
@@ -21,6 +25,7 @@ pub mod register;
 pub struct Mutation;
 #[Object]
 impl Mutation {
+  /// Authenticates against an existing user account, if one exists.
   pub async fn login(
     &self,
     context: &Context<'_>,
@@ -30,6 +35,7 @@ impl Mutation {
     login(context, email, password).await
   }
 
+  /// Registers a new user account.
   pub async fn register(
     &self,
     context: &Context<'_>,
@@ -45,6 +51,44 @@ impl Mutation {
     register(pool, email, password, name).await
   }
 
+  /// Creates a new blog under the currently authenticated user.
+  pub async fn create_blog(&self, ctx: &Context<'_>, name: String) -> Result<Blog> {
+    let claims = ctx
+      .data::<Token>()?
+      .get_claims()
+      .as_ref()
+      .ok_or_else(|| TumblepubError::Unauthorized.extend())?;
+    let mut txn = ctx.data::<PgPool>()?.begin().await.unwrap();
+
+    let keypair =
+      KeyPair::generate().map_err(|e| TumblepubError::InternalServerError(e).extend())?;
+    let blog = DbBlog::create_new(
+      &mut *txn,
+      NewBlog {
+        uri: Option::<String>::None,
+        name,
+        domain: Option::<String>::None,
+        is_public: true,
+        title: Option::<String>::None,
+        description: Option::<String>::None,
+        private_key: keypair.private_key,
+        public_key: keypair.public_key,
+      },
+    )
+    .await
+    .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
+    UserBlogs::create_new(&mut *txn, claims.sub, blog.id, Some(true))
+      .await
+      .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
+
+    txn
+      .commit()
+      .await
+      .map_err(|e| TumblepubError::InternalServerError(anyhow::format_err!(e)).extend())?;
+    Ok(blog.into())
+  }
+
+  /// Creates a new post under the given blog.
   pub async fn create_post(
     &self,
     ctx: &Context<'_>,
@@ -62,7 +106,7 @@ impl Mutation {
       .await
       .map_err(|_| TumblepubError::Unauthorized.extend())?
       .ok_or_else(|| TumblepubError::Unauthorized.extend())?;
-    let blog = Blog::find(&mut pool, (blog_name, None))
+    let blog = DbBlog::find(&mut pool, (blog_name, None))
       .await
       .map_err(|e| TumblepubError::InternalServerError(e).extend())?
       .ok_or_else(|| TumblepubError::BadRequest("the given blog does not exist").extend())?;
