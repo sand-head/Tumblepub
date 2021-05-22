@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 if (!globalThis.fetch) {
-  globalThis.fetch = fetch;
+  (globalThis as any).fetch = fetch;
 }
 
 import path from 'path';

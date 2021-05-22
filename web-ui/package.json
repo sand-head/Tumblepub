@@ -2,11 +2,14 @@
   "name": "tumblepub-ui",
   "version": "0.1.0",
   "license": "AGPL-3.0",
+  "private": true,
   "scripts": {
     "build": "vite-ssr build",
     "start:spa": "vite dev",
     "start:ssr": "vite-ssr dev",
-    "start:prod": "vite-ssr build && ts-node -TO \"{\\\"module\\\":\\\"CommonJS\\\"}\" server.ts"
+    "start:prod": "vite-ssr build && ts-node -TO \"{\\\"module\\\":\\\"CommonJS\\\"}\" server.ts",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@vueuse/head": "^0.5.1",
@@ -18,15 +21,25 @@
     "vue-router": "4"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@storybook/addon-actions": "^6.2.9",
+    "@storybook/addon-essentials": "^6.2.9",
+    "@storybook/addon-links": "^6.2.9",
+    "@storybook/vue3": "^6.2.9",
     "@vitejs/plugin-vue": "^1.2.2",
     "@vue/compiler-sfc": "^3.0.5",
     "@vue/server-renderer": "^3.0.11",
     "@vuedx/typescript-plugin-vue": "^0.6.3",
+    "autoprefixer": "^10.2.5",
+    "babel-loader": "^8.2.2",
     "middie": "^5.2.0",
+    "postcss": "^8.3.0",
     "serve-static": "^1.14.1",
+    "tailwindcss": "^2.1.2",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3",
     "vite": "^2.3.3",
+    "vue-loader": "^16.2.0",
     "vue-tsc": "^0.0.24"
   }
 }
