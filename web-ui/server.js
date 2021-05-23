@@ -1,33 +1,26 @@
-import fetch from 'node-fetch';
-if (!globalThis.fetch) {
-  (globalThis as any).fetch = fetch;
-}
+globalThis.fetch = require('node-fetch');
 
-import path from 'path';
-import Fastify, { FastifyInstance } from 'fastify';
-import serveStatic from 'serve-static';
-import { AddressInfo } from 'net';
+const path = require('path');
+const Fastify = require('fastify');
+const serveStatic = require('serve-static');
 
 // This contains a list of static routes (assets)
-import { ssr } from './dist/server/package.json';
+const { ssr } = require('./dist/server/package.json');
 // The manifest is required for preloading assets
-import manifest from './dist/client/ssr-manifest.json';
+const manifest = require('./dist/client/ssr-manifest.json');
 // This is the server renderer we just built
-import { default as renderPage } from './dist/server/main';
+const { default: renderPage } = require('./dist/server/main');
 
 // const api = require('./api');
 
 (async () => {
-  const fastify: FastifyInstance = Fastify();
+  const fastify = Fastify();
   await fastify.register(require('fastify-compress'));
   await fastify.register(require('middie'));
 
   // Serve every static asset route
   for (const asset of ssr.assets || []) {
-    (fastify as any).use(
-      '/' + asset,
-      serveStatic(path.join(__dirname, `./dist/client/${asset}`))
-    );
+    fastify.use('/' + asset, serveStatic(path.join(__dirname, `./dist/client/${asset}`)));
   }
 
   // Custom API to get data for each page
@@ -53,9 +46,9 @@ import { default as renderPage } from './dist/server/main';
   });
 
   try {
-    await fastify.listen(3000);
+    await fastify.listen(3000, '0.0.0.0');
 
-    const address = fastify.server.address() as AddressInfo;
+    const address = fastify.server.address();
     console.log(`🚀 Listening on ${address.address}:${address.port}!`);
   } catch (e) {
     console.error(e);
