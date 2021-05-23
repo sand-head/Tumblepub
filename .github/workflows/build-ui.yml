@@ -74,6 +74,6 @@ jobs:
         with:
           push: true
           file: ./web-ui/Dockerfile
-          context: ./web-ui
+          context: ./
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.metadata.outputs.tags }}
