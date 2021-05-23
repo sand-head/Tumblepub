@@ -19,6 +19,7 @@ import { default as renderPage } from './dist/server/main';
 
 (async () => {
   const fastify: FastifyInstance = Fastify();
+  await fastify.register(require('fastify-compress'));
   await fastify.register(require('middie'));
 
   // Serve every static asset route
