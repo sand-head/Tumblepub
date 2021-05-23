@@ -27,13 +27,12 @@ const Template: Story = (args) => ({
 export const Primary = Template.bind({});
 Primary.args = {
   label: 'Button',
-  type: 'primary',
 };
 
 export const Secondary = Template.bind({});
 Secondary.args = {
   label: 'Button',
-  type: 'secondary',
+  color: 'secondary',
 };
 /*
 export const Large = Template.bind({});
