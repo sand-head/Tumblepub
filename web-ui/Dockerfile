@@ -9,7 +9,7 @@ WORKDIR /usr/app/web-ui
 COPY ./web-ui ./
 RUN yarn build
 
-FROM node:lts AS runtime
+FROM node:lts-alpine AS runtime
 WORKDIR /usr/app
 COPY --from=build /usr/app/web-ui/dist ./dist
 COPY --from=build /usr/app/web-ui/package.json /usr/app/web-ui/tsconfig.json /usr/app/web-ui/server.js ./
