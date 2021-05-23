@@ -7,7 +7,7 @@
     "build": "vite-ssr build",
     "start:spa": "vite dev",
     "start:ssr": "vite-ssr dev",
-    "start:prod": "vite-ssr build && ts-node -TO \"{\\\"module\\\":\\\"CommonJS\\\"}\" server.ts",
+    "start:prod": "ts-node -TO \"{\\\"module\\\":\\\"CommonJS\\\"}\" server.ts",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
