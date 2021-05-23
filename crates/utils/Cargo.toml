@@ -18,5 +18,4 @@ percent-encoding = "2.1"
 pulldown-cmark = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
-sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "migrate", "offline"] }
 thiserror = "1.0"
