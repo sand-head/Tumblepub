@@ -2,6 +2,7 @@
 
 [![Build (Core)](https://github.com/sand-head/tumblepub/actions/workflows/build-core.yml/badge.svg)](https://github.com/sand-head/tumblepub/actions/workflows/build-core.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/sandhead/tumblepub)](https://hub.docker.com/r/sandhead/tumblepub)
+[![Matrix](https://img.shields.io/matrix/tumblepub:schweigert.dev?server_fqdn=schweigert.dev)](https://matrix.to/#/#tumblepub:schweigert.dev)
 
 A federated tumbleblog hosting platform, for both individuals and communities. This repository contains two projects: the [core server](./core-server/README.md) and the web UI.
 
