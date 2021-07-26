@@ -36,7 +36,7 @@ impl Blog {
       .posts(&mut pool, Some(limit), Some(offset))
       .await?
       .iter()
-      .map(|post| Post::from(post))
+      .map(Post::from)
       .collect();
 
     Ok(posts)

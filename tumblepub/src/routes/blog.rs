@@ -23,12 +23,12 @@ async fn single_blog_route(pool: web::Data<PgPool>) -> Result<impl Responder> {
   let mut conn = pool.acquire().await.unwrap();
   let first_user = User::get_by_id(&mut conn, 1)
     .await
-    .map_err(|e| TumblepubError::InternalServerError(e))?
-    .ok_or_else(|| TumblepubError::NotFound)?;
+    .map_err(TumblepubError::InternalServerError)?
+    .ok_or(TumblepubError::NotFound)?;
   let blog = first_user
     .primary_blog(&mut conn)
     .await
-    .map_err(|e| TumblepubError::InternalServerError(e))?;
+    .map_err(TumblepubError::InternalServerError)?;
 
   display_blog(&mut conn, blog).await
 }
@@ -38,8 +38,8 @@ async fn blog_route(path: web::Path<BlogPath>, pool: web::Data<PgPool>) -> Resul
   let mut conn = pool.acquire().await.unwrap();
   let blog = Blog::find(&mut conn, (blog_name.clone(), None))
     .await
-    .map_err(|e| TumblepubError::InternalServerError(e))?
-    .ok_or_else(|| TumblepubError::NotFound)?;
+    .map_err(TumblepubError::InternalServerError)?
+    .ok_or(TumblepubError::NotFound)?;
 
   display_blog(&mut conn, blog).await
 }
@@ -49,14 +49,14 @@ async fn display_blog(conn: &mut PgConnection, blog: Blog) -> Result<impl Respon
   let posts = blog
     .posts(conn, Some(25), Some(0))
     .await
-    .map_err(|e| TumblepubError::InternalServerError(e))?;
+    .map_err(TumblepubError::InternalServerError)?;
 
   let hbs = create_handlebars()
     .map_err(|_| TumblepubError::InternalServerError(anyhow!("Could not create Handlebars")))?;
 
   let blog_title = blog.title.unwrap_or(blog.name);
   let vars = ThemeVariables {
-    title: blog_title.clone(),
+    title: blog_title,
     description: blog.description,
     posts: posts
       .iter()

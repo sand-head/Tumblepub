@@ -14,11 +14,3 @@ pub fn create_schema(db_pool: PgPool) -> Schema<Query, Mutation, EmptySubscripti
     .data(db_pool)
     .finish()
 }
-
-#[cfg(test)]
-mod tests {
-  #[test]
-  fn it_works() {
-    assert_eq!(2 + 2, 4);
-  }
-}

@@ -13,8 +13,8 @@ async fn graphql(
   let token = req
     .headers()
     .get("Token")
-    .and_then(|value| value.to_str().map(|str| String::from(str)).ok())
-    .unwrap_or_else(|| String::new());
+    .and_then(|value| value.to_str().map(String::from).ok())
+    .unwrap_or_else(String::new);
   let token = Token::from(token);
 
   schema

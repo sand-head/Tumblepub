@@ -15,7 +15,7 @@ handlebars_helper!(time_ago: |iso_8601: str| {
     .map_err(|_| RenderError::new("Could not parse first parameter as RFC3339 date."))?;
   let now = Utc::now();
   let formatter = Formatter::new();
-  format!("{}", formatter.convert_chrono(date, now))
+  formatter.convert_chrono(date, now)
 });
 
 #[derive(Serialize)]

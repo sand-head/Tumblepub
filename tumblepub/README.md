@@ -1,8 +1,8 @@
-# `core-server`
+# `tumblepub`
 
-[![Build (Core)](https://github.com/sand-head/tumblepub/actions/workflows/build-core.yml/badge.svg)](https://github.com/sand-head/tumblepub/actions/workflows/build-core.yml)
+[![CI](https://github.com/sand-head/tumblepub/actions/workflows/ci.yml/badge.svg)](https://github.com/sand-head/tumblepub/actions/workflows/ci.yml)
 
-This directory houses the core server of Tumblepub, which implements the GraphQL API and ActivityPub endpoints.
+This directory houses the Tumblepub binary, which implements the GraphQL API and ActivityPub endpoints and renders blogs.
 
 ## Options
 
