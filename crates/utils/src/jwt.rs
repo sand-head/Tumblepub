@@ -1,6 +1,8 @@
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
+use crate::options::Options;
+
 #[derive(Deserialize, Serialize)]
 pub struct UserClaims {
   pub sub: i64,
@@ -25,8 +27,7 @@ impl Token {
 
     let claims = decode::<UserClaims>(
       &token,
-      // todo: do not hardcode the secret
-      &DecodingKey::from_secret("big boy secret time".as_bytes()),
+      &DecodingKey::from_secret(Options::get().secret.as_bytes()),
       &validation,
     )
     .ok()
@@ -42,14 +43,13 @@ impl Token {
   pub fn generate(&self) -> Result<String, anyhow::Error> {
     match &self.claims {
       None => Err(anyhow::anyhow!(
-        "could not generate JWT with no user claims"
+        "could not generate JWT without user claims"
       )),
       Some(claims) => Ok(
         encode(
           &Header::default(),
           claims,
-          // todo: do not hardcode the secret
-          &EncodingKey::from_secret("big boy secret time".as_bytes()),
+          &EncodingKey::from_secret(Options::get().secret.as_bytes()),
         )
         .unwrap(),
       ),

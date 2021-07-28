@@ -57,12 +57,11 @@ pub async fn webfinger(
   query: web::Query<WebfingerReq>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse> {
-  let resource = match &query.resource {
-    Some(res) => res,
-    None => return Err(TumblepubError::NotFound),
-  };
-  let captures = match WEBFINGER_URI.captures(resource) {
-    Some(captures) => captures,
+  let captures = match &query.resource {
+    Some(res) => match WEBFINGER_URI.captures(res) {
+      Some(captures) => captures,
+      None => return Err(TumblepubError::NotFound),
+    },
     None => return Err(TumblepubError::NotFound),
   };
 
@@ -76,11 +75,9 @@ pub async fn webfinger(
   }
 
   let mut pool = pool.acquire().await.unwrap();
-  let blog = Blog::find(&mut pool, (blog_name, None))
-    .await
-    .expect("could not find blog");
+  let blog = Blog::find(&mut pool, (blog_name, None)).await;
   Ok(match blog {
-    Some(blog) => {
+    Ok(Some(blog)) => {
       let res = WebfingerRes {
         subject: format!("acct:{}@{}", blog.name, domain),
         aliases: vec![],
@@ -98,6 +95,6 @@ pub async fn webfinger(
         .content_type("application/jrd+json")
         .json(res)
     }
-    None => HttpResponse::NotFound().finish(),
+    _ => HttpResponse::NotFound().finish(),
   })
 }

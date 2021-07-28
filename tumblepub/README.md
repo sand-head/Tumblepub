@@ -23,6 +23,10 @@ single_user_mode: true
 single_user: null
 # The domain name this instance exists on
 local_domain: null
+# The secret phrase used in generating JWTs
+# Think of it as the "master password" for your instance
+# While it's an empty string by default, it *must* be changed in order to start the instance
+secret: ""
 # PostgreSQL database properties
 database:
   db_name: "tumblepub"

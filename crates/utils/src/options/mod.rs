@@ -18,6 +18,7 @@ static OPTIONS: Lazy<RwLock<Options>> =
 pub struct Options {
   pub single_user_mode: bool,
   pub local_domain: String,
+  pub secret: String,
   pub database: DatabaseOptions,
   pub single_user: Option<SingleUserOptions>,
 }
@@ -27,6 +28,7 @@ impl Default for Options {
     Self {
       single_user_mode: true,
       local_domain: String::from("example.com"),
+      secret: String::from(""),
       database: DatabaseOptions::default(),
       single_user: None,
     }
@@ -51,7 +53,11 @@ impl Options {
     // 1. environment variables
     config.merge(Environment::with_prefix("TUMBLEPUB_"))?;
 
-    config.try_into()
+    if config.get::<String>("secret")?.is_empty() {
+      Err(ConfigError::NotFound("secret".to_string()))
+    } else {
+      config.try_into()
+    }
   }
 
   /// Get a cloned `Options`.
