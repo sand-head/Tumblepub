@@ -1,12 +1,11 @@
 use async_graphql::{ErrorExtensions, Result};
 
 use sqlx::PgPool;
-use tumblepub_ap::crypto::KeyPair;
 use tumblepub_db::models::{
   blog::{Blog, NewBlog},
   user::{NewUser, User},
 };
-use tumblepub_utils::errors::TumblepubError;
+use tumblepub_utils::{crypto::KeyPair, errors::TumblepubError};
 
 use crate::models::user::{User as GqlUser, UserAuthPayload};
 

@@ -1,24 +1,26 @@
-use std::future::{ready, Ready};
-
-use actix_web::{Error, HttpRequest, HttpResponse, Responder};
-use anyhow::Result;
+use activitystreams::actor::{ApActor, Person};
+use activitystreams_ext::Ext1;
+use actix_web::{HttpResponse, Responder};
+use extensions::public_key::PublicKey;
 use serde::Serialize;
-use serde_json::Value;
 
-pub mod crypto;
+use tumblepub_utils::errors::Result as TpResult;
 
-pub struct ActivityStreams<T = Value>(pub T);
-impl<T: Serialize> Responder for ActivityStreams<T> {
-  type Error = Error;
-  type Future = Ready<Result<HttpResponse, Error>>;
+pub mod conversion;
+pub mod extensions;
 
-  fn respond_to(self, _req: &HttpRequest) -> Self::Future {
-    let body = serde_json::to_string(&self.0).unwrap();
+pub type ApBlog = Ext1<ApActor<Person>, PublicKey>;
 
-    ready(Ok(
-      HttpResponse::Ok()
-        .content_type("application/ld+json")
-        .body(body),
-    ))
-  }
+pub trait ActivityPub {
+  type ApType;
+  fn as_activitypub(&self) -> TpResult<Self::ApType>;
+}
+
+pub fn activitypub_response<T>(body: &T) -> impl Responder
+where
+  T: Serialize,
+{
+  HttpResponse::Ok()
+    .content_type("application/ld+json")
+    .json(body)
 }

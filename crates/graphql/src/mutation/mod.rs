@@ -3,14 +3,13 @@ use std::convert::TryInto;
 use async_graphql::{Context, ErrorExtensions, Object, Result};
 use sqlx::PgPool;
 
-use tumblepub_ap::crypto::KeyPair;
 use tumblepub_db::models::{
   blog::{Blog as DbBlog, NewBlog},
   post::{NewPost, Post as DbPost, PostContent as DbPostContent},
   user::User,
   user_blogs::UserBlogs,
 };
-use tumblepub_utils::{errors::TumblepubError, jwt::Token, options::Options};
+use tumblepub_utils::{crypto::KeyPair, errors::TumblepubError, jwt::Token, options::Options};
 
 use self::{login::login, register::register};
 use super::models::user::UserAuthPayload;

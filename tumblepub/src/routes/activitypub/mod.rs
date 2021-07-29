@@ -1,11 +1,10 @@
 use actix_web::{web, Either, HttpResponse, Responder};
 use serde::Deserialize;
-use serde_json::json;
 use sqlx::PgPool;
 
-use tumblepub_ap::ActivityStreams;
+use tumblepub_ap::{activitypub_response, ActivityPub};
 use tumblepub_db::models::blog::Blog;
-use tumblepub_utils::{errors::TumblepubError, options::Options};
+use tumblepub_utils::errors::TumblepubError;
 
 mod inbox;
 mod outbox;
@@ -25,26 +24,8 @@ pub async fn get_ap_blog(
     .await
     .expect("could not retrieve blog from db");
 
-  let local_domain = Options::get().local_domain;
   if let Some(blog) = blog {
-    Ok(Either::A(ActivityStreams(json!({
-      "@context": "https://www.w3.org/ns/activitystreams",
-      "type": "Person",
-      "id": format!("{}/@{}.json", local_domain, blog.name),
-
-      "inbox": format!("{}/inbox/@{}.json", local_domain, blog.name),
-      "outbox": format!("{}/outbox/@{}.json", local_domain, blog.name),
-
-      "preferredUsername": blog.name,
-      "name": blog.title,
-      "summary": blog.description,
-
-      "publicKey": {
-        "id": format!("{}/@{}.json#main-key", local_domain, blog.name),
-        "owner": format!("{}/@{}.json", local_domain, blog.name),
-        "publicKeyPem": blog.public_key
-      }
-    }))))
+    Ok(Either::A(activitypub_response(&blog.as_activitypub()?)))
   } else {
     Ok(Either::B(
       HttpResponse::NotFound().body("The requested user does not exist."),
