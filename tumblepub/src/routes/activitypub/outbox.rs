@@ -1,4 +1,5 @@
 use actix_web::{web, Either, HttpResponse, Responder};
+use serde::Deserialize;
 use serde_json::json;
 
 use sqlx::PgPool;
@@ -8,8 +9,14 @@ use tumblepub_utils::errors::Result;
 
 use super::BlogPath;
 
+#[derive(Deserialize)]
+pub struct PagingParams {
+  pub page: Option<bool>,
+}
+
 pub async fn get_ap_blog_outbox(
   path: web::Path<BlogPath>,
+  params: web::Query<PagingParams>,
   pool: web::Data<PgPool>,
 ) -> Result<impl Responder> {
   let mut pool = pool.acquire().await.unwrap();
@@ -18,8 +25,19 @@ pub async fn get_ap_blog_outbox(
     .expect("could not retrieve blog from db");
 
   if let Some(blog) = blog {
-    let posts = blog.posts(&mut pool, Some(20), Some(0)).await?;
-    Ok(Either::A(activitypub_response(&posts.as_activitypub()?)))
+    if params.page.is_some() && params.page.unwrap() {
+      // we paginate thru real posts here
+      let posts = blog.posts(&mut pool, Some(20), Some(0)).await?;
+      Ok(Either::A(activitypub_response(
+        &(blog, posts).as_activitypub()?,
+      )))
+    } else {
+      // we give a general overview of the outbox here
+      let posts = blog.posts(&mut pool, Some(20), Some(0)).await?;
+      Ok(Either::A(activitypub_response(
+        &(blog, posts).as_activitypub()?,
+      )))
+    }
   } else {
     Ok(Either::B(
       HttpResponse::NotFound().body("The requested user does not exist."),
