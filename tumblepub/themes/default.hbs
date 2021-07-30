@@ -77,15 +77,20 @@
       {{/each}}
     </main>
     <footer>
-      {{#if PreviousPage}}
-      <a href="{{PreviousPage}}">Previous</a>
+      {{#if (or PreviousPage NextPage)}}
+      <div>
+        {{#if PreviousPage}}
+        <a href="{{PreviousPage}}">Previous</a>
+        {{/if}}
+        {{#if (and PreviousPage NextPage)}}
+        &mdash;
+        {{/if}}
+        {{#if NextPage}}
+        <a href="{{NextPage}}">Next</a>
+        {{/if}}
+      </div>
       {{/if}}
-      {{#if (and PreviousPage NextPage)}}
-      &mdash;
-      {{/if}}
-      {{#if NextPage}}
-      <a href="{{NextPage}}">Next</a>
-      {{/if}}
+      served with ♥ using <a href="https://github.com/sand-head/Tumblepub" target="_blank" rel="noopener noreferrer">Tumblepub</a>
     </footer>
   </body>
 </html>
