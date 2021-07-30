@@ -1,5 +1,5 @@
 use activitystreams::{
-  collection::{CollectionExt, OrderedCollection},
+  collection::{CollectionExt, OrderedCollection, OrderedCollectionPage},
   context,
   object::{ApObject, Page},
   prelude::BaseExt,
@@ -18,11 +18,11 @@ impl ActivityPub for Post {
   }
 }
 
-impl ActivityPub for (Blog, Vec<Post>) {
+impl ActivityPub for (Blog, usize) {
   type ApType = OrderedCollection;
 
   fn as_activitypub(&self) -> tumblepub_utils::errors::Result<Self::ApType> {
-    let (blog, posts) = self;
+    let (blog, total_posts) = self;
     let local_domain = Options::get().local_domain;
     let mut collection = OrderedCollection::new();
 
@@ -30,20 +30,39 @@ impl ActivityPub for (Blog, Vec<Post>) {
       .set_context(context())
       .set_id(
         Url::parse(&format!(
-          "https://{}/@{}/outbox.json",
+          "https://{}/outbox/@{}.json",
           local_domain, blog.name
         ))
         .unwrap(),
       )
-      .set_total_items(posts.len() as u64)
+      .set_total_items(*total_posts as u64)
       .set_first(
         Url::parse(&format!(
-          "https://{}/@{}/outbox.json?page=true",
+          "https://{}/outbox/@{}.json?page=true",
           local_domain, blog.name
         ))
         .unwrap(),
       );
-    // .set_many_items(
+    Ok(collection)
+  }
+}
+
+impl ActivityPub for (Blog, Vec<Post>) {
+  type ApType = OrderedCollectionPage;
+
+  fn as_activitypub(&self) -> tumblepub_utils::errors::Result<Self::ApType> {
+    let (blog, _posts) = self;
+    let local_domain = Options::get().local_domain;
+    let mut collection = OrderedCollectionPage::new();
+
+    collection.set_context(context()).set_id(
+      Url::parse(&format!(
+        "https://{}/outbox/@{}.json",
+        local_domain, blog.name
+      ))
+      .unwrap(),
+    );
+    // .set_many_ordered_items(
     //   self
     //     .iter()
     //     .map(|p| {

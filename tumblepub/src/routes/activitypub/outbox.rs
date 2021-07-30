@@ -25,19 +25,17 @@ pub async fn get_ap_blog_outbox(
     .expect("could not retrieve blog from db");
 
   if let Some(blog) = blog {
-    if params.page.is_some() && params.page.unwrap() {
-      // we paginate thru real posts here
-      let posts = blog.posts(&mut pool, Some(20), Some(0)).await?;
-      Ok(Either::A(activitypub_response(
-        &(blog, posts).as_activitypub()?,
-      )))
-    } else {
-      // we give a general overview of the outbox here
-      let posts = blog.posts(&mut pool, Some(20), Some(0)).await?;
-      Ok(Either::A(activitypub_response(
-        &(blog, posts).as_activitypub()?,
-      )))
-    }
+    Ok(Either::A(
+      if params.page.is_some() && params.page.unwrap() {
+        // we paginate thru real posts here
+        let posts = blog.posts(&mut pool, Some(20), Some(0)).await?;
+        Either::A(activitypub_response(&(blog, posts).as_activitypub()?))
+      } else {
+        // we give a general overview of the outbox here
+        let posts = blog.total_posts(&mut pool).await?;
+        Either::B(activitypub_response(&(blog, posts).as_activitypub()?))
+      },
+    ))
   } else {
     Ok(Either::B(
       HttpResponse::NotFound().body("The requested user does not exist."),

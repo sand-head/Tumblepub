@@ -128,6 +128,23 @@ RETURNING *
     )
   }
 
+  pub async fn total_posts(&self, conn: &mut PgConnection) -> Result<usize> {
+    Ok(
+      sqlx::query!(
+        r#"
+SELECT COUNT(id) as count
+FROM posts
+WHERE blog_id = $1
+        "#,
+        &self.id,
+      )
+      .fetch_all(conn)
+      .await?[0]
+        .count
+        .unwrap_or(0) as usize,
+    )
+  }
+
   pub async fn posts(
     &self,
     conn: &mut PgConnection,
@@ -146,7 +163,8 @@ FROM posts
 WHERE blog_id = $1
 ORDER BY created_at DESC
 LIMIT $2
-OFFSET $3"#,
+OFFSET $3
+        "#,
         &self.id,
         limit,
         offset
