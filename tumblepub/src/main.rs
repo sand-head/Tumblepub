@@ -18,7 +18,7 @@ async fn single_user_init(pool: &PgPool) -> Result<()> {
       anyhow::anyhow!(r#"could not get "single_user" options, please set them before running"#)
     })?;
     register(
-      &pool,
+      pool,
       single_user.email,
       single_user.password,
       single_user.username.to_owned(),

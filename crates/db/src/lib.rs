@@ -1,5 +1,7 @@
+pub use sqlx::PgConnection;
+
 use anyhow::Result;
-use sqlx::{Connection, PgConnection};
+use sqlx::Connection;
 use tumblepub_utils::options::Options;
 
 pub mod models;

@@ -6,12 +6,12 @@ use timeago::Formatter;
 
 handlebars_helper!(url_encode: |v: str| utf8_percent_encode(v, NON_ALPHANUMERIC).to_string());
 handlebars_helper!(date_format: |iso_8601: str, format_str: str| {
-  let date = DateTime::parse_from_rfc3339(&iso_8601)
+  let date = DateTime::parse_from_rfc3339(iso_8601)
     .map_err(|_| RenderError::new("Could not parse first parameter as RFC3339 date."))?;
   format!("{}", date.format(format_str))
 });
 handlebars_helper!(time_ago: |iso_8601: str| {
-  let date = DateTime::parse_from_rfc3339(&iso_8601)
+  let date = DateTime::parse_from_rfc3339(iso_8601)
     .map_err(|_| RenderError::new("Could not parse first parameter as RFC3339 date."))?;
   let now = Utc::now();
   let formatter = Formatter::new();
