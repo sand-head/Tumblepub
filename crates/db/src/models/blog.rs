@@ -7,6 +7,8 @@ use uuid::Uuid;
 use super::post::Post;
 use crate::models::post::PostContent;
 
+pub type BlogName = (String, Option<String>);
+
 #[derive(Debug)]
 pub struct Blog {
   pub id: i64,
@@ -70,10 +72,7 @@ RETURNING *
   }
 
   /// Searches for a Blog by the given name & domain tuple and returns it if found.
-  pub async fn find(
-    conn: &mut PgConnection,
-    name: (String, Option<String>),
-  ) -> Result<Option<Self>> {
+  pub async fn find(conn: &mut PgConnection, name: BlogName) -> Result<Option<Self>> {
     let (name, domain) = name;
 
     if let Some(domain) = domain {

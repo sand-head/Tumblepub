@@ -17,32 +17,34 @@ use tumblepub_db::{
 };
 use tumblepub_utils::{errors::Result, markdown::markdown_to_safe_html, options::Options};
 
-use crate::ActivityPub;
+pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Note>> {
+  let local_domain = Options::get().local_domain;
+  let mut object = ApObject::new(Note::new());
 
-impl ActivityPub for Post {
-  type ApType = ApObject<Note>;
+  object
+    .set_id(
+      Url::parse(&format!(
+        "https://{}/@{}/posts/{}.json",
+        local_domain, blog_name, post.id
+      ))
+      .unwrap(),
+    )
+    .set_published(post.created_at.with_timezone(&FixedOffset::east(0)))
+    // todo: change when post visibility is added
+    .set_to(public())
+    .set_content(
+      post
+        .content
+        .0
+        .iter()
+        .map(|c| match c {
+          PostContent::Markdown(markdown) => markdown_to_safe_html(markdown.to_owned()),
+        })
+        .collect::<Vec<_>>()
+        .join("\n"),
+    );
 
-  fn as_activitypub(&self) -> tumblepub_utils::errors::Result<Self::ApType> {
-    let mut post = ApObject::new(Note::new());
-
-    post
-      .set_published(self.created_at.with_timezone(&FixedOffset::east(0)))
-      // todo: change when post visibility is added
-      .set_to(public())
-      .set_content(
-        self
-          .content
-          .0
-          .iter()
-          .map(|c| match c {
-            PostContent::Markdown(markdown) => markdown_to_safe_html(markdown.to_owned()),
-          })
-          .collect::<Vec<_>>()
-          .join("\n"),
-      );
-
-    Ok(post)
-  }
+  Ok(object)
 }
 
 pub async fn post_collection(conn: &mut PgConnection, blog: Blog) -> Result<OrderedCollection> {
@@ -97,7 +99,7 @@ pub async fn post_collection_page(
         .map(|p: &Post| {
           let mut create = Create::new(
             Url::parse(&format!("https://{}/@{}.json", local_domain, blog.name)).unwrap(),
-            p.as_activitypub()?.into_any_base().unwrap(),
+            post(blog.name.to_owned(), p)?.into_any_base().unwrap(),
           );
           create.set_published(p.created_at.with_timezone(&FixedOffset::east(0)));
 

@@ -42,4 +42,20 @@ RETURNING id, blog_id, content as "content: Json<Vec<PostContent>>", created_at,
       .await?,
     )
   }
+  pub async fn find(conn: &mut PgConnection, id: Uuid) -> Result<Option<Self>> {
+    Ok(
+      sqlx::query_as!(
+        Post,
+        r#"
+SELECT id, blog_id, content as "content: Json<Vec<PostContent>>", created_at, updated_at
+FROM posts
+WHERE id = $1
+LIMIT 1
+        "#,
+        id
+      )
+      .fetch_optional(conn)
+      .await?,
+    )
+  }
 }
