@@ -24,7 +24,7 @@ pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Note>> {
   object
     .set_id(
       Url::parse(&format!(
-        "https://{}/@{}/posts/{}.json",
+        "https://{}/@{}/posts/{}",
         local_domain, blog_name, post.id
       ))
       .unwrap(),
@@ -54,17 +54,11 @@ pub async fn post_collection(conn: &mut PgConnection, blog: Blog) -> Result<Orde
 
   collection
     .set_context(context())
-    .set_id(
-      Url::parse(&format!(
-        "https://{}/outbox/@{}.json",
-        local_domain, blog.name
-      ))
-      .unwrap(),
-    )
+    .set_id(Url::parse(&format!("https://{}/@{}/outbox", local_domain, blog.name)).unwrap())
     .set_total_items(total_posts as u64)
     .set_first(
       Url::parse(&format!(
-        "https://{}/outbox/@{}.json?page=true",
+        "https://{}/@{}/outbox?page=true",
         local_domain, blog.name
       ))
       .unwrap(),
@@ -84,24 +78,19 @@ pub async fn post_collection_page(
 
   collection
     .set_context(context())
-    .set_id(
-      Url::parse(&format!(
-        "https://{}/outbox/@{}.json",
-        local_domain, blog.name
-      ))
-      .unwrap(),
-    )
-    // todo: change when post visibility is added
-    .set_to(public())
+    .set_id(Url::parse(&format!("https://{}/@{}/outbox", local_domain, blog.name)).unwrap())
     .set_many_ordered_items(
       posts
         .iter()
         .map(|p: &Post| {
           let mut create = Create::new(
-            Url::parse(&format!("https://{}/@{}.json", local_domain, blog.name)).unwrap(),
+            Url::parse(&format!("https://{}/@{}", local_domain, blog.name)).unwrap(),
             post(blog.name.to_owned(), p)?.into_any_base().unwrap(),
           );
-          create.set_published(p.created_at.with_timezone(&FixedOffset::east(0)));
+          create
+            // todo: change when post visibility is added
+            .set_to(public())
+            .set_published(p.created_at.with_timezone(&FixedOffset::east(0)));
 
           Ok(create.into_any_base().unwrap())
         })

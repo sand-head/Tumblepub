@@ -1,4 +1,4 @@
-use actix_web::{web, Either, HttpResponse, Responder};
+use actix_web::{guard, web, Either, HttpResponse, Responder};
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -62,17 +62,33 @@ pub async fn get_ap_blog_post(
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {
-  config.service(web::resource("/@{blog}.json").route(web::get().to(get_ap_blog)));
-  config
-    .service(web::resource("/@{blog}/posts/{post_id}.json").route(web::get().to(get_ap_blog_post)));
+  // get requests
   config.service(
-    web::resource("/inbox/@{blog}.json")
-      .route(web::get().to(inbox::get_ap_blog_inbox))
-      .route(web::post().to(inbox::post_ap_blog_inbox)),
+    web::scope("/")
+      .guard(
+        guard::Any(guard::Header("Accept", "application/activity+json")).or(guard::Header(
+          "Accept",
+          r#"application/ld+json; profile="https://www.w3.org/ns/activitystreams""#,
+        )),
+      )
+      .route("/@{blog}", web::get().to(get_ap_blog))
+      .route("/@{blog}/inbox", web::get().to(inbox::get_ap_blog_inbox))
+      .route("/@{blog}/outbox", web::get().to(outbox::get_ap_blog_outbox))
+      .route("/@{blog}/posts/{post_id}", web::get().to(get_ap_blog_post)),
   );
+  // post requests
   config.service(
-    web::resource("/outbox/@{blog}.json")
-      .route(web::get().to(outbox::get_ap_blog_outbox))
-      .route(web::post().to(outbox::post_ap_blog_outbox)),
+    web::scope("/")
+      .guard(
+        guard::Any(guard::Header("Content-Type", "application/activity+json")).or(guard::Header(
+          "Content-Type",
+          r#"application/ld+json; profile="https://www.w3.org/ns/activitystreams""#,
+        )),
+      )
+      .route("/@{blog}/inbox", web::post().to(inbox::post_ap_blog_inbox))
+      .route(
+        "/@{blog}/outbox",
+        web::post().to(outbox::post_ap_blog_outbox),
+      ),
   );
 }

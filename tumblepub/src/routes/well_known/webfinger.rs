@@ -84,7 +84,7 @@ pub async fn webfinger(
         links: vec![WebfingerLink {
           rel: "self".to_string(),
           content_type: Some("application/activity+json".to_string()),
-          href: Some(format!("https://{}/@{}.json", local_domain, blog.name)),
+          href: Some(format!("https://{}/@{}", local_domain, blog.name)),
           titles: None,
           properties: None,
           template: None,

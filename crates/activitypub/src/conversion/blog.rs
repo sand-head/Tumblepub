@@ -24,27 +24,17 @@ impl ActivityPub for Blog {
     // I could probably switch protocols based on request protocol
     // but that'd be adding support for http... just reverse proxy
     let mut blog = ApActor::new(
-      Url::parse(&format!(
-        "https://{}/inbox/@{}.json",
-        local_domain, self.name
-      ))
-      .unwrap(),
+      Url::parse(&format!("https://{}/@{}/inbox", local_domain, self.name)).unwrap(),
       Person::new(),
     );
 
     blog
       .set_context(context())
-      .set_id(Url::parse(&format!("https://{}/@{}.json", local_domain, self.name)).unwrap())
+      .set_id(Url::parse(&format!("https://{}/@{}", local_domain, self.name)).unwrap())
       .set_published(self.created_at.with_timezone(&FixedOffset::east(0)))
       .set_name(self.title.as_ref().unwrap_or(&self.name).to_owned())
       .set_preferred_username(self.name.to_owned())
-      .set_outbox(
-        Url::parse(&format!(
-          "https://{}/outbox/@{}.json",
-          local_domain, self.name
-        ))
-        .unwrap(),
-      );
+      .set_outbox(Url::parse(&format!("https://{}/@{}/outbox", local_domain, self.name)).unwrap());
 
     if let Some(description) = self.description.to_owned() {
       blog.set_summary(description);
@@ -54,12 +44,8 @@ impl ActivityPub for Blog {
       blog,
       PublicKey {
         public_key: PublicKeyInner {
-          id: Url::parse(&format!(
-            "https://{}/@{}.json#main-key",
-            local_domain, self.name
-          ))
-          .unwrap(),
-          owner: Url::parse(&format!("https://{}/@{}.json", local_domain, self.name)).unwrap(),
+          id: Url::parse(&format!("https://{}/@{}#main-key", local_domain, self.name)).unwrap(),
+          owner: Url::parse(&format!("https://{}/@{}", local_domain, self.name)).unwrap(),
           public_key_pem: String::from_utf8(self.public_key.to_owned()).unwrap(),
         },
       },
