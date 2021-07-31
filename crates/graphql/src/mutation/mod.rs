@@ -101,16 +101,24 @@ impl Mutation {
       .ok_or_else(|| TumblepubError::Unauthorized.extend())?;
     let mut conn = ctx.data::<PgPool>()?.acquire().await.unwrap();
 
-    let blog = DbBlog::find(&mut conn, (name, None)).await?;
-    if let Some(mut blog) = blog {
-      if !UserBlogs::user_is_admin(&mut conn, claims.sub, blog.id).await? {
-        return Err(TumblepubError::Unauthorized.extend());
-      }
+    let user = User::get_by_id(&mut conn, claims.sub).await?;
+    if let Some(user) = user {
+      let blog = DbBlog::find(&mut conn, (name, None)).await?;
+      if let Some(mut blog) = blog {
+        if user.primary_blog != blog.id
+          && !UserBlogs::user_is_admin(&mut conn, claims.sub, blog.id).await?
+        {
+          return Err(TumblepubError::Unauthorized.extend());
+        }
 
-      blog.set_description(&mut conn, description).await?;
-      Ok(blog.into())
+        // ok! we can now set the blog's description
+        blog.set_description(&mut conn, description).await?;
+        Ok(blog.into())
+      } else {
+        Err(TumblepubError::NotFound.extend())
+      }
     } else {
-      Err(TumblepubError::NotFound.extend())
+      Err(TumblepubError::BadRequest("User is banned or does not exist.").extend())
     }
   }
 
