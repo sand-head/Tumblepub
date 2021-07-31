@@ -32,6 +32,7 @@ pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Note>> {
     .set_published(post.created_at.with_timezone(&FixedOffset::east(0)))
     // todo: change when post visibility is added
     .set_to(public())
+    .set_attributed_to(Url::parse(&format!("https://{}/@{}", local_domain, blog_name)).unwrap())
     .set_content(
       post
         .content
