@@ -1,5 +1,6 @@
 use activitystreams::{
   actor::{ApActor, ApActorExt, Person},
+  chrono::FixedOffset,
   context,
   object::ObjectExt,
   prelude::BaseExt,
@@ -34,6 +35,7 @@ impl ActivityPub for Blog {
     blog
       .set_context(context())
       .set_id(Url::parse(&format!("https://{}/@{}.json", local_domain, self.name)).unwrap())
+      .set_published(self.created_at.with_timezone(&FixedOffset::east(0)))
       .set_name(self.title.as_ref().unwrap_or(&self.name).to_owned())
       .set_preferred_username(self.name.to_owned())
       .set_outbox(

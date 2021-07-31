@@ -3,7 +3,10 @@ use serde::Deserialize;
 use serde_json::json;
 
 use sqlx::PgPool;
-use tumblepub_ap::{activitypub_response, ActivityPub};
+use tumblepub_ap::{
+  activitypub_response,
+  conversion::posts::{post_collection, post_collection_page},
+};
 use tumblepub_db::models::blog::Blog;
 use tumblepub_utils::errors::Result;
 
@@ -28,12 +31,14 @@ pub async fn get_ap_blog_outbox(
     Ok(Either::A(
       if params.page.is_some() && params.page.unwrap() {
         // we paginate thru real posts here
-        let posts = blog.posts(&mut pool, Some(20), Some(0)).await?;
-        Either::A(activitypub_response(&(blog, posts).as_activitypub()?))
+        Either::A(activitypub_response(
+          &post_collection_page(&mut pool, blog, 0).await?,
+        ))
       } else {
         // we give a general overview of the outbox here
-        let posts = blog.total_posts(&mut pool).await?;
-        Either::B(activitypub_response(&(blog, posts).as_activitypub()?))
+        Either::B(activitypub_response(
+          &post_collection(&mut pool, blog).await?,
+        ))
       },
     ))
   } else {
