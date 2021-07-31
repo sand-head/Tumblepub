@@ -183,4 +183,26 @@ OFFSET $3
       None => None,
     })
   }
+
+  pub async fn set_description(&mut self, conn: &mut PgConnection, desc: String) -> Result<()> {
+    let result = sqlx::query!(
+      r#"
+UPDATE blogs
+SET description = $1
+WHERE id = $2
+      "#,
+      desc,
+      self.id
+    )
+    .execute(conn)
+    .await;
+
+    match result {
+      Ok(_) => {
+        self.description = Some(desc);
+        Ok(())
+      }
+      Err(e) => Err(e.into()),
+    }
+  }
 }

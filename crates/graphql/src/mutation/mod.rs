@@ -87,6 +87,33 @@ impl Mutation {
     Ok(blog.into())
   }
 
+  /// Modifies the description of the blog by the given name, provided that it exists and the current user is an admin of the blog.
+  pub async fn set_blog_description(
+    &self,
+    ctx: &Context<'_>,
+    name: String,
+    description: String,
+  ) -> Result<Blog> {
+    let claims = ctx
+      .data::<Token>()?
+      .get_claims()
+      .as_ref()
+      .ok_or_else(|| TumblepubError::Unauthorized.extend())?;
+    let mut conn = ctx.data::<PgPool>()?.acquire().await.unwrap();
+
+    let blog = DbBlog::find(&mut conn, (name, None)).await?;
+    if let Some(mut blog) = blog {
+      if !UserBlogs::user_is_admin(&mut conn, claims.sub, blog.id).await? {
+        return Err(TumblepubError::Unauthorized.extend());
+      }
+
+      blog.set_description(&mut conn, description).await?;
+      Ok(blog.into())
+    } else {
+      Err(TumblepubError::NotFound.extend())
+    }
+  }
+
   /// Creates a new post under the given blog.
   pub async fn create_post(
     &self,

@@ -43,4 +43,20 @@ VALUES ($1, $2, $3)
 
     Ok(())
   }
+
+  pub async fn user_is_admin(conn: &mut PgConnection, user_id: i64, blog_id: i64) -> Result<bool> {
+    let record = sqlx::query!(
+      r#"
+SELECT is_admin
+FROM user_blogs
+WHERE user_id = $1 AND blog_id = $2
+      "#,
+      user_id,
+      blog_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(record.is_admin)
+  }
 }
