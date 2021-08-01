@@ -20,7 +20,7 @@ use tumblepub_db::{
 use tumblepub_utils::{errors::Result, markdown::markdown_to_safe_html, options::Options};
 
 static ARTICLE_KIND_REGEX: Lazy<Regex> = Lazy::new(|| {
-  Regex::new(r#"!\[(.*)\]\((.+)\)|\n#+(.*)"#).expect("could not compile article regex")
+  Regex::new(r#"!\[([^]]*)\]\(([^)]+)\)|^#*# (.+)"#).expect("could not compile article regex")
 });
 
 pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Object<String>>> {
