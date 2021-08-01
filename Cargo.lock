@@ -3289,6 +3289,8 @@ dependencies = [
  "activitystreams-ext",
  "actix-web",
  "anyhow",
+ "once_cell",
+ "regex",
  "serde 1.0.126",
  "serde_json",
  "tumblepub_db",

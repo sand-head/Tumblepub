@@ -3,11 +3,13 @@ use activitystreams::{
   chrono::FixedOffset,
   collection::{CollectionExt, OrderedCollection, OrderedCollectionPage},
   context,
-  object::{ApObject, Note},
+  object::{ApObject, Object},
   prelude::*,
   public,
   url::Url,
 };
+use once_cell::sync::Lazy;
+use regex::Regex;
 use tumblepub_db::{
   models::{
     blog::Blog,
@@ -17,9 +19,32 @@ use tumblepub_db::{
 };
 use tumblepub_utils::{errors::Result, markdown::markdown_to_safe_html, options::Options};
 
-pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Note>> {
+static ARTICLE_KIND_REGEX: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r#"!\[(.*)\]\((.+)\)|\n#+(.*)"#).expect("could not compile article regex")
+});
+
+pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Object<String>>> {
+  // flatten the post's content
+  let content = post
+    .content
+    .0
+    .iter()
+    .map(|c| match c {
+      PostContent::Markdown(markdown) => markdown.to_owned(),
+    })
+    .collect::<Vec<_>>()
+    .join("\n");
+
   let local_domain = Options::get().local_domain;
-  let mut object = ApObject::new(Note::new());
+  let mut inner = Object::<String>::new();
+  if ARTICLE_KIND_REGEX.captures(&content).is_some() {
+    // if the post contains image tags or headings
+    // then we'll send it off as an article
+    inner.set_kind("Article".to_owned());
+  } else {
+    inner.set_kind("Note".to_owned());
+  }
+  let mut object = ApObject::new(inner);
 
   object
     .set_id(
@@ -33,17 +58,7 @@ pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Note>> {
     // todo: change when post visibility is added
     .set_to(public())
     .set_attributed_to(Url::parse(&format!("https://{}/@{}", local_domain, blog_name)).unwrap())
-    .set_content(
-      post
-        .content
-        .0
-        .iter()
-        .map(|c| match c {
-          PostContent::Markdown(markdown) => markdown_to_safe_html(markdown.to_owned()),
-        })
-        .collect::<Vec<_>>()
-        .join("\n"),
-    );
+    .set_content(markdown_to_safe_html(content));
 
   Ok(object)
 }
