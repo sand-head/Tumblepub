@@ -72,6 +72,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         )),
       )
       .route("/@{blog}", web::get().to(get_ap_blog))
+      .route(
+        "/@{blog}/followers",
+        web::get().to(HttpResponse::NotImplemented),
+      )
       .route("/@{blog}/inbox", web::get().to(inbox::get_ap_blog_inbox))
       .route("/@{blog}/outbox", web::get().to(outbox::get_ap_blog_outbox))
       .route("/@{blog}/posts/{post_id}", web::get().to(get_ap_blog_post)),

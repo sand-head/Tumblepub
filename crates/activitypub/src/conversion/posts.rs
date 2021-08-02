@@ -19,6 +19,8 @@ use tumblepub_db::{
 };
 use tumblepub_utils::{errors::Result, markdown::markdown_to_safe_html, options::Options};
 
+/// Captures Markdown images and headings of any size.
+/// Used in determining whether a post should be considered an article in ActivityPub for compatibility.
 static ARTICLE_KIND_REGEX: Lazy<Regex> = Lazy::new(|| {
   Regex::new(r#"!\[([^]]*)\]\(([^)]+)\)|^#*# (.+)"#).expect("could not compile article regex")
 });
