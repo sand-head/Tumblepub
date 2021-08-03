@@ -7,26 +7,39 @@ use tumblepub_db::models::{
 };
 use tumblepub_utils::{crypto::KeyPair, errors::TumblepubError};
 
-use crate::models::user::{User as GqlUser, UserAuthPayload};
+use crate::models::AuthPayload;
 
 pub async fn register(
   pool: &PgPool,
   email: String,
   password: String,
   name: String,
-) -> Result<UserAuthPayload> {
+) -> Result<AuthPayload> {
   let mut txn = pool.begin().await?;
-  // step 1: create a primary blog for the new user
+  // step 1: create a new user
+  let user = User::create(
+    &mut *txn,
+    NewUser {
+      email,
+      password,
+    },
+  )
+  .await
+  .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
+
+  // step 2: create a primary blog for the new user using the provided name
   let keypair = KeyPair::generate().map_err(|e| TumblepubError::InternalServerError(e).extend())?;
-  let primary_blog = Blog::create_new(
+  Blog::create_new(
     &mut *txn,
     NewBlog {
-      uri: Option::<String>::None,
+      user_id: user.id,
+      uri: None,
       name,
-      domain: Option::<String>::None,
+      domain: None,
+      is_primary: true,
       is_public: true,
-      title: Option::<String>::None,
-      description: Option::<String>::None,
+      title: None,
+      description: None,
       private_key: keypair.private_key,
       public_key: keypair.public_key,
     },
@@ -34,19 +47,7 @@ pub async fn register(
   .await
   .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
 
-  // step 2: create a new user using the created primary blog ID
-  let user = User::create(
-    &mut *txn,
-    NewUser {
-      email,
-      password,
-      primary_blog: primary_blog.id,
-    },
-  )
-  .await
-  .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
-
   // step 3: commit transaction and return auth payload with JWT
   txn.commit().await?;
-  Ok(UserAuthPayload::new(GqlUser::from((user, primary_blog))))
+  Ok(AuthPayload::new(user))
 }

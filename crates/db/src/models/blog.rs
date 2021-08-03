@@ -12,19 +12,20 @@ pub type BlogName = (String, Option<String>);
 #[derive(Debug)]
 pub struct Blog {
   pub id: i64,
+  pub user_id: i64,
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
+  pub is_primary: bool,
   pub is_public: bool,
+  pub is_nsfw: bool,
   pub title: Option<String>,
   pub description: Option<String>,
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
   pub theme_id: Option<Uuid>,
-  pub is_nsfw: bool,
-  pub is_private: bool,
   pub private_key: Option<Vec<u8>>,
   pub public_key: Vec<u8>,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug)]
@@ -36,9 +37,11 @@ pub struct BlogTheme {
 }
 
 pub struct NewBlog {
+  pub user_id: i64,
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
+  pub is_primary: bool,
   pub is_public: bool,
   pub title: Option<String>,
   pub description: Option<String>,
@@ -53,13 +56,15 @@ impl Blog {
       sqlx::query_as!(
         Blog,
         r#"
-INSERT INTO blogs (uri, name, domain, is_public, title, description, private_key, public_key)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO blogs (user_id, uri, name, domain, is_primary, is_public, title, description, private_key, public_key)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 RETURNING *
         "#,
+        model.user_id,
         model.uri,
         model.name,
         model.domain,
+        model.is_primary,
         model.is_public,
         model.title,
         model.description,

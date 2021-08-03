@@ -6,7 +6,12 @@
 
 DROP TABLE user_blogs;
 ALTER TABLE blogs
-  ADD COLUMN user_id BIGSERIAL REFERENCES users (id);
+  ADD COLUMN user_id BIGSERIAL REFERENCES users (id) NOT NULL,
+  ADD COLUMN is_primary BOOLEAN NOT NULL DEFAULT false,
+  -- why did I add both `is_public` *and* `is_private`
+  DROP COLUMN is_private;
+ALTER TABLE users
+  DROP COLUMN primary_blog;
 
 -- also, we're adding follows
 -- technically, it is the primary blog that does the following, not the user
