@@ -12,9 +12,9 @@ use tumblepub_utils::{crypto::KeyPair, errors::TumblepubError, jwt::Token, optio
 
 use self::{login::login, register::register};
 use crate::models::{
-  AuthPayload,
   blog::Blog,
   posts::{Post, PostInput},
+  AuthPayload,
 };
 
 mod login;
@@ -100,7 +100,7 @@ impl Mutation {
     let mut conn = ctx.data::<PgPool>()?.acquire().await.unwrap();
 
     let user = User::get_by_id(&mut conn, claims.sub).await?;
-    if let Some(_) = user {
+    if user.is_some() {
       let blog = DbBlog::find(&mut conn, (name, None)).await?;
       if let Some(mut blog) = blog {
         if blog.user_id != blog.id {

@@ -121,4 +121,13 @@ RETURNING *
       .await?,
     )
   }
+
+  // Returns all of the given user's blogs.
+  pub async fn blogs(&self, conn: &mut PgConnection) -> Result<Vec<Blog>> {
+    Ok(
+      sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE user_id = $1", self.id)
+        .fetch_all(conn)
+        .await?,
+    )
+  }
 }

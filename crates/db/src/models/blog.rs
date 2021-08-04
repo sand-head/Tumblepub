@@ -9,7 +9,7 @@ use crate::models::post::PostContent;
 
 pub type BlogName = (String, Option<String>);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Blog {
   pub id: i64,
   pub user_id: i64,

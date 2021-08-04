@@ -4,6 +4,8 @@ use sqlx::PgPool;
 use tumblepub_db::models::{blog::Blog as DbBlog, user::User as DbUser};
 use tumblepub_utils::{errors::TumblepubError, jwt::Token};
 
+use crate::models::CurrentUser;
+
 use super::models::blog::Blog;
 
 pub struct Query;
@@ -27,7 +29,7 @@ impl Query {
   }
 
   /// Gets the currently authenticated user.
-  pub async fn current_user(&self, ctx: &Context<'_>) -> Result<Blog> {
+  pub async fn current_user(&self, ctx: &Context<'_>) -> Result<CurrentUser> {
     let token = ctx.data::<Token>()?;
     let mut pool = ctx.data::<PgPool>()?.acquire().await.unwrap();
 
@@ -35,8 +37,14 @@ impl Query {
       .await
       .map_err(|_| TumblepubError::Unauthorized.extend())?
       .ok_or_else(|| TumblepubError::Unauthorized.extend())?;
-    let blog = user.primary_blog(&mut pool).await?;
 
-    Ok(Blog::from(blog))
+    Ok(CurrentUser {
+      blogs: user
+        .blogs(&mut pool)
+        .await?
+        .iter()
+        .map(|b| Blog::from(b.to_owned()))
+        .collect(),
+    })
   }
 }

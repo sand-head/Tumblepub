@@ -2,6 +2,8 @@ use async_graphql::SimpleObject;
 use tumblepub_db::models::user::User;
 use tumblepub_utils::jwt::{Token, UserClaims};
 
+use self::blog::Blog;
+
 pub mod blog;
 pub mod posts;
 
@@ -16,4 +18,9 @@ impl AuthPayload {
       token: Token::new(claims).generate().unwrap(),
     }
   }
+}
+
+#[derive(Debug, Clone, SimpleObject)]
+pub struct CurrentUser {
+  pub blogs: Vec<Blog>,
 }
