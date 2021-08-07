@@ -6,6 +6,7 @@ use serde::Serialize;
 
 use tumblepub_utils::errors::Result as TpResult;
 
+pub mod activity;
 pub mod conversion;
 pub mod extensions;
 

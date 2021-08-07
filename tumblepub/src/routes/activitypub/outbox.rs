@@ -1,6 +1,5 @@
 use actix_web::{web, Either, HttpResponse, Responder};
 use serde::Deserialize;
-use serde_json::json;
 
 use sqlx::PgPool;
 use tumblepub_ap::{
@@ -46,9 +45,4 @@ pub async fn get_ap_blog_outbox(
       HttpResponse::NotFound().body("The requested user does not exist."),
     ))
   }
-}
-
-pub async fn post_ap_blog_outbox() -> Result<impl Responder> {
-  // todo: implement posting outbox
-  Ok(activitypub_response(&json!({})))
 }

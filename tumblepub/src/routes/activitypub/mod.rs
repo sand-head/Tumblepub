@@ -86,7 +86,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         "/@{blog}/followers",
         web::get().to(HttpResponse::NotImplemented),
       )
-      .route("/@{blog}/inbox", web::get().to(inbox::get_ap_blog_inbox))
       .route("/@{blog}/outbox", web::get().to(outbox::get_ap_blog_outbox))
       .route("/@{blog}/posts/{post_id}", web::get().to(get_ap_blog_post)),
   );
@@ -99,10 +98,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
           r#"application/ld+json; profile="https://www.w3.org/ns/activitystreams""#,
         )),
       )
-      .route("/@{blog}/inbox", web::post().to(inbox::post_ap_blog_inbox))
-      .route(
-        "/@{blog}/outbox",
-        web::post().to(outbox::post_ap_blog_outbox),
-      ),
+      .route("/@{blog}/inbox", web::post().to(inbox::post_ap_blog_inbox)),
   );
 }

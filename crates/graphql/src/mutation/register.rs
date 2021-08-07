@@ -17,15 +17,9 @@ pub async fn register(
 ) -> Result<AuthPayload> {
   let mut txn = pool.begin().await?;
   // step 1: create a new user
-  let user = User::create(
-    &mut *txn,
-    NewUser {
-      email,
-      password,
-    },
-  )
-  .await
-  .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
+  let user = User::create(&mut *txn, NewUser { email, password })
+    .await
+    .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
 
   // step 2: create a primary blog for the new user using the provided name
   let keypair = KeyPair::generate().map_err(|e| TumblepubError::InternalServerError(e).extend())?;
