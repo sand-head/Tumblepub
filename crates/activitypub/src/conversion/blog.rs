@@ -8,7 +8,7 @@ use activitystreams::{
 };
 use activitystreams_ext::Ext1;
 use tumblepub_db::models::blog::Blog;
-use tumblepub_utils::options::Options;
+use tumblepub_utils::{description_to_html, options::Options};
 
 use crate::{extensions::public_key::PublicKey, ActivityPub, ApBlog};
 
@@ -34,7 +34,7 @@ impl ActivityPub for Blog {
       .set_outbox(Url::parse(&format!("https://{}/@{}/outbox", local_domain, self.name)).unwrap());
 
     if let Some(description) = self.description.to_owned() {
-      blog.set_summary(description);
+      blog.set_summary(description_to_html(description));
     }
 
     Ok(Ext1::new(
