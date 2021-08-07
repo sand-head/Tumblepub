@@ -6,9 +6,10 @@ use serde::Serialize;
 
 use tumblepub_utils::errors::Result as TpResult;
 
-pub mod activity;
 pub mod conversion;
 pub mod extensions;
+pub mod models;
+pub mod webfinger;
 
 pub type ApBlog = Ext1<ApActor<Person>, PublicKey>;
 

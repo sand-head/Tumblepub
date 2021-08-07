@@ -1,9 +1,10 @@
 use actix_web::{web, HttpResponse, Responder};
 
-use tumblepub_ap::activity::{Activity, ActivityKind};
+use tumblepub_ap::models::activity::{Activity, ActivityKind};
 use tumblepub_utils::errors::Result;
 
 pub async fn post_ap_blog_inbox(activity: web::Json<Activity>) -> Result<impl Responder> {
+  // todo: check if actor exists in db and, if not, finger for it
   match &activity.kind {
     ActivityKind::Create { object } => todo!(),
     ActivityKind::Announce => todo!(),

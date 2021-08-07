@@ -1,19 +1,13 @@
-use activitystreams::{unparsed::UnparsedMutExt, url::Url};
+use activitystreams::unparsed::UnparsedMutExt;
 use activitystreams_ext::UnparsedExtension;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+use crate::models;
+
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicKey {
-  pub public_key: PublicKeyInner,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PublicKeyInner {
-  pub id: Url,
-  pub owner: Url,
-  pub public_key_pem: String,
+  pub public_key: models::actor::PublicKey,
 }
 
 impl<U> UnparsedExtension<U> for PublicKey

@@ -10,10 +10,7 @@ use activitystreams_ext::Ext1;
 use tumblepub_db::models::blog::Blog;
 use tumblepub_utils::options::Options;
 
-use crate::{
-  extensions::public_key::{PublicKey, PublicKeyInner},
-  ActivityPub, ApBlog,
-};
+use crate::{extensions::public_key::PublicKey, ActivityPub, ApBlog};
 
 impl ActivityPub for Blog {
   type ApType = ApBlog;
@@ -43,9 +40,9 @@ impl ActivityPub for Blog {
     Ok(Ext1::new(
       blog,
       PublicKey {
-        public_key: PublicKeyInner {
-          id: Url::parse(&format!("https://{}/@{}#main-key", local_domain, self.name)).unwrap(),
-          owner: Url::parse(&format!("https://{}/@{}", local_domain, self.name)).unwrap(),
+        public_key: crate::models::actor::PublicKey {
+          id: format!("https://{}/@{}#main-key", local_domain, self.name),
+          owner: format!("https://{}/@{}", local_domain, self.name),
           public_key_pem: String::from_utf8(self.public_key.to_owned()).unwrap(),
         },
       },

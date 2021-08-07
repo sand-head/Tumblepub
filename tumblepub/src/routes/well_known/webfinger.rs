@@ -1,18 +1,15 @@
 use std::collections::HashMap;
 
 use actix_web::{web, HttpResponse};
-use once_cell::sync::Lazy;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+use tumblepub_ap::webfinger::WEBFINGER_URI;
 use tumblepub_db::models::blog::Blog;
 use tumblepub_utils::{
   errors::{Result, TumblepubError},
   options::Options,
 };
-
-static WEBFINGER_URI: Lazy<Regex> = Lazy::new(|| Regex::new("^acct:([a-z0-9_]*)@(.*)$").unwrap());
 
 #[derive(Deserialize)]
 pub struct WebfingerReq {
