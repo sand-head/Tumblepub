@@ -1,16 +1,20 @@
 use activitystreams::object::{ApObject, Object};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Deserialize, Serialize)]
 #[serde(tag = "type")]
 pub enum ActivityKind {
   Create { object: ApObject<Object<String>> },
-  Announce,
-  Follow,
+  Announce { object: ApObject<Object<String>> },
+  Follow { object: String },
 }
 #[derive(Deserialize, Serialize)]
 pub struct Activity {
-  pub actor: String,
+  #[serde(rename = "@context")]
+  pub context: Value,
   #[serde(flatten)]
   pub kind: ActivityKind,
+
+  pub actor: String,
 }

@@ -12,7 +12,8 @@ pub type BlogName = (String, Option<String>);
 #[derive(Debug, Clone)]
 pub struct Blog {
   pub id: i64,
-  pub user_id: i64,
+  // Foreign blogs do not have users
+  pub user_id: Option<i64>,
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
@@ -37,7 +38,7 @@ pub struct BlogTheme {
 }
 
 pub struct NewBlog {
-  pub user_id: i64,
+  pub user_id: Option<i64>,
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
@@ -45,7 +46,7 @@ pub struct NewBlog {
   pub is_public: bool,
   pub title: Option<String>,
   pub description: Option<String>,
-  pub private_key: Vec<u8>,
+  pub private_key: Option<Vec<u8>>,
   pub public_key: Vec<u8>,
 }
 
@@ -107,6 +108,14 @@ RETURNING *
   pub async fn get_by_id(conn: &mut PgConnection, id: i64) -> Result<Option<Self>> {
     Ok(
       sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE id = $1", id)
+        .fetch_optional(conn)
+        .await?,
+    )
+  }
+
+  pub async fn get_by_uri(conn: &mut PgConnection, uri: &str) -> Result<Option<Self>> {
+    Ok(
+      sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE uri = $1", uri)
         .fetch_optional(conn)
         .await?,
     )
@@ -210,4 +219,6 @@ WHERE id = $2
       Err(e) => Err(e.into()),
     }
   }
+
+  pub async fn follow_blog(&self, conn: &mut PgConnection, name: BlogName) {}
 }

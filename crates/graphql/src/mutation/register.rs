@@ -26,7 +26,7 @@ pub async fn register(
   Blog::create_new(
     &mut *txn,
     NewBlog {
-      user_id: user.id,
+      user_id: Some(user.id),
       uri: None,
       name,
       domain: None,
@@ -34,7 +34,7 @@ pub async fn register(
       is_public: true,
       title: None,
       description: None,
-      private_key: keypair.private_key,
+      private_key: Some(keypair.private_key),
       public_key: keypair.public_key,
     },
   )

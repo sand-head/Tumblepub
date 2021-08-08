@@ -14,6 +14,12 @@ pub enum TumblepubError {
   InternalServerError(#[from] anyhow::Error),
 }
 
+impl From<reqwest::Error> for TumblepubError {
+  fn from(err: reqwest::Error) -> Self {
+    TumblepubError::InternalServerError(err.into())
+  }
+}
+
 pub type Result<T> = ::std::result::Result<T, TumblepubError>;
 
 // handle TumblepubErrors for GraphQL requests

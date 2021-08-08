@@ -63,7 +63,7 @@ impl Mutation {
     let blog = DbBlog::create_new(
       &mut *txn,
       NewBlog {
-        user_id: claims.sub,
+        user_id: Some(claims.sub),
         uri: Option::<String>::None,
         name,
         domain: Option::<String>::None,
@@ -71,7 +71,7 @@ impl Mutation {
         is_public: true,
         title: Option::<String>::None,
         description: Option::<String>::None,
-        private_key: keypair.private_key,
+        private_key: Some(keypair.private_key),
         public_key: keypair.public_key,
       },
     )
@@ -103,7 +103,7 @@ impl Mutation {
     if user.is_some() {
       let blog = DbBlog::find(&mut conn, (name, None)).await?;
       if let Some(mut blog) = blog {
-        if blog.user_id != blog.id {
+        if blog.user_id != Some(user.unwrap().id) {
           return Err(TumblepubError::Unauthorized.extend());
         }
 
@@ -142,7 +142,7 @@ impl Mutation {
       .ok_or_else(|| TumblepubError::BadRequest("the given blog does not exist").extend())?;
 
     // if the user does not own the blog, bad request
-    if blog.user_id != user.id {
+    if blog.user_id != Some(user.id) {
       return Err(
         TumblepubError::BadRequest("the given blog does not belong to the current user").extend(),
       );
