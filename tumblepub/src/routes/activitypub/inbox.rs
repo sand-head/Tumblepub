@@ -1,8 +1,9 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{guard::Options, web, HttpResponse, Responder};
 
+use serde_json::json;
 use sqlx::PgPool;
 use tumblepub_ap::{
-  get_foreign_actor,
+  deliver, get_foreign_actor, get_name_from_uri,
   models::activity::{Activity, ActivityKind},
   verify_signature,
 };
@@ -10,6 +11,7 @@ use tumblepub_db::models::blog::{Blog, NewBlog};
 use tumblepub_utils::{
   crypto::Signature,
   errors::{Result, TumblepubError},
+  options::Options,
 };
 use url::Url;
 
@@ -63,12 +65,28 @@ pub async fn post_ap_blog_inbox(
 
   // finally, handle each activity type
   match &activity.kind {
-    ActivityKind::Create { object } => todo!(),
-    ActivityKind::Announce { object } => todo!(),
     ActivityKind::Follow { object } => {
-      // todo: add a follow to the database
-      // todo: send an Accept activity back
+      let blog_name = get_name_from_uri(object)?;
+
+      // add a follow to the database
+      blog
+        .follow_blog(&mut conn, (blog_name.clone(), None))
+        .await?;
+
+      // send an Accept activity back
+      let local_domain = Options::get().local_domain;
+      deliver(Activity {
+        context: json!("https://www.w3.org/ns/activitystreams"),
+        kind: ActivityKind::Accept,
+
+        actor: format!("https://{}/@{}", local_domain, blog_name),
+        to: vec![activity.actor.clone()],
+        cc: vec![],
+      })
+      .await?;
+
+      Ok(HttpResponse::Created())
     }
+    _ => todo!(),
   }
-  Ok(HttpResponse::Ok())
 }

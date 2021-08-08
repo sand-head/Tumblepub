@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use sqlx::types::Json;
 use sqlx::PgConnection;
@@ -220,5 +220,22 @@ WHERE id = $2
     }
   }
 
-  pub async fn follow_blog(&self, conn: &mut PgConnection, name: BlogName) {}
+  pub async fn follow_blog(&self, conn: &mut PgConnection, name: BlogName) -> Result<()> {
+    let blog_to_follow = Blog::find(conn, name).await?;
+    if let Some(blog) = blog_to_follow {
+      sqlx::query!(
+        r#"
+INSERT INTO follows (follower_id, followee_id)
+VALUES ($1, $2)
+        "#,
+        blog.id,
+        self.id,
+      )
+      .execute(conn)
+      .await?;
+      Ok(())
+    } else {
+      Err(anyhow!("could not find blog to follow"))
+    }
+  }
 }

@@ -8,6 +8,7 @@ pub enum ActivityKind {
   Create { object: ApObject<Object<String>> },
   Announce { object: ApObject<Object<String>> },
   Follow { object: String },
+  Accept,
 }
 #[derive(Deserialize, Serialize)]
 pub struct Activity {
@@ -17,4 +18,6 @@ pub struct Activity {
   pub kind: ActivityKind,
 
   pub actor: String,
+  pub to: Vec<String>,
+  pub cc: Vec<String>,
 }

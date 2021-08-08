@@ -1,6 +1,8 @@
 use once_cell::sync::Lazy;
 use reqwest::Client;
 
+pub use reqwest::Response;
+
 pub mod crypto;
 pub mod errors;
 pub mod jwt;
