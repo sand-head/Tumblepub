@@ -6,6 +6,7 @@ use sqlx::{PgConnection, PgPool};
 
 use tumblepub_db::models::{blog::Blog, post::PostContent, user::User};
 use tumblepub_utils::{
+  description_to_html,
   errors::{Result, TumblepubError},
   markdown::markdown_to_safe_html,
   options::Options,
@@ -57,7 +58,7 @@ async fn display_blog(conn: &mut PgConnection, blog: Blog) -> Result<impl Respon
   let blog_title = blog.title.unwrap_or(blog.name);
   let vars = ThemeVariables {
     title: blog_title,
-    description: blog.description,
+    description: blog.description.map(description_to_html),
     posts: posts
       .iter()
       .map(|post| ThemePost {

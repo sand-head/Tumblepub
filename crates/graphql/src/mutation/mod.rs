@@ -7,15 +7,14 @@ use tumblepub_db::models::{
   blog::{Blog as DbBlog, NewBlog},
   post::{NewPost, Post as DbPost, PostContent as DbPostContent},
   user::User,
-  user_blogs::UserBlogs,
 };
 use tumblepub_utils::{crypto::KeyPair, errors::TumblepubError, jwt::Token, options::Options};
 
 use self::{login::login, register::register};
-use super::models::user::UserAuthPayload;
 use crate::models::{
   blog::Blog,
   posts::{Post, PostInput},
+  AuthPayload,
 };
 
 mod login;
@@ -30,7 +29,7 @@ impl Mutation {
     context: &Context<'_>,
     email: String,
     password: String,
-  ) -> Result<UserAuthPayload> {
+  ) -> Result<AuthPayload> {
     login(context, email, password).await
   }
 
@@ -41,7 +40,7 @@ impl Mutation {
     email: String,
     password: String,
     name: String,
-  ) -> Result<UserAuthPayload> {
+  ) -> Result<AuthPayload> {
     if Options::get().single_user_mode {
       return Err(TumblepubError::BadRequest("Registration has been disabled.").extend());
     }
@@ -64,21 +63,20 @@ impl Mutation {
     let blog = DbBlog::create_new(
       &mut *txn,
       NewBlog {
+        user_id: Some(claims.sub),
         uri: Option::<String>::None,
         name,
         domain: Option::<String>::None,
+        is_primary: false,
         is_public: true,
         title: Option::<String>::None,
         description: Option::<String>::None,
-        private_key: keypair.private_key,
+        private_key: Some(keypair.private_key),
         public_key: keypair.public_key,
       },
     )
     .await
     .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
-    UserBlogs::create_new(&mut *txn, claims.sub, blog.id, Some(true))
-      .await
-      .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
 
     txn
       .commit()
@@ -102,12 +100,10 @@ impl Mutation {
     let mut conn = ctx.data::<PgPool>()?.acquire().await.unwrap();
 
     let user = User::get_by_id(&mut conn, claims.sub).await?;
-    if let Some(user) = user {
+    if user.is_some() {
       let blog = DbBlog::find(&mut conn, (name, None)).await?;
       if let Some(mut blog) = blog {
-        if user.primary_blog != blog.id
-          && !UserBlogs::user_is_admin(&mut conn, claims.sub, blog.id).await?
-        {
+        if blog.user_id != Some(user.unwrap().id) {
           return Err(TumblepubError::Unauthorized.extend());
         }
 
@@ -146,7 +142,7 @@ impl Mutation {
       .ok_or_else(|| TumblepubError::BadRequest("the given blog does not exist").extend())?;
 
     // if the user does not own the blog, bad request
-    if user.primary_blog != blog.id && !UserBlogs::exists(&mut pool, user.id, blog.id).await? {
+    if blog.user_id != Some(user.id) {
       return Err(
         TumblepubError::BadRequest("the given blog does not belong to the current user").extend(),
       );

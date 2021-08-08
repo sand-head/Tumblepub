@@ -12,7 +12,6 @@ use super::blog::Blog;
 pub struct User {
   pub id: i64,
   pub email: String,
-  pub primary_blog: i64,
   pub hash: Vec<u8>,
   pub salt: String,
   pub created_at: DateTime<Utc>,
@@ -24,7 +23,6 @@ pub struct User {
 pub struct NewUser {
   pub email: String,
   pub password: String,
-  pub primary_blog: i64,
 }
 
 impl User {
@@ -60,12 +58,11 @@ impl User {
       sqlx::query_as!(
         User,
         r#"
-INSERT INTO users (email, primary_blog, hash, salt)
-VALUES ($1, $2, $3, $4)
+INSERT INTO users (email, hash, salt)
+VALUES ($1, $2, $3)
 RETURNING *
       "#,
         model.email,
-        model.primary_blog,
         hash,
         salt,
       )
@@ -117,11 +114,20 @@ RETURNING *
     Ok(
       sqlx::query_as!(
         Blog,
-        "SELECT * FROM blogs WHERE id = $1 LIMIT 1",
-        self.primary_blog
+        "SELECT * FROM blogs WHERE user_id = $1 AND is_primary = true LIMIT 1",
+        self.id
       )
       .fetch_one(conn)
       .await?,
+    )
+  }
+
+  // Returns all of the given user's blogs.
+  pub async fn blogs(&self, conn: &mut PgConnection) -> Result<Vec<Blog>> {
+    Ok(
+      sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE user_id = $1", self.id)
+        .fetch_all(conn)
+        .await?,
     )
   }
 }

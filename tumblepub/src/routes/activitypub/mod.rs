@@ -34,6 +34,12 @@ pub async fn get_ap_blog(
   }
 }
 
+pub async fn get_ap_blog_activity(pool: web::Data<PgPool>) -> Result<impl Responder> {
+  let mut pool = pool.acquire().await.unwrap();
+
+  Ok(HttpResponse::NotImplemented())
+}
+
 #[derive(Deserialize)]
 pub struct BlogPostPath {
   pub blog: String,
@@ -72,7 +78,14 @@ pub fn routes(config: &mut web::ServiceConfig) {
         )),
       )
       .route("/@{blog}", web::get().to(get_ap_blog))
-      .route("/@{blog}/inbox", web::get().to(inbox::get_ap_blog_inbox))
+      .route(
+        "/@{blog}/activity/{activity_id}",
+        web::get().to(get_ap_blog_activity),
+      )
+      .route(
+        "/@{blog}/followers",
+        web::get().to(HttpResponse::NotImplemented),
+      )
       .route("/@{blog}/outbox", web::get().to(outbox::get_ap_blog_outbox))
       .route("/@{blog}/posts/{post_id}", web::get().to(get_ap_blog_post)),
   );
@@ -85,10 +98,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
           r#"application/ld+json; profile="https://www.w3.org/ns/activitystreams""#,
         )),
       )
-      .route("/@{blog}/inbox", web::post().to(inbox::post_ap_blog_inbox))
-      .route(
-        "/@{blog}/outbox",
-        web::post().to(outbox::post_ap_blog_outbox),
-      ),
+      .route("/@{blog}/inbox", web::post().to(inbox::post_ap_blog_inbox)),
   );
 }

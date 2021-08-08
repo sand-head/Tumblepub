@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use sqlx::types::Json;
 use sqlx::PgConnection;
@@ -9,22 +9,24 @@ use crate::models::post::PostContent;
 
 pub type BlogName = (String, Option<String>);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Blog {
   pub id: i64,
+  // Foreign blogs do not have users
+  pub user_id: Option<i64>,
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
+  pub is_primary: bool,
   pub is_public: bool,
+  pub is_nsfw: bool,
   pub title: Option<String>,
   pub description: Option<String>,
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
   pub theme_id: Option<Uuid>,
-  pub is_nsfw: bool,
-  pub is_private: bool,
   pub private_key: Option<Vec<u8>>,
   pub public_key: Vec<u8>,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug)]
@@ -36,13 +38,15 @@ pub struct BlogTheme {
 }
 
 pub struct NewBlog {
+  pub user_id: Option<i64>,
   pub uri: Option<String>,
   pub name: String,
   pub domain: Option<String>,
+  pub is_primary: bool,
   pub is_public: bool,
   pub title: Option<String>,
   pub description: Option<String>,
-  pub private_key: Vec<u8>,
+  pub private_key: Option<Vec<u8>>,
   pub public_key: Vec<u8>,
 }
 
@@ -53,13 +57,15 @@ impl Blog {
       sqlx::query_as!(
         Blog,
         r#"
-INSERT INTO blogs (uri, name, domain, is_public, title, description, private_key, public_key)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO blogs (user_id, uri, name, domain, is_primary, is_public, title, description, private_key, public_key)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 RETURNING *
         "#,
+        model.user_id,
         model.uri,
         model.name,
         model.domain,
+        model.is_primary,
         model.is_public,
         model.title,
         model.description,
@@ -102,6 +108,14 @@ RETURNING *
   pub async fn get_by_id(conn: &mut PgConnection, id: i64) -> Result<Option<Self>> {
     Ok(
       sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE id = $1", id)
+        .fetch_optional(conn)
+        .await?,
+    )
+  }
+
+  pub async fn get_by_uri(conn: &mut PgConnection, uri: &str) -> Result<Option<Self>> {
+    Ok(
+      sqlx::query_as!(Blog, "SELECT * FROM blogs WHERE uri = $1", uri)
         .fetch_optional(conn)
         .await?,
     )
@@ -203,6 +217,25 @@ WHERE id = $2
         Ok(())
       }
       Err(e) => Err(e.into()),
+    }
+  }
+
+  pub async fn follow_blog(&self, conn: &mut PgConnection, name: BlogName) -> Result<()> {
+    let blog_to_follow = Blog::find(conn, name).await?;
+    if let Some(blog) = blog_to_follow {
+      sqlx::query!(
+        r#"
+INSERT INTO follows (follower_id, followee_id)
+VALUES ($1, $2)
+        "#,
+        blog.id,
+        self.id,
+      )
+      .execute(conn)
+      .await?;
+      Ok(())
+    } else {
+      Err(anyhow!("could not find blog to follow"))
     }
   }
 }
