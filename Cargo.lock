@@ -3577,6 +3577,7 @@ dependencies = [
  "activitystreams-ext",
  "actix-web",
  "anyhow",
+ "base64 0.13.0",
  "chrono",
  "itertools",
  "once_cell",
@@ -3586,6 +3587,7 @@ dependencies = [
  "serde_json",
  "tumblepub_db",
  "tumblepub_utils",
+ "url",
  "uuid",
 ]
 

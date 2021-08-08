@@ -1,4 +1,4 @@
-use actix_web::{guard::Options, web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder};
 
 use serde_json::json;
 use sqlx::PgPool;
@@ -75,14 +75,17 @@ pub async fn post_ap_blog_inbox(
 
       // send an Accept activity back
       let local_domain = Options::get().local_domain;
-      deliver(Activity {
-        context: json!("https://www.w3.org/ns/activitystreams"),
-        kind: ActivityKind::Accept,
+      deliver(
+        Activity {
+          context: json!("https://www.w3.org/ns/activitystreams"),
+          kind: ActivityKind::Accept,
 
-        actor: format!("https://{}/@{}", local_domain, blog_name),
-        to: vec![activity.actor.clone()],
-        cc: vec![],
-      })
+          actor: format!("https://{}/@{}", local_domain, blog_name),
+          to: vec![activity.actor.clone()],
+          cc: vec![],
+        },
+        &blog.private_key.unwrap(),
+      )
       .await?;
 
       Ok(HttpResponse::Created())

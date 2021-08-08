@@ -1,8 +1,15 @@
 use actix_web::{http::HeaderMap, HttpResponse, Responder};
+use base64::encode;
+use chrono::Utc;
 use itertools::Itertools;
 use models::{activity::Activity, actor::Actor};
 use once_cell::sync::Lazy;
-use openssl::{hash::MessageDigest, pkey::PKey, rsa::Rsa, sign::Verifier};
+use openssl::{
+  hash::MessageDigest,
+  pkey::PKey,
+  rsa::Rsa,
+  sign::{Signer, Verifier},
+};
 use regex::Regex;
 use serde::Serialize;
 
@@ -12,6 +19,7 @@ use tumblepub_utils::{
   options::Options,
   Response, HTTP_CLIENT,
 };
+use url::Url;
 
 static ACTOR_URI: Lazy<Regex> = Lazy::new(|| Regex::new("^https?://(.*)/@([a-z0-9_]+)$").unwrap());
 
@@ -33,35 +41,64 @@ where
     .json(body)
 }
 
-async fn deliver_one(activity: &Activity, url: &str) -> Result<Response> {
-  let request = HTTP_CLIENT
+async fn resolve_inbox_uri(actor_uri: &str) -> Result<String> {
+  // todo: we should probably cache inbox urls, either in memory or in db
+  let actor = get_foreign_actor(actor_uri).await?;
+  Ok(actor.inbox)
+}
+
+/// Delivers an [activity](Activity) to a single recipient's inbox.
+async fn deliver_one(activity: &Activity, url: &str, private_key: &[u8]) -> Result<Response> {
+  let builder = HTTP_CLIENT
     .post(url)
     .header("Content-Type", "application/activity+json")
-    .json(activity)
-    .build()?;
+    .json(activity);
 
   // todo: sign the request
+  let inbox_uri = Url::parse(url).unwrap();
+  let now = Utc::now().to_rfc2822();
+  let signature = format!(
+    "(request-target): post {}\nhost: {}\ndate: {}",
+    inbox_uri.path(),
+    inbox_uri.host_str().unwrap(),
+    now.clone()
+  );
 
+  let key = PKey::from_rsa(Rsa::private_key_from_pem(private_key).unwrap()).unwrap();
+  let mut signer = Signer::new(MessageDigest::sha256(), &key).unwrap();
+  signer.update(signature.as_bytes()).unwrap();
+
+  let builder = builder.header("Date", now).header(
+    "Signature",
+    format!(
+      r#"keyId="{}#main-key",headers="(request-target) host date",signature="{}""#,
+      activity.actor,
+      encode(signer.sign_to_vec().unwrap())
+    ),
+  );
+
+  let request = builder.build()?;
   Ok(HTTP_CLIENT.execute(request).await?)
 }
 
 /// Delivers an [activity](Activity) to all of its recipients.
-pub async fn deliver(activity: Activity) -> Result<()> {
+pub async fn deliver(activity: Activity, private_key: &[u8]) -> Result<()> {
   // get all recipients
   // ensure that all recipients are unique
   // also, filter out the public URI
-  // todo: resolve inboxes for all recipients
   let recipients = activity
     .to
     .iter()
     .merge(activity.cc.iter())
     .unique()
-    .filter(|r| *r != "https://www.w3.org/ns/activitystreams#Public")
+    .filter_map(|r| {
+      (r != "https://www.w3.org/ns/activitystreams#Public").then(|| resolve_inbox_uri(r))
+    })
     .collect_vec();
 
   // send activity to inbox of all recipients
   for recipient in recipients {
-    deliver_one(&activity, recipient).await?;
+    deliver_one(&activity, &recipient.await?, private_key).await?;
   }
 
   Ok(())
