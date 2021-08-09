@@ -23,8 +23,8 @@ pub async fn webfinger(
     return Ok(HttpResponse::NotFound().finish());
   }
 
-  let mut pool = pool.acquire().await.unwrap();
-  let blog = Blog::find(&mut pool, (blog_name, None)).await;
+  let mut conn = pool.acquire().await.unwrap();
+  let blog = Blog::find(&mut conn, (blog_name, None)).await;
   Ok(match blog {
     Ok(Some(blog)) => {
       let res = Resource {
