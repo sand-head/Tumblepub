@@ -4,7 +4,7 @@ use serde_json::json;
 use sqlx::PgPool;
 use tumblepub_ap::{
   deliver, get_foreign_actor, get_name_from_uri,
-  models::activity::{Activity, ActivityKind},
+  models::activity::{Activity, ActivityKind, ActivityObject},
   verify_signature,
 };
 use tumblepub_db::models::blog::{Blog, NewBlog};
@@ -65,8 +65,11 @@ pub async fn post_ap_blog_inbox(
 
   // finally, handle each activity type
   match &activity.kind {
-    ActivityKind::Follow { object } => {
-      let blog_name = get_name_from_uri(object)?;
+    ActivityKind::Follow => {
+      let blog_name = match &activity.object {
+        ActivityObject::Uri(uri) => get_name_from_uri(uri),
+        _ => Err(TumblepubError::BadRequest("invalid object type")),
+      }?;
 
       // add a follow to the database
       blog
@@ -75,13 +78,17 @@ pub async fn post_ap_blog_inbox(
 
       // send an Accept activity back
       let local_domain = Options::get().local_domain;
+      let remote_actor = activity.actor.clone();
       deliver(
         Activity {
           context: json!("https://www.w3.org/ns/activitystreams"),
           kind: ActivityKind::Accept,
 
           actor: format!("https://{}/@{}", local_domain, blog_name),
-          to: vec![activity.actor.clone()],
+          object: ActivityObject::Activity(Box::new(activity.0)),
+
+          published: None,
+          to: vec![remote_actor],
           cc: vec![],
         },
         &blog.private_key.unwrap(),

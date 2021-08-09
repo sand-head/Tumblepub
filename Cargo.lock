@@ -13,31 +13,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "activitystreams"
-version = "0.7.0-alpha.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a5da1d857ec9ca65ef8d0469cdd64e7b93b59d6cad26f1444bf84b62f3eadd4"
-dependencies = [
- "chrono",
- "mime",
- "serde 1.0.126",
- "serde_json",
- "thiserror",
- "url",
-]
-
-[[package]]
-name = "activitystreams-ext"
-version = "0.1.0-alpha.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb8e19a0810cc25df3535061a08b7d8f8a734d309ea4411c57a9767e4a2ffa0e"
-dependencies = [
- "activitystreams",
- "serde 1.0.126",
- "serde_json",
-]
-
-[[package]]
 name = "actix"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1477,9 +1452,9 @@ dependencies = [
 
 [[package]]
 name = "http-body"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60daa14be0e0786db0f03a9e57cb404c9d756eed2b6c62b9ea98ec5743ec75a9"
+checksum = "399c583b2979440c60be0821a6199eca73bc3c8dcd9d070d75ac726e2c6186e5"
 dependencies = [
  "bytes 1.0.1",
  "http",
@@ -3573,8 +3548,6 @@ dependencies = [
 name = "tumblepub_ap"
 version = "0.1.0"
 dependencies = [
- "activitystreams",
- "activitystreams-ext",
  "actix-web",
  "anyhow",
  "base64 0.13.0",
@@ -3736,7 +3709,6 @@ dependencies = [
  "idna",
  "matches",
  "percent-encoding",
- "serde 1.0.126",
 ]
 
 [[package]]

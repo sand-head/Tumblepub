@@ -9,8 +9,6 @@ edition = "2018"
 [dependencies]
 tumblepub_db = { path = "../db" }
 tumblepub_utils = { path = "../utils" }
-activitystreams = "0.7.0-alpha.11"
-activitystreams-ext = "0.1.0-alpha.2"
 actix-web = "3"
 anyhow = "1.0"
 base64 = "0.13"

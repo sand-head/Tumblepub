@@ -1,15 +1,6 @@
-use activitystreams::{
-  activity::Create,
-  chrono::FixedOffset,
-  collection::{CollectionExt, OrderedCollection, OrderedCollectionPage},
-  context,
-  object::{ApObject, Object},
-  prelude::*,
-  public,
-  url::Url,
-};
 use once_cell::sync::Lazy;
 use regex::Regex;
+use serde_json::json;
 use tumblepub_db::{
   models::{
     blog::Blog,
@@ -19,13 +10,21 @@ use tumblepub_db::{
 };
 use tumblepub_utils::{errors::Result, markdown::markdown_to_safe_html, options::Options};
 
+use crate::models::{
+  activity::{Activity, ActivityKind, ActivityObject},
+  collection::{Collection, CollectionItem, CollectionKind},
+  object::{Object, ObjectKind},
+};
+
 /// Captures Markdown images and headings of any size.
 /// Used in determining whether a post should be considered an article in ActivityPub for compatibility.
 static ARTICLE_KIND_REGEX: Lazy<Regex> = Lazy::new(|| {
   Regex::new(r#"!\[([^]]*)\]\(([^)]+)\)|^#*# (.+)"#).expect("could not compile article regex")
 });
 
-pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Object<String>>> {
+pub fn post(blog_name: String, post: &Post) -> Result<Object> {
+  let local_domain = Options::get().local_domain;
+
   // flatten the post's content
   let content = post
     .content
@@ -37,50 +36,48 @@ pub fn post(blog_name: String, post: &Post) -> Result<ApObject<Object<String>>> 
     .collect::<Vec<_>>()
     .join("\n");
 
-  let local_domain = Options::get().local_domain;
-  let mut inner = Object::<String>::new();
-  if ARTICLE_KIND_REGEX.captures(&content).is_some() {
-    // if the post contains image tags or headings
-    // then we'll send it off as an article
-    inner.set_kind("Article".to_owned());
-  } else {
-    inner.set_kind("Note".to_owned());
-  }
-  let mut object = ApObject::new(inner);
+  let object = Object {
+    context: json!("https://www.w3.org/ns/activitystreams"),
+    kind: if ARTICLE_KIND_REGEX.captures(&content).is_some() {
+      // if the post contains image tags or headings
+      // then we'll send it off as an article
+      ObjectKind::Article
+    } else {
+      ObjectKind::Note
+    },
 
-  object
-    .set_id(
-      Url::parse(&format!(
-        "https://{}/@{}/posts/{}",
-        local_domain, blog_name, post.id
-      ))
-      .unwrap(),
-    )
-    .set_published(post.created_at.with_timezone(&FixedOffset::east(0)))
+    id: format!("https://{}/@{}/posts/{}", local_domain, blog_name, post.id),
+    attributed_to: format!("https://{}/@{}", local_domain, blog_name),
+    content: markdown_to_safe_html(content),
+
+    published: Some(post.created_at.naive_utc()),
     // todo: change when post visibility is added
-    .set_to(public())
-    .set_attributed_to(Url::parse(&format!("https://{}/@{}", local_domain, blog_name)).unwrap())
-    .set_content(markdown_to_safe_html(content));
+    to: vec!["https://www.w3.org/ns/activitystreams#Public".to_string()],
+    cc: vec![],
+  };
 
   Ok(object)
 }
 
-pub async fn post_collection(conn: &mut PgConnection, blog: Blog) -> Result<OrderedCollection> {
+pub async fn post_collection(conn: &mut PgConnection, blog: Blog) -> Result<Collection> {
   let total_posts = blog.total_posts(conn).await?;
   let local_domain = Options::get().local_domain;
-  let mut collection = OrderedCollection::new();
 
-  collection
-    .set_context(context())
-    .set_id(Url::parse(&format!("https://{}/@{}/outbox", local_domain, blog.name)).unwrap())
-    .set_total_items(total_posts as u64)
-    .set_first(
-      Url::parse(&format!(
-        "https://{}/@{}/outbox?page=true",
-        local_domain, blog.name
-      ))
-      .unwrap(),
-    );
+  let collection = Collection {
+    context: json!("https://www.w3.org/ns/activitystreams"),
+    kind: CollectionKind::OrderedCollection,
+
+    id: format!("https://{}/@{}/outbox", local_domain, blog.name),
+    total_items: total_posts as i64,
+    items: vec![],
+    ordered_items: vec![],
+
+    first: Some(format!(
+      "https://{}/@{}/outbox?page=true",
+      local_domain, blog.name
+    )),
+  };
+
   Ok(collection)
 }
 
@@ -88,33 +85,43 @@ pub async fn post_collection_page(
   conn: &mut PgConnection,
   blog: Blog,
   page: i32,
-) -> Result<OrderedCollectionPage> {
+) -> Result<Collection> {
   let offset = page * 20;
+  let total_posts = blog.total_posts(conn).await?;
   let posts = blog.posts(conn, Some(offset + 20), Some(offset)).await?;
   let local_domain = Options::get().local_domain;
-  let mut collection = OrderedCollectionPage::new();
 
-  collection
-    .set_context(context())
-    .set_id(Url::parse(&format!("https://{}/@{}/outbox", local_domain, blog.name)).unwrap())
-    .set_many_ordered_items(
-      posts
-        .iter()
-        .map(|p: &Post| {
-          let mut create = Create::new(
-            Url::parse(&format!("https://{}/@{}", local_domain, blog.name)).unwrap(),
-            post(blog.name.to_owned(), p)?.into_any_base().unwrap(),
-          );
-          create
-            // todo: change when post visibility is added
-            .set_to(public())
-            .set_published(p.created_at.with_timezone(&FixedOffset::east(0)));
+  let collection = Collection {
+    context: json!("https://www.w3.org/ns/activitystreams"),
+    kind: CollectionKind::OrderedCollectionPage,
 
-          Ok(create.into_any_base().unwrap())
-        })
-        .collect::<Vec<Result<_>>>()
-        .into_iter()
-        .collect::<Result<Vec<_>>>()?,
-    );
+    id: format!("https://{}/@{}/outbox", local_domain, blog.name),
+    total_items: total_posts as i64,
+    items: vec![],
+    ordered_items: posts
+      .iter()
+      .map(|p: &Post| {
+        let create = Activity {
+          context: json!("https://www.w3.org/ns/activitystreams"),
+          kind: ActivityKind::Create,
+
+          actor: format!("https://{}/@{}", local_domain, blog.name),
+          object: ActivityObject::Object(post(blog.name.to_owned(), p)?),
+
+          published: Some(p.created_at.naive_utc()),
+          // todo: change when post visibility is added
+          to: vec!["https://www.w3.org/ns/activitystreams#Public".to_string()],
+          cc: vec![],
+        };
+
+        Ok(CollectionItem::Activity(create))
+      })
+      .collect::<Vec<Result<_>>>()
+      .into_iter()
+      .collect::<Result<Vec<_>>>()?,
+
+    first: None,
+  };
+
   Ok(collection)
 }
