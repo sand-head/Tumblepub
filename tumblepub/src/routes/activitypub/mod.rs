@@ -78,6 +78,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         )),
       )
       .route("/@{blog}", web::get().to(get_ap_blog))
+      // guess I'll keep this around now that I have screwed up mastodon federation
+      .route("/@{blog}.json", web::get().to(get_ap_blog))
       .route(
         "/@{blog}/activity/{activity_id}",
         web::get().to(get_ap_blog_activity),
