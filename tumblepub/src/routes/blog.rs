@@ -22,7 +22,7 @@ pub struct BlogPath {
 /// Displays the primary blog of the first user, for single user mode.
 async fn single_blog_route(pool: web::Data<PgPool>) -> Result<impl Responder> {
   let mut conn = pool.acquire().await.unwrap();
-  let first_user = User::get_by_id(&mut conn, 1)
+  let first_user = User::first(&mut conn)
     .await
     .map_err(TumblepubError::InternalServerError)?
     .ok_or(TumblepubError::NotFound)?;

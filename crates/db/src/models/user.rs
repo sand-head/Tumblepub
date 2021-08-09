@@ -91,6 +91,14 @@ RETURNING *
     Ok(None)
   }
 
+  pub async fn first(conn: &mut PgConnection) -> Result<Option<Self>> {
+    Ok(
+      sqlx::query_as!(User, "SELECT * FROM users ORDER BY created_at ASC LIMIT 1")
+        .fetch_optional(conn)
+        .await?,
+    )
+  }
+
   /// Gets a user by their ID, or `Option::None` if none exists.
   pub async fn get_by_id(conn: &mut PgConnection, id: i64) -> Result<Option<Self>> {
     Ok(
