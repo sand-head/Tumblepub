@@ -45,6 +45,9 @@ async fn main() -> Result<()> {
   let schema = Arc::new(create_schema(pool.clone()));
 
   println!("Starting webserver...");
+  // access logs are printed with the INFO level so ensure it is enabled by default
+  env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
   let server = HttpServer::new(move || {
     let schema: web::Data<TumblepubSchema> = schema.clone().into();
     App::new()
