@@ -1963,6 +1963,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "npm_rs"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ecb6192fc578d0be3f2ff020223980e0160068d916cdd2947a9bfbe7153e34c5"
+dependencies = [
+ "cfg-if 1.0.0",
+]
+
+[[package]]
 name = "ntapi"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3567,6 +3576,7 @@ dependencies = [
  "chrono",
  "env_logger",
  "handlebars",
+ "npm_rs",
  "once_cell",
  "openssl",
  "percent-encoding",
