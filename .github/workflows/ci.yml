@@ -19,9 +19,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ---
-  # Tumblepub Core jobs:
-  # ---
   # Generate the sqlx-data.json file so the jobs below can build "offline"
   sqlx-prepare:
     runs-on: ubuntu-latest
@@ -40,6 +37,9 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
       - name: Cache dependencies
         uses: actions/cache@v2
         with:

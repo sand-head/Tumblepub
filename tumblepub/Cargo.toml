@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [build-dependencies]
 anyhow = "1.0"
-npm_rs = "0.1"
+dunce = "1.0"
 
 [dependencies]
 tumblepub_ap = { path = "../crates/activitypub" }
