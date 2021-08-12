@@ -1,4 +1,10 @@
 FROM rust:1.52 as builder
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    npm
+RUN npm install npm@latest -g && \
+    npm install n -g && \
+    n lts
 WORKDIR /usr/app
 COPY . .
 
