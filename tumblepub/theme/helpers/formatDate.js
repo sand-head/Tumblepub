@@ -2,13 +2,13 @@ const moment = require("moment");
 
 module.exports = (date, format) => {
   const momentFormat = format
-    .replaceAll("%A", "dddd")
-    .replaceAll("%B", "MMMM")
-    .replaceAll("%-d", "D")
-    .replaceAll("%Y", "YYYY")
-    .replaceAll("%-I", "h")
-    .replaceAll("%M", "mm")
-    .replaceAll("%P", "A")
-    .replaceAll("%Z", "Z");
+    .replace("%A", "dddd")
+    .replace("%B", "MMMM")
+    .replace("%-d", "D")
+    .replace("%Y", "YYYY")
+    .replace("%-I", "h")
+    .replace("%M", "mm")
+    .replace("%P", "A")
+    .replace("%Z", "Z");
   return moment(date).format(momentFormat);
 };

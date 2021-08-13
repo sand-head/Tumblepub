@@ -14,7 +14,21 @@ module.exports = merge(common, {
       template: "./src/index.hbs",
       templateParameters: {
         Title: "justin",
-        Posts: [],
+        Description:
+          "howdy! my name's Justin and this is a lil demo description for testing this theme<br><br>very cool!",
+        PreviousPage: null,
+        NextPage: null,
+        Posts: [
+          {
+            CreatedAt: "2021-07-28T22:35:58.196302+00:00",
+            Content: [
+              {
+                Type: "Markdown",
+                Content: "<h1>hello world!</h1>\n",
+              },
+            ],
+          },
+        ],
       },
     }),
   ],
@@ -26,7 +40,11 @@ module.exports = merge(common, {
           {
             loader: "handlebars-loader",
             options: {
+              debug: true,
               helperDirs: [path.resolve(__dirname, "helpers")],
+              precompileOptions: {
+                noEscape: true,
+              },
             },
           },
         ],
