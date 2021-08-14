@@ -3,7 +3,11 @@ module.exports = {
   purge: ["./**/*.hbs"],
   darkMode: "media", // or false or 'class'
   theme: {
-    extend: {},
+    extend: {
+      boxShadow: {
+        border: "0 0 0 4px #fff",
+      },
+    },
   },
   variants: {
     extend: {},
