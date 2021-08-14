@@ -47,7 +47,7 @@ pub struct ThemeVariables {
 
 pub fn create_handlebars() -> Result<Handlebars<'static>, TemplateError> {
   let mut hbs = Handlebars::new();
-  let default_theme = include_str!("../theme/dist/index.hbs");
+  let default_theme = include_str!("../../theme/dist/index.hbs");
   hbs.register_template_string("default", default_theme)?;
   hbs.register_helper("url", Box::new(url_encode));
   hbs.register_helper("formatDate", Box::new(date_format));
