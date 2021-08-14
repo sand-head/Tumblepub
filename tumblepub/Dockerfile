@@ -9,7 +9,7 @@ WORKDIR /usr/app
 COPY . .
 
 ENV SQLX_OFFLINE=true
-RUN cargo build --release
+RUN cargo build --release --locked
 RUN strip ./target/release/tumblepub
 
 FROM debian:buster-slim as runtime
