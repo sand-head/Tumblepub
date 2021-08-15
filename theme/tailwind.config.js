@@ -7,6 +7,13 @@ module.exports = {
       boxShadow: {
         border: "0 0 0 4px #fff",
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "none",
+          },
+        },
+      },
     },
   },
   variants: {

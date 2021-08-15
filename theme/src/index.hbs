@@ -9,20 +9,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <div class="h-32 w-screen bg-purple-400"></div>
+    <div class="h-32 w-screen bg-purple-400 lg:h-64"></div>
     <div class="py-4 flex flex-col grid-cols-3 gap-4 max-w-screen-lg lg:grid lg:px-4 lg:mx-auto">
-      <header class="relative flex flex-col items-center text-center">
-        <div class="absolute -top-16 h-16 w-16 bg-gray-500 rounded shadow-border">
+      <header class="relative flex flex-col row-span-2 items-center text-center">
+        <div class="absolute -top-16 h-16 w-16 bg-gray-500 rounded shadow-border lg:-top-24 lg:h-24 lg:w-24">
           <!-- todo: avatar goes here -->
         </div>
-        <h1 class="my-2 text-xl font-bold">{{Title}}</h1>
+        <h1 class="my-2 text-2xl font-bold">{{Title}}</h1>
         {{#if Description}}
         <p>{{Description}}</p>
         {{/if}}
       </header>
       <main class="flex flex-col col-span-2 items-center">
         {{#each Posts}}
-        <article class="prose w-full p-4 rounded-xl border border-gray-100 shadow-md flex flex-col" data-created-at="{{this.CreatedAt}}">
+        <article class="prose prose-sm w-full p-4 border border-gray-100 shadow-md flex flex-col lg:prose lg:rounded-xl" data-created-at="{{this.CreatedAt}}">
           {{#each this.Content}}
             {{#if (eq this.Type "Markdown")}}
               {{this.Content}}
@@ -38,7 +38,7 @@
         </article>
         {{/each}}
       </main>
-      <footer class="col-span-3 flex flex-col justify-center items-center">
+      <footer class="col-span-2 flex flex-col justify-center items-center">
         {{#if (or PreviousPage NextPage)}}
         <div>
           {{#if PreviousPage}}
