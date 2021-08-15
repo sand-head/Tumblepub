@@ -16,6 +16,7 @@ module.exports = merge(common, {
         Title: "justin",
         Description:
           "howdy! my name's Justin and this is a lil demo description for testing this theme<br><br>very cool!",
+        Avatar: "https://avatars.githubusercontent.com/u/25518361?v=4",
         PreviousPage: null,
         NextPage: null,
         Posts: [
