@@ -1,7 +1,6 @@
 use actix_web::{web, HttpResponse, Responder};
 use anyhow::anyhow;
 use chrono::Local;
-use serde::Deserialize;
 use sqlx::{PgConnection, PgPool};
 
 use tumblepub_db::models::{blog::Blog, post::PostContent, user::User};
@@ -14,10 +13,7 @@ use tumblepub_utils::{
 
 use crate::theme::{create_handlebars, ThemePost, ThemePostContent, ThemeVariables};
 
-#[derive(Deserialize)]
-pub struct BlogPath {
-  pub blog: String,
-}
+use super::BlogPath;
 
 /// Displays the primary blog of the first user, for single user mode.
 async fn single_blog_route(pool: web::Data<PgPool>) -> Result<impl Responder> {
@@ -55,10 +51,15 @@ async fn display_blog(conn: &mut PgConnection, blog: Blog) -> Result<impl Respon
   let hbs = create_handlebars()
     .map_err(|_| TumblepubError::InternalServerError(anyhow!("Could not create Handlebars")))?;
 
-  let blog_title = blog.title.unwrap_or(blog.name);
+  let blog_title = blog.title.unwrap_or(blog.name.clone());
   let vars = ThemeVariables {
     title: blog_title,
     description: blog.description.map(description_to_html),
+    avatar: format!(
+      "https://{}/assets/avatar/{}",
+      Options::get().local_domain,
+      blog.name
+    ),
     posts: posts
       .iter()
       .map(|post| ThemePost {

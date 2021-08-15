@@ -15,7 +15,7 @@ use tumblepub_utils::{
 };
 use url::Url;
 
-use super::BlogPath;
+use crate::routes::BlogPath;
 
 pub async fn post_ap_blog_inbox(
   activity: web::Json<Activity>,

@@ -39,6 +39,7 @@ pub struct ThemePost {
 pub struct ThemeVariables {
   pub title: String,
   pub description: Option<String>,
+  pub avatar: String,
   pub posts: Vec<ThemePost>,
 
   pub previous_page: Option<String>,

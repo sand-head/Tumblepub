@@ -9,7 +9,7 @@ use tumblepub_ap::{
 use tumblepub_db::models::blog::Blog;
 use tumblepub_utils::errors::Result;
 
-use super::BlogPath;
+use crate::routes::BlogPath;
 
 #[derive(Deserialize)]
 pub struct PagingParams {

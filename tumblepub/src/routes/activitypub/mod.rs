@@ -7,13 +7,10 @@ use tumblepub_db::models::{blog::Blog, post::Post};
 use tumblepub_utils::errors::Result;
 use uuid::Uuid;
 
+use super::BlogPath;
+
 mod inbox;
 mod outbox;
-
-#[derive(Deserialize)]
-pub struct BlogPath {
-  pub blog: String,
-}
 
 /// A publically accessible JSON-LD document that provides information about a given blog.
 pub async fn get_ap_blog(

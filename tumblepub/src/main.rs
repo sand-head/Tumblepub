@@ -61,6 +61,8 @@ async fn main() -> Result<()> {
       .configure(routes::activitypub::routes)
       // GraphQL:
       .configure(routes::graphql::routes)
+      // Assets:
+      .configure(routes::assets::routes)
       // Blog content:
       .configure(routes::blog::routes)
   })
