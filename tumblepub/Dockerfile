@@ -11,7 +11,7 @@ COPY . .
 ENV SQLX_OFFLINE=true
 RUN --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,shared=locked,target=/usr/app/target \
+    --mount=type=cache,sharing=private,target=/usr/app/target \
     cargo build --release --locked && \
     cp ./target/release/tumblepub ./tumblepub
 RUN strip ./tumblepub
