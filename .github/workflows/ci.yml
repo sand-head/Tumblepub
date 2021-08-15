@@ -61,7 +61,7 @@ jobs:
           CARGO_TARGET_DIR: ~/.target/sqlx
           DATABASE_URL: "postgres://postgres:mysecretpassword@localhost/tumblepub_dev"
         run: |
-          cargo install sqlx-cli --version ^0.4 --no-default-features --features postgres
+          cargo install sqlx-cli --no-default-features --features postgres
           cd tumblepub && cargo sqlx migrate run
           cd .. && cargo sqlx prepare --merged
       - name: Upload sqlx-data.json
