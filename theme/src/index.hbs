@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>{{Title}}</title>
+    <link rel="shortcut icon" type="image/png" href="{{Avatar}}" />
     {{#if Description}}
     <meta name="description" content="{{Description}}" />
     {{/if}}
@@ -30,7 +31,9 @@
           {{/each}}
           <!-- todo: tags go here -->
           <div class="flex justify-between">
-            <span title="{{formatDate this.CreatedAt "%A, %B %-d, %Y %-I:%M %p %Z"}}">{{timeAgo this.CreatedAt}}</span>
+            <time datetime="{{this.CreatedAt}}" title="{{formatDate this.CreatedAt "%A, %B %-d, %Y %-I:%M %p %Z"}}">
+              {{timeAgo this.CreatedAt}}
+            </time>
             <div>
               <!-- todo: like/reblog buttons go here -->
             </div>
@@ -42,13 +45,13 @@
         {{#if (or PreviousPage NextPage)}}
         <div>
           {{#if PreviousPage}}
-          <a href="{{PreviousPage}}">Previous</a>
+          <a class="text-purple-600 bg-purple-100 font-semibold rounded-md px-2 py-1" href="{{PreviousPage}}">Previous</a>
           {{/if}}
           {{#if (and PreviousPage NextPage)}}
           &mdash;
           {{/if}}
           {{#if NextPage}}
-          <a href="{{NextPage}}">Next</a>
+          <a class="text-purple-600 bg-purple-100 font-semibold rounded-md px-2 py-1" href="{{NextPage}}">Next</a>
           {{/if}}
         </div>
         {{/if}}

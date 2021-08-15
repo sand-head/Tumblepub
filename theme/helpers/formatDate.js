@@ -8,7 +8,7 @@ module.exports = (date, format) => {
     .replace("%Y", "YYYY")
     .replace("%-I", "h")
     .replace("%M", "mm")
-    .replace("%P", "A")
+    .replace("%p", "A")
     .replace("%Z", "Z");
   return moment(date).format(momentFormat);
 };
