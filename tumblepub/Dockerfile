@@ -13,8 +13,8 @@ RUN --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,sharing=private,target=/usr/app/target \
     cargo build --release --locked && \
-    cp ./target/release/tumblepub ./tumblepub
-RUN strip ./tumblepub
+    mkdir ./bin && cp ./target/release/tumblepub ./bin/tumblepub
+RUN strip ./bin/tumblepub
 
 FROM debian:buster-slim as runtime
 # make sure libssl is installed, for `openssl`
@@ -24,7 +24,7 @@ RUN apt-get update && \
 WORKDIR /usr/app
 RUN groupadd -g 999 tumblepub && \
     useradd -r -u 999 -g tumblepub tumblepub
-COPY --chown=tumblepub:tumblepub --from=builder /usr/app/tumblepub .
+COPY --chown=tumblepub:tumblepub --from=builder /usr/app/bin/tumblepub .
 
 USER tumblepub
 EXPOSE 8080
