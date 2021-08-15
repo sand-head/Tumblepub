@@ -9,8 +9,12 @@ WORKDIR /usr/app
 COPY . .
 
 ENV SQLX_OFFLINE=true
-RUN cargo build --release --locked
-RUN strip ./target/release/tumblepub
+RUN --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,shared=locked,target=/usr/app/target \
+    cargo build --release --locked && \
+    cp ./target/release/tumblepub ./tumblepub
+RUN strip ./tumblepub
 
 FROM debian:buster-slim as runtime
 # make sure libssl is installed, for `openssl`
@@ -20,7 +24,7 @@ RUN apt-get update && \
 WORKDIR /usr/app
 RUN groupadd -g 999 tumblepub && \
     useradd -r -u 999 -g tumblepub tumblepub
-COPY --chown=tumblepub:tumblepub --from=builder /usr/app/target/release/tumblepub .
+COPY --chown=tumblepub:tumblepub --from=builder /usr/app/tumblepub .
 
 USER tumblepub
 EXPOSE 8080
