@@ -3860,7 +3860,9 @@ dependencies = [
  "async-graphql",
  "chrono",
  "serde 1.0.126",
+ "serde_json",
  "sqlx",
+ "tumblepub_ap",
  "tumblepub_db",
  "tumblepub_utils",
 ]

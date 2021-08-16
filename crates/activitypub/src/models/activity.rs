@@ -11,6 +11,7 @@ pub enum ActivityKind {
   Announce,
   Follow,
   Accept,
+  Update,
 }
 
 #[derive(Deserialize, Serialize)]

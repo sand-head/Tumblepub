@@ -1,8 +1,13 @@
 use std::convert::TryInto;
 
 use async_graphql::{Context, ErrorExtensions, Object, Result};
+use serde_json::json;
 use sqlx::PgPool;
 
+use tumblepub_ap::{
+  models::activity::{Activity, ActivityKind, ActivityObject},
+  ActivityPub,
+};
 use tumblepub_db::models::{
   blog::{Blog as DbBlog, NewBlog},
   post::{NewPost, Post as DbPost, PostContent as DbPostContent},
@@ -109,6 +114,24 @@ impl Mutation {
 
         // ok! we can now set the blog's description
         blog.set_description(&mut conn, description).await?;
+        // todo: deliver update to all followers,
+        // instead of hardcoding it to update the main mastodon instance
+        let local_domain = Options::get().local_domain;
+        tumblepub_ap::deliver(
+          Activity {
+            context: json!("https://www.w3.org/ns/activitystreams"),
+            kind: ActivityKind::Update,
+
+            actor: format!("https://{}/@{}", local_domain, &blog.name),
+            object: ActivityObject::Actor(blog.as_activitypub()?),
+
+            published: None,
+            to: vec!["https://mastodon.social/inbox".to_string()],
+            cc: vec![],
+          },
+          blog.private_key.as_ref().unwrap(),
+        )
+        .await?;
         Ok(blog.into())
       } else {
         Err(TumblepubError::NotFound.extend())

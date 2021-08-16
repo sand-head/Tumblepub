@@ -42,6 +42,10 @@ where
 }
 
 async fn resolve_inbox_uri(actor_uri: &str) -> Result<String> {
+  if actor_uri == "https://mastodon.social/inbox" {
+    // todo: definitely handle this better
+    return Ok(actor_uri.to_string());
+  }
   // todo: we should probably cache inbox urls, either in memory or in db
   let actor = get_foreign_actor(actor_uri).await?;
   Ok(actor.inbox)
