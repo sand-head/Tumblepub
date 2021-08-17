@@ -71,7 +71,7 @@ pub async fn get_resource(acct: String) -> Result<Resource> {
 
   // webfinger the domain for the account
   let request = HTTP_CLIENT
-    .get(format!(
+    .get(&format!(
       "https://{}/.well-known/webfinger?resource={}",
       domain, acct
     ))
