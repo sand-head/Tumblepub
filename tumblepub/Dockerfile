@@ -18,8 +18,9 @@ RUN strip ./bin/tumblepub
 
 FROM debian:buster-slim as runtime
 # make sure libssl is installed, for `openssl`
+# also ca-certificates, for SSL
 RUN apt-get update && \
-    apt-get install libssl1.1 -y --no-install-recommends
+    apt-get install ca-certificates libssl1.1 -y --no-install-recommends
 
 WORKDIR /usr/app
 RUN groupadd -g 999 tumblepub && \
