@@ -102,7 +102,12 @@ pub async fn deliver(activity: Activity, private_key: &[u8]) -> Result<()> {
 
   // send activity to inbox of all recipients
   for recipient in recipients {
-    deliver_one(&activity, &recipient.await?, private_key).await?;
+    let response = deliver_one(&activity, &recipient.await?, private_key).await?;
+    (!response.status().is_client_error())
+      .then(|| ())
+      .ok_or(TumblepubError::BadRequest(
+        "Recipient responded with a 4XX error.",
+      ))?;
   }
 
   Ok(())
