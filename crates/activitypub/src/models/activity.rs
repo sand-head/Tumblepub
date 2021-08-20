@@ -7,10 +7,11 @@ use super::{actor::Actor, object::Object};
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub enum ActivityKind {
-  Create,
-  Announce,
-  Follow,
   Accept,
+  Announce,
+  Create,
+  Delete,
+  Follow,
   Update,
 }
 
@@ -18,7 +19,7 @@ pub enum ActivityKind {
 #[serde(untagged)]
 pub enum ActivityObject {
   Uri(String),
-  Actor(Actor),
+  Actor(Box<Actor>),
   Object(Object),
   Activity(Box<Activity>),
 }

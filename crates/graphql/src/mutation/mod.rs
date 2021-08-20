@@ -5,8 +5,8 @@ use serde_json::json;
 use sqlx::PgPool;
 
 use tumblepub_ap::{
+  conversion::blog::blog_to_ap,
   models::activity::{Activity, ActivityKind, ActivityObject},
-  ActivityPub,
 };
 use tumblepub_db::models::{
   blog::{Blog as DbBlog, NewBlog},
@@ -19,7 +19,7 @@ use self::{login::login, register::register};
 use crate::models::{
   blog::Blog,
   posts::{Post, PostInput},
-  AuthPayload,
+  AuthPayload, CurrentUser,
 };
 
 mod login;
@@ -123,7 +123,7 @@ impl Mutation {
             kind: ActivityKind::Update,
 
             actor: format!("https://{}/@{}", local_domain, &blog.name),
-            object: ActivityObject::Actor(blog.as_activitypub()?),
+            object: ActivityObject::Actor(Box::new(blog_to_ap(&blog)?)),
 
             published: None,
             to: vec!["https://mastodon.social/inbox".to_string()],
@@ -189,5 +189,45 @@ impl Mutation {
     .await
     .map_err(|e| TumblepubError::InternalServerError(e).extend())?;
     Ok(post.into())
+  }
+
+  pub async fn delete_user(&self, ctx: &Context<'_>) -> Result<CurrentUser> {
+    let token = ctx.data::<Token>()?;
+    let mut pool = ctx.data::<PgPool>()?.acquire().await.unwrap();
+
+    let user = User::get_by_token(&mut pool, token)
+      .await
+      .map_err(|_| TumblepubError::Unauthorized.extend())?
+      .ok_or_else(|| TumblepubError::Unauthorized.extend())?;
+
+    let local_domain = Options::get().local_domain;
+    for blog in user.blogs(&mut pool).await?.iter() {
+      tumblepub_ap::deliver(
+        Activity {
+          context: json!("https://www.w3.org/ns/activitystreams"),
+          kind: ActivityKind::Delete,
+
+          actor: format!("https://{}/@{}", local_domain, &blog.name),
+          object: ActivityObject::Actor(Box::new(blog_to_ap(blog)?)),
+
+          published: None,
+          to: vec!["https://mastodon.social/inbox".to_string()],
+          cc: vec![],
+        },
+        blog.private_key.as_ref().unwrap(),
+      )
+      .await?;
+    }
+
+    // todo: actually delete the db entries
+
+    Ok(CurrentUser {
+      blogs: user
+        .blogs(&mut pool)
+        .await?
+        .iter()
+        .map(|b| Blog::from(b.to_owned()))
+        .collect(),
+    })
   }
 }

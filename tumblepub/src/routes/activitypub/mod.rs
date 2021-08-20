@@ -2,7 +2,10 @@ use actix_web::{guard, web, Either, HttpResponse, Responder};
 use serde::Deserialize;
 use sqlx::PgPool;
 
-use tumblepub_ap::{activitypub_response, conversion::posts, ActivityPub};
+use tumblepub_ap::{
+  activitypub_response,
+  conversion::{blog::blog_to_ap, posts},
+};
 use tumblepub_db::models::{blog::Blog, post::Post};
 use tumblepub_utils::errors::Result;
 use uuid::Uuid;
@@ -23,7 +26,7 @@ pub async fn get_ap_blog(
     .expect("could not retrieve blog from db");
 
   if let Some(blog) = blog {
-    Ok(Either::A(activitypub_response(&blog.as_activitypub()?)))
+    Ok(Either::A(activitypub_response(&blog_to_ap(&blog)?)))
   } else {
     Ok(Either::B(
       HttpResponse::NotFound().body("The requested user does not exist."),
