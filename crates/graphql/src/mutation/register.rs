@@ -1,7 +1,7 @@
 use async_graphql::{ErrorExtensions, Result};
 
 use sqlx::PgPool;
-use tumblepub_db::models::{
+use tumblepub_events::models::{
   blog::{Blog, NewBlog},
   user::{NewUser, User},
 };

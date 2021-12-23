@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use chrono::Local;
 use sqlx::{PgConnection, PgPool};
 
-use tumblepub_db::models::{blog::Blog, post::PostContent, user::User};
+use tumblepub_events::models::{blog::Blog, post::PostContent, user::User};
 use tumblepub_utils::{
   description_to_html,
   errors::{Result, TumblepubError},

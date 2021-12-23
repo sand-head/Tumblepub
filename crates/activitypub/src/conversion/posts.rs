@@ -1,7 +1,7 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde_json::json;
-use tumblepub_db::{
+use tumblepub_events::{
   models::{
     blog::Blog,
     post::{Post, PostContent},

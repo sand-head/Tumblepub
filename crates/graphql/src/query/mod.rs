@@ -1,7 +1,7 @@
 use async_graphql::{Context, ErrorExtensions, Object, Result};
 use sqlx::PgPool;
 
-use tumblepub_db::models::{blog::Blog as DbBlog, user::User as DbUser};
+use tumblepub_events::models::{blog::Blog as DbBlog, user::User as DbUser};
 use tumblepub_utils::{errors::TumblepubError, jwt::Token};
 
 use crate::models::CurrentUser;

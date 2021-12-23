@@ -7,7 +7,7 @@ use tumblepub_ap::{
   models::activity::{Activity, ActivityKind, ActivityObject},
   verify_signature,
 };
-use tumblepub_db::models::blog::{Blog, NewBlog};
+use tumblepub_events::models::blog::{Blog, NewBlog};
 use tumblepub_utils::{
   crypto::Signature,
   errors::{Result, TumblepubError},

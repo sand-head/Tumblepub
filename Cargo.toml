@@ -3,7 +3,7 @@
 [workspace]
 members = [
     "crates/activitypub",
-    "crates/db",
+    "crates/events",
     "crates/graphql",
     "crates/utils",
     "tumblepub"

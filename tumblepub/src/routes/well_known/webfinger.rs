@@ -3,7 +3,7 @@ use serde::Deserialize;
 use sqlx::PgPool;
 
 use tumblepub_ap::webfinger::{get_name_and_domain, Link, Resource};
-use tumblepub_db::models::blog::Blog;
+use tumblepub_events::models::blog::Blog;
 use tumblepub_utils::{errors::Result, options::Options};
 
 #[derive(Deserialize)]

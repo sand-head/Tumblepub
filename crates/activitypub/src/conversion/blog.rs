@@ -1,5 +1,5 @@
 use serde_json::json;
-use tumblepub_db::models::blog::Blog;
+use tumblepub_events::models::blog::Blog;
 use tumblepub_utils::{description_to_html, errors::Result, options::Options};
 
 use crate::models::actor::{Actor, ActorKind, PublicKey};

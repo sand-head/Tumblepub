@@ -138,5 +138,8 @@ build
 # VSCode settings
 .vscode
 
+# macOS junk
+.DS_Store
+
 # Tumblepub options
 options.yml

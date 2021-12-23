@@ -6,7 +6,7 @@ use tumblepub_ap::{
   activitypub_response,
   conversion::{blog::blog_to_ap, posts},
 };
-use tumblepub_db::models::{blog::Blog, post::Post};
+use tumblepub_events::models::{blog::Blog, post::Post};
 use tumblepub_utils::errors::Result;
 use uuid::Uuid;
 

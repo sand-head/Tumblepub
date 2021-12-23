@@ -1,7 +1,7 @@
 use actix_web::{web, HttpResponse};
 use serde_json::json;
 use sqlx::PgPool;
-use tumblepub_db::models::user::User;
+use tumblepub_events::models::user::User;
 use tumblepub_utils::{errors::Result, options::Options};
 
 pub fn nodeinfo() -> HttpResponse {

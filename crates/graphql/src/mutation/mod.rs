@@ -8,7 +8,7 @@ use tumblepub_ap::{
   conversion::blog::blog_to_ap,
   models::activity::{Activity, ActivityKind, ActivityObject},
 };
-use tumblepub_db::models::{
+use tumblepub_events::models::{
   blog::{Blog as DbBlog, NewBlog},
   post::{NewPost, Post as DbPost, PostContent as DbPostContent},
   user::User,

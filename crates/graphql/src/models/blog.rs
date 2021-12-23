@@ -1,7 +1,7 @@
 use async_graphql::{ComplexObject, Context, Result, SimpleObject};
 use sqlx::PgPool;
 
-use tumblepub_db::models::blog::Blog as DbBlog;
+use tumblepub_events::aggregates::Blog as DbBlog;
 
 use super::posts::Post;
 

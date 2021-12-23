@@ -1,12 +1,11 @@
-pub use sqlx::PgConnection;
-
 use anyhow::Result;
-use sqlx::Connection;
 use tumblepub_utils::options::Options;
 
-pub mod models;
+pub mod blog;
+pub mod post;
+pub mod user;
 
-pub async fn create_database_if_not_exists() -> Result<()> {
+/* pub async fn create_database_if_not_exists() -> Result<()> {
   let database_opts = Options::get().database;
   let db_name = database_opts.db_name.to_owned();
   let postgres_url = database_opts.database_url(Some("postgres".to_string()));
@@ -30,4 +29,4 @@ pub async fn create_database_if_not_exists() -> Result<()> {
   }
 
   Ok(())
-}
+} */

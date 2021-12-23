@@ -1,5 +1,5 @@
 use async_graphql::SimpleObject;
-use tumblepub_db::models::user::User;
+use tumblepub_events::models::user::User;
 use tumblepub_utils::jwt::{Token, UserClaims};
 
 use self::blog::Blog;

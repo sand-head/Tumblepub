@@ -6,7 +6,7 @@ use tumblepub_ap::{
   activitypub_response,
   conversion::posts::{post_collection, post_collection_page},
 };
-use tumblepub_db::models::blog::Blog;
+use tumblepub_events::models::blog::Blog;
 use tumblepub_utils::errors::Result;
 
 use crate::routes::BlogPath;

@@ -3242,7 +3242,7 @@ dependencies = [
  "sqlx",
  "timeago",
  "tumblepub_ap",
- "tumblepub_db",
+ "tumblepub_events",
  "tumblepub_gql",
  "tumblepub_utils",
  "url",
@@ -3261,7 +3261,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tumblepub_db"
+name = "tumblepub_events"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -3286,7 +3286,7 @@ dependencies = [
  "serde 1.0.126",
  "sqlx",
  "tumblepub_ap",
- "tumblepub_db",
+ "tumblepub_events",
  "tumblepub_utils",
 ]
 

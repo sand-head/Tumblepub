@@ -2,7 +2,7 @@
 name = "tumblepub"
 version = "0.1.0"
 authors = ["Justin Schweigert <justin@schweigert.dev>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [build-dependencies]
@@ -11,7 +11,7 @@ dunce = "1.0"
 
 [dependencies]
 tumblepub_ap = { path = "../crates/activitypub" }
-tumblepub_db = { path = "../crates/db" }
+tumblepub_events = { path = "../crates/events" }
 tumblepub_gql = { path = "../crates/graphql" }
 tumblepub_utils = { path = "../crates/utils" }
 # misc:
@@ -23,11 +23,6 @@ url = "2.2"
 # web server:
 actix-web = "3"
 env_logger = "0.9"
-# database:
-# note that we can upgrade sqlx once actix_web hits 4.0
-chrono = { version = "0.4", features = ["serde"] }
-sqlx = { version = "0.4", features = ["runtime-actix-rustls", "postgres", "uuid", "chrono", "json", "migrate", "offline"] }
-uuid = { version = "0.8", features = ["serde", "v4"] }
 # auth:
 argon2rs = "0.2"
 # GraphQL:

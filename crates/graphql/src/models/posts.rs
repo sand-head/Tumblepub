@@ -2,7 +2,7 @@ use std::convert::TryInto;
 
 use async_graphql::{InputObject, SimpleObject, Union};
 use chrono::{DateTime, Utc};
-use tumblepub_db::models::post::{Post as DbPost, PostContent as DbPostContent};
+use tumblepub_events::models::post::{Post as DbPost, PostContent as DbPostContent};
 use tumblepub_utils::markdown::markdown_to_safe_html;
 
 #[derive(Debug, SimpleObject)]
