@@ -1,3 +1,0 @@
-ALTER TABLE blogs
-  ADD COLUMN private_key BYTEA,
-  ADD COLUMN public_key BYTEA NOT NULL DEFAULT '';
