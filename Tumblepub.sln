@@ -3,7 +3,31 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub", "Tumblepub\Tumblepub.csproj", "{8490F955-DA88-4038-A421-6193FAE9B517}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.EventSourcing", "Tumblepub.EventSourcing\Tumblepub.EventSourcing.csproj", "{F7AE6D66-6CCB-4BFF-9DFA-2A21960A6A1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.ActivityPub", "Tumblepub.ActivityPub\Tumblepub.ActivityPub.csproj", "{475FAD16-65AD-4E04-A38E-DB90A5BFC232}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8490F955-DA88-4038-A421-6193FAE9B517}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8490F955-DA88-4038-A421-6193FAE9B517}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8490F955-DA88-4038-A421-6193FAE9B517}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8490F955-DA88-4038-A421-6193FAE9B517}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7AE6D66-6CCB-4BFF-9DFA-2A21960A6A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7AE6D66-6CCB-4BFF-9DFA-2A21960A6A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7AE6D66-6CCB-4BFF-9DFA-2A21960A6A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7AE6D66-6CCB-4BFF-9DFA-2A21960A6A1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{475FAD16-65AD-4E04-A38E-DB90A5BFC232}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{475FAD16-65AD-4E04-A38E-DB90A5BFC232}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{475FAD16-65AD-4E04-A38E-DB90A5BFC232}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{475FAD16-65AD-4E04-A38E-DB90A5BFC232}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
