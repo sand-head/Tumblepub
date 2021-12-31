@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Net.Mime;
 using System.Text;
 using Tumblepub.EventSourcing.Extensions;
 using Tumblepub.GraphQL;
 using Tumblepub.Infrastructure;
+using Tumblepub.Themes;
+
+Helpers.Register();
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -48,7 +52,18 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/@{name}", (string name) => $"Hello {name}!");
+app.MapGet("/@{name}", (string name) =>
+{
+    var data = new
+    {
+        Title = name,
+        Avatar = "https://pbs.twimg.com/profile_images/1444764955505532929/1l5wrYIs_400x400.jpg",
+        Posts = new List<object>()
+    };
+
+    var page = DefaultTheme.Template.Value(data);
+    return Results.Content(page, "text/html");
+});
 
 // maps "/graphql" to the GraphQL API endpoint
 app.MapGraphQL();
