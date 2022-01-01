@@ -52,48 +52,26 @@ public static class Helpers
         });
     }
 
-    private static void RegisterLogicalOperator(string name, Func<bool, bool, bool> func)
+    private static void RegisterLogicalOperator(string name, Func<bool, bool, bool> func) =>
+        RegisterBinaryOperator(name,
+            left => HandlebarsUtils.IsTruthyOrNonEmpty(left),
+            right => HandlebarsUtils.IsTruthyOrNonEmpty(right),
+            func);
+
+    private static void RegisterComparisonOperator(string name, Func<object, object, bool> func) =>
+        RegisterBinaryOperator(name, left => left, right => right, func);
+
+    private static void RegisterBinaryOperator<TLeft, TRight, TResult>(string name, Func<object, TLeft> leftFunc, Func<object, TRight> rightFunc, Func<TLeft, TRight, TResult> resultFunc)
     {
-        Handlebars.RegisterHelper(name, (writer, options, context, args) =>
+        Handlebars.RegisterHelper(name, (writer, context, args) =>
         {
             args.RequireLength(name, 2);
 
-            var left = DetermineTruthiness(args[0]);
-            var right = DetermineTruthiness(args[1]);
+            var left = leftFunc(args[0]);
+            var right = rightFunc(args[1]);
 
-            if (func(left, right))
-                options.Template(writer, context);
-            else
-                options.Inverse(writer, context);
+            writer.WriteSafeString(resultFunc(left, right));
         });
-    }
-
-    private static void RegisterComparisonOperator(string name, Func<object, object, bool> func)
-    {
-        Handlebars.RegisterHelper(name, (writer, options, context, args) =>
-        {
-            args.RequireLength(name, 2);
-
-            var left = args[0];
-            var right = args[1];
-
-            if (func(left, right))
-                options.Template(writer, context);
-            else
-                options.Inverse(writer, context);
-        });
-    }
-
-    private static bool DetermineTruthiness(object? obj)
-    {
-        return obj switch
-        {
-            null => false,
-            string s => s.Length > 0,
-            int i => i != 0,
-            // todo: add more types if necessary
-            _ => true
-        };
     }
 
     private static void RequireLength(this Arguments args, string name, int length)

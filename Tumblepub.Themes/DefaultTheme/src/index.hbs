@@ -25,9 +25,9 @@
             {{#each Posts}}
             <article class="prose prose-sm w-full p-4 border border-gray-100 shadow-md flex flex-col lg:prose lg:rounded-xl" data-created-at="{{this.CreatedAt}}">
                 {{#each this.Content}}
-                {{#eq this.Type "Markdown"}}
+                {{#if (eq this.Type "Markdown")}}
                 {{this.Content}}
-                {{/eq}}
+                {{/if}}
                 {{/each}}
                 <!-- todo: tags go here -->
                 <div class="flex justify-between">
@@ -42,19 +42,19 @@
             {{/each}}
         </main>
         <footer class="col-span-2 flex flex-col justify-center items-center">
-            {{#or PreviousPage NextPage}}
+            {{#if (or PreviousPage NextPage)}}
             <div>
                 {{#if PreviousPage}}
                 <a class="text-purple-600 bg-purple-100 font-semibold rounded-md px-2 py-1" href="{{PreviousPage}}">Previous</a>
                 {{/if}}
-                {{#and PreviousPage NextPage}}
+                {{#if (and PreviousPage NextPage)}}
                 &mdash;
-                {{/and}}
+                {{/if}}
                 {{#if NextPage}}
                 <a class="text-purple-600 bg-purple-100 font-semibold rounded-md px-2 py-1" href="{{NextPage}}">Next</a>
                 {{/if}}
             </div>
-            {{/or}}
+            {{/if}}
             <span>
                 served up with ♥ using <a class="text-purple-600 bg-purple-100 font-semibold rounded-md px-2 py-1" href="https://github.com/sand-head/Tumblepub" target="_blank" rel="noopener noreferrer">Tumblepub</a>
             </span>
