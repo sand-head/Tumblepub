@@ -61,6 +61,7 @@ app.MapGet("/@{name}", (string name) =>
         Posts = new List<object>()
     };
 
+    // todo: add ThemeService to allow for custom themes
     var page = DefaultTheme.Template.Value(data);
     return Results.Content(page, "text/html");
 });

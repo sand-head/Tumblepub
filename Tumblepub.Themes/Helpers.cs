@@ -14,6 +14,15 @@ public static class Helpers
         RegisterComparisonOperator("eq", (left, right) => left == right);
         RegisterComparisonOperator("ne", (left, right) => left != right);
 
+        Handlebars.RegisterHelper("not", (writer, context, args) =>
+        {
+            args.RequireLength("not", 1);
+
+            var value = HandlebarsUtils.IsFalsyOrEmpty(args[0]);
+
+            writer.WriteSafeString(value);
+        });
+
         Handlebars.RegisterHelper("urlEncode", (writer, context, args) =>
         {
             args.RequireLength("urlEncode", 1);
