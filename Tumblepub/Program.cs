@@ -77,6 +77,9 @@ app.MapGet("/@{name}", (string name) =>
     return Results.Content(page, "text/html");
 });
 
+// todo: show blog in "single user" mode
+app.MapGet("/", () => Results.NotFound());
+
 // maps "/graphql" to the GraphQL API endpoint
 app.MapGraphQL();
 
