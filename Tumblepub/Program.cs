@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Net.Mime;
+using Serilog;
+using Serilog.Events;
 using System.Text;
 using Tumblepub.EventSourcing.Extensions;
 using Tumblepub.GraphQL;
@@ -9,8 +10,16 @@ using Tumblepub.Themes;
 
 Helpers.Register();
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
+
+builder.Host.UseSerilog();
 
 // configure event sourcing
 builder.AddEventSourcing(config.GetConnectionString("Database"));
@@ -48,6 +57,8 @@ builder.Services
     });
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 app.UseAuthentication();
 app.UseAuthorization();
