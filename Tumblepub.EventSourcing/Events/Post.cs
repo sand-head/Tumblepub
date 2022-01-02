@@ -1,4 +1,4 @@
-﻿namespace Tumblepub.EventSourcing.Events;
+﻿namespace Tumblepub.Database.Events;
 
 public record PostCreated();
 public record PostDiscovered();

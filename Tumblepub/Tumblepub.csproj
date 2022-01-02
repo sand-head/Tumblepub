@@ -17,7 +17,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Tumblepub.ActivityPub\Tumblepub.ActivityPub.csproj" />
-		<ProjectReference Include="..\Tumblepub.EventSourcing\Tumblepub.EventSourcing.csproj" />
+		<ProjectReference Include="..\Tumblepub.EventSourcing\Tumblepub.Database.csproj" />
 		<ProjectReference Include="..\Tumblepub.Themes\Tumblepub.Themes.csproj" />
 	</ItemGroup>
 

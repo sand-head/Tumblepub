@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Weasel.Postgresql;
 
-namespace Tumblepub.EventSourcing.Extensions;
+namespace Tumblepub.Database.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -16,6 +16,8 @@ public static class WebApplicationBuilderExtensions
             options.AutoCreateSchemaObjects = builder.Environment.IsDevelopment()
                 ? AutoCreate.All
                 : AutoCreate.CreateOrUpdate;
+
+            options.Events.DatabaseSchemaName = "events";
         });
 
         return builder;

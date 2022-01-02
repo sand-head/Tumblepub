@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tumblepub", "Tumblepub\Tumblepub.csproj", "{8490F955-DA88-4038-A421-6193FAE9B517}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tumblepub.EventSourcing", "Tumblepub.EventSourcing\Tumblepub.EventSourcing.csproj", "{F7AE6D66-6CCB-4BFF-9DFA-2A21960A6A1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tumblepub.Database", "Tumblepub.EventSourcing\Tumblepub.Database.csproj", "{F7AE6D66-6CCB-4BFF-9DFA-2A21960A6A1C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tumblepub.ActivityPub", "Tumblepub.ActivityPub\Tumblepub.ActivityPub.csproj", "{475FAD16-65AD-4E04-A38E-DB90A5BFC232}"
 EndProject

@@ -1,4 +1,4 @@
-﻿namespace Tumblepub.EventSourcing.Projections;
+﻿namespace Tumblepub.Database.Projections;
 
 public class Post
 {

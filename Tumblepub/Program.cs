@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using System.Text;
-using Tumblepub.EventSourcing.Extensions;
+using Tumblepub.Database.Extensions;
 using Tumblepub.GraphQL;
 using Tumblepub.Infrastructure;
 using Tumblepub.Themes;
