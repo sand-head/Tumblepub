@@ -31,14 +31,15 @@ builder.Services
     .AddMutationType<Mutation>();
 
 builder.Services
-    .AddSingleton<JwtTokenConfig>(new JwtTokenConfig(config["LocalDomain"], config["JwtSecret"], 60 * 2, 60 * 24))
+    .AddSingleton<JwtTokenConfig>(new JwtTokenConfig(
+        config["LocalDomain"],
+        config["JwtSecret"],
+        AccessTokenExpiration: (int)TimeSpan.FromHours(2).TotalMinutes,
+        RefreshTokenExpiration: (int)TimeSpan.FromDays(90).TotalMinutes))
     .AddSingleton<JwtAuthenticationManager>()
+    .AddScoped<IUserService, UserService>()
     .AddAuthorization()
-    .AddAuthentication(x =>
-    {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(x =>
     {
         x.RequireHttpsMetadata = !builder.Environment.IsDevelopment();

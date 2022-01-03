@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Tumblepub.Database.Projections;
 
 namespace Tumblepub.Infrastructure;
 
@@ -27,16 +28,22 @@ public class JwtAuthenticationManager
         _secret = Encoding.ASCII.GetBytes(jwtTokenConfig.Secret);
     }
 
-    public JwtAuthResult GenerateTokens(string username, Claim[] claims, DateTime now)
+    public JwtAuthResult GenerateTokens(User user)
     {
+        var now = DateTime.UtcNow;
         var jwtToken = new JwtSecurityToken(
             issuer: _jwtTokenConfig.Issuer,
-            claims: claims,
+            claims: new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Email)
+            },
             expires: now.AddMinutes(_jwtTokenConfig.AccessTokenExpiration),
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(_secret), SecurityAlgorithms.HmacSha256Signature));
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
-        var refreshToken = new RefreshToken(username, GenerateRefreshTokenString(), now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration));
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+        var refreshToken = new RefreshToken(user.Email, GenerateRefreshTokenString(), now.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration));
         _usersRefreshTokens.AddOrUpdate(refreshToken.Token, refreshToken, (s, t) => refreshToken);
 
         return new JwtAuthResult(accessToken, refreshToken);

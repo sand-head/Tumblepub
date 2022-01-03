@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="DefaultTheme\**" />
 		<None Remove="DefaultTheme\node_modules\**" />
 		<None Remove="DefaultTheme\dist\**" />
 		<EmbeddedResource Include="DefaultTheme\dist\index.hbs" />

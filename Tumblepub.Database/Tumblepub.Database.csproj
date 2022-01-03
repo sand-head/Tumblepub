@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Marten" Version="4.3.1" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
   </ItemGroup>
 
 </Project>

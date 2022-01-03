@@ -5,7 +5,7 @@
 /// </summary>
 public record BlogCreated(
     Guid BlogId,
-    Guid UserId,
+    string UserEmail,
     string BlogName,
     string PublicKey,
     string PrivateKey,

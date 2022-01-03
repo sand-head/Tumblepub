@@ -7,7 +7,6 @@ public record UserCreated(
     Guid UserId,
     string Email,
     string PasswordHash,
-    string Salt,
     DateTimeOffset At);
 
 /// <summary>
