@@ -1,4 +1,5 @@
 ﻿using Tumblepub.Infrastructure;
+using Tumblepub.Services;
 
 namespace Tumblepub.GraphQL;
 
@@ -21,9 +22,18 @@ public class Mutation
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
 
-    public async Task<AuthResult> Login(string email, string password)
+    public async Task<AuthResult> Login(string email, string password,
+        [Service] IUserService userService,
+        [Service] JwtAuthenticationManager authenticationManager)
     {
-        throw new NotImplementedException();
+        if (!await userService.ValidateCredentialsAsync(email, password))
+        {
+            throw new Exception("bad");
+        }
+
+        var user = await userService.GetByEmailAsync(email);
+        var result = authenticationManager.GenerateTokens(user);
+        return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
 
     public async Task RefreshAccessToken(string refreshToken)

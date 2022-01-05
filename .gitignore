@@ -454,4 +454,5 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 # Built web app junk
-/Tumblepub.Themes/DefaultTheme/dist
+/theme/dist
+/Tumblepub.Themes/DefaultTheme.hbs

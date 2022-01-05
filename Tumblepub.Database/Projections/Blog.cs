@@ -5,7 +5,7 @@ namespace Tumblepub.Database.Projections;
 public class Blog
 {
     public Guid Id { get; private set; }
-    public string? UserEmail { get; private set; }
+    public Guid? UserId { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string PublicKey { get; private set; } = string.Empty;
     public string? PrivateKey { get; private set; }
@@ -17,7 +17,7 @@ public class Blog
     public void Apply(BlogCreated @event)
     {
         Id = @event.BlogId;
-        UserEmail = @event.UserEmail;
+        UserId = @event.UserId;
         Name = @event.BlogName;
         PublicKey = @event.PublicKey;
         PrivateKey = @event.PrivateKey;

@@ -33,12 +33,12 @@ public class User
     }
 }
 
-public class UserBlogsProjection : ViewProjection<UserBlogs, string>
+public class UserBlogsProjection : ViewProjection<UserBlogs, Guid>
 {
     public UserBlogsProjection()
     {
-        Identity<UserCreated>(u => u.Email);
-        Identity<BlogCreated>(b => b.UserEmail);
+        Identity<UserCreated>(u => u.UserId);
+        Identity<BlogCreated>(b => b.UserId);
     }
 
     public void Apply(UserCreated @event, UserBlogs view)

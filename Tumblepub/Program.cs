@@ -6,6 +6,7 @@ using System.Text;
 using Tumblepub.Database.Extensions;
 using Tumblepub.GraphQL;
 using Tumblepub.Infrastructure;
+using Tumblepub.Services;
 using Tumblepub.Themes;
 
 Helpers.Register();
