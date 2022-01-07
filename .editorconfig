@@ -9,6 +9,9 @@ max_line_length = 100
 indent_style = space
 indent_size = 2
 
-[*.sql]
+[*.{sql,csproj}]
 indent_style = space
 indent_size = 2
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning

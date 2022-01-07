@@ -11,7 +11,7 @@ public static class DefaultTheme
     {
         var assembly = typeof(DefaultTheme).GetTypeInfo().Assembly;
         var resourceName = assembly.GetManifestResourceNames()
-            .First(r => r.EndsWith("index.hbs", StringComparison.CurrentCultureIgnoreCase));
+            .First(r => r.EndsWith("DefaultTheme.hbs", StringComparison.CurrentCultureIgnoreCase));
 
         using var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream == null)

@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="HotChocolate.AspNetCore" Version="12.4.1" />
+		<PackageReference Include="Jdenticon.AspNetCore" Version="3.1.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.1" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
 		<PackageReference Include="Serilog" Version="2.10.0" />

@@ -58,6 +58,8 @@ builder.Services
         };
     });
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
@@ -70,7 +72,7 @@ app.MapGet("/@{name}", (string name) =>
     var data = new
     {
         Title = name,
-        Avatar = "https://pbs.twimg.com/profile_images/1444764955505532929/1l5wrYIs_400x400.jpg",
+        Avatar = $"/api/assets/avatar/{name}",
         Posts = new List<object>()
     };
 
@@ -84,5 +86,7 @@ app.MapGet("/", () => Results.NotFound());
 
 // maps "/graphql" to the GraphQL API endpoint
 app.MapGraphQL();
+
+app.MapControllers();
 
 app.Run();
