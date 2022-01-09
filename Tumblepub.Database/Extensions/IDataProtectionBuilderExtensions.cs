@@ -4,21 +4,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tumblepub.Database.Infrastructure;
 
-namespace Tumblepub.Database.Extensions
-{
-    public static class IDataProtectionBuilderExtensions
-    {
-        public static IDataProtectionBuilder PersistKeysToMarten(this IDataProtectionBuilder builder)
-        {
-            builder.Services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(services =>
-            {
-                return new ConfigureOptions<KeyManagementOptions>(options =>
-                {
-                    options.XmlRepository = new MartenXmlRepository();
-                });
-            });
+namespace Tumblepub.Database.Extensions;
 
-            return builder;
-        }
+public static class IDataProtectionBuilderExtensions
+{
+    public static IDataProtectionBuilder PersistKeysToMarten(this IDataProtectionBuilder builder)
+    {
+        builder.Services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(services =>
+        {
+            return new ConfigureOptions<KeyManagementOptions>(options =>
+            {
+                options.XmlRepository = new MartenXmlRepository();
+            });
+        });
+
+        return builder;
     }
 }

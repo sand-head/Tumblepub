@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
@@ -6,6 +7,7 @@ using System.Text;
 using Tumblepub.Database.Extensions;
 using Tumblepub.GraphQL;
 using Tumblepub.Infrastructure;
+using Tumblepub.Models;
 using Tumblepub.Services;
 using Tumblepub.Themes;
 
@@ -17,10 +19,18 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-var builder = WebApplication.CreateBuilder(args);
-var config = builder.Configuration;
+WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
+ConfigurationManager? config = builder.Configuration;
 
 builder.Host.UseSerilog();
+
+builder.Services
+    .Configure<SingleUserConfiguration>(config.GetSection("SingleUser"));
+
+// add domain services
+builder.Services
+    .AddScoped<IUserService, UserService>()
+    .AddScoped<IBlogService, BlogService>();
 
 // configure event sourcing
 builder.AddEventSourcing(config.GetConnectionString("Database"));
@@ -38,7 +48,6 @@ builder.Services
         AccessTokenExpiration: (int)TimeSpan.FromHours(2).TotalMinutes,
         RefreshTokenExpiration: (int)TimeSpan.FromDays(90).TotalMinutes))
     .AddSingleton<JwtAuthenticationManager>()
-    .AddScoped<IUserService, UserService>()
     .AddAuthorization()
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(x =>
@@ -60,29 +69,23 @@ builder.Services
 
 builder.Services.AddControllers();
 
-var app = builder.Build();
+WebApplication? app = builder.Build();
 
 app.UseSerilogRequestLogging();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/@{name}", (string name) =>
+app.MapGet("/@{name}", async (string name, IBlogService blogService) =>
 {
-    var data = new
-    {
-        Title = name,
-        Avatar = $"/api/assets/avatar/{name}",
-        Posts = new List<object>()
-    };
-
-    // todo: add ThemeService to allow for custom themes
-    var page = DefaultTheme.Template.Value(data);
-    return Results.Content(page, "text/html");
+    return await blogService.RenderAsync(name);
 });
 
 // todo: show blog in "single user" mode
-app.MapGet("/", () => Results.NotFound());
+app.MapGet("/", async (IOptions<SingleUserConfiguration> singleUserConfig, IBlogService blogService) =>
+{
+    return singleUserConfig.Value is not null ? await blogService.RenderAsync(singleUserConfig.Value.Username) : Results.NotFound();
+});
 
 // maps "/graphql" to the GraphQL API endpoint
 app.MapGraphQL();
