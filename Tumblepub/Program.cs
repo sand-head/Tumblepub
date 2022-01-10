@@ -19,8 +19,8 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
-ConfigurationManager? config = builder.Configuration;
+var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
 builder.Host.UseSerilog();
 
@@ -69,7 +69,26 @@ builder.Services
 
 builder.Services.AddControllers();
 
-WebApplication? app = builder.Build();
+var app = builder.Build();
+
+// create single user on "first run"
+// (I don't actually care if it's the first run)
+// (so if people want to create additional accounts that's whatever)
+using (var scope = app.Services.CreateScope())
+{
+    var userService = scope.ServiceProvider.GetService<IUserService>()!;
+    var singleUserConfig = scope.ServiceProvider.GetService<IOptions<SingleUserConfiguration>>()?.Value;
+
+    if (singleUserConfig != null)
+    {
+        // if "single user" user doesn't exist, create
+        if (await userService.GetByEmailAsync(singleUserConfig.Email) == null)
+        {
+            await userService.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
+            // todo: create blog
+        }
+    }
+}
 
 app.UseSerilogRequestLogging();
 
