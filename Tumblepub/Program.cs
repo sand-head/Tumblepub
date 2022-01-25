@@ -76,16 +76,17 @@ var app = builder.Build();
 // (so if people want to create additional accounts that's whatever)
 using (var scope = app.Services.CreateScope())
 {
-    var userService = scope.ServiceProvider.GetService<IUserService>()!;
     var singleUserConfig = scope.ServiceProvider.GetService<IOptions<SingleUserConfiguration>>()?.Value;
-
     if (singleUserConfig != null)
     {
-        // if "single user" user doesn't exist, create
+        var userService = scope.ServiceProvider.GetService<IUserService>()!;
+        var blogService = scope.ServiceProvider.GetService<IBlogService>()!;
+
+        // if "single user" user doesn't exist, create new user and blog
         if (await userService.GetByEmailAsync(singleUserConfig.Email) == null)
         {
-            await userService.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
-            // todo: create blog
+            var user = await userService.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
+            await blogService.CreateAsync(user.Id, singleUserConfig.Username);
         }
     }
 }
@@ -103,7 +104,9 @@ app.MapGet("/@{name}", async (string name, IBlogService blogService) =>
 // todo: show blog in "single user" mode
 app.MapGet("/", async (IOptions<SingleUserConfiguration> singleUserConfig, IBlogService blogService) =>
 {
-    return singleUserConfig.Value is not null ? await blogService.RenderAsync(singleUserConfig.Value.Username) : Results.NotFound();
+    return singleUserConfig.Value is not null
+        ? await blogService.RenderAsync(singleUserConfig.Value.Username)
+        : Results.NotFound();
 });
 
 // maps "/graphql" to the GraphQL API endpoint
