@@ -30,11 +30,11 @@ public class BlogService : IBlogService
         var (publicKey, privateKey) = CryptoUtils.CreateKeyPair();
         var blogCreated = new BlogCreated(Guid.NewGuid(), userId, name, publicKey, privateKey, DateTimeOffset.UtcNow);
 
-        _session.Events.StartStream<Blog>(blogCreated.UserId, blogCreated);
+        _session.Events.StartStream<Blog>(blogCreated.BlogId, blogCreated);
         await _session.SaveChangesAsync();
         _logger.LogDebug("Created new blog {Id} with name {Name}", blogCreated.BlogId, name);
 
-        var blog = await _session.Events.AggregateStreamAsync<Blog>(blogCreated.UserId);
+        var blog = await _session.Events.AggregateStreamAsync<Blog>(blogCreated.BlogId);
         return blog!;
     }
 
