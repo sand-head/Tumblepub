@@ -32,7 +32,7 @@ public class BlogService : IBlogService
 
         _session.Events.StartStream<Blog>(blogCreated.BlogId, blogCreated);
         await _session.SaveChangesAsync();
-        _logger.LogDebug("Created new blog {Id} with name {Name}", blogCreated.BlogId, name);
+        _logger.LogInformation("Created new blog {Id} with name {Name}", blogCreated.BlogId, blogCreated.BlogName);
 
         var blog = await _session.Events.AggregateStreamAsync<Blog>(blogCreated.BlogId);
         return blog!;
@@ -49,10 +49,15 @@ public class BlogService : IBlogService
     public async Task<IResult> RenderAsync(string name)
     {
         var blog = await GetByNameAsync(name, null);
+        if (blog == null)
+        {
+            return Results.NotFound();
+        }
+
         var data = new
         {
             Title = blog.BlogName,
-            Avatar = $"/api/assets/avatar/{name}",
+            Avatar = $"/api/assets/avatar/{blog.BlogName}",
             Posts = new List<object>()
         };
 

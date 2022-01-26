@@ -38,7 +38,7 @@ builder.Services
 builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
 {
     options.Projections.SelfAggregate<User>();
-    options.Projections.SelfAggregate<Blog>();
+    options.Projections.SelfAggregate<Blog>(Marten.Events.Projections.ProjectionLifecycle.Live);
 
     options.Projections.Add(new UserDtoProjection());
     //options.Projections.Add(new BlogDtoProjection());

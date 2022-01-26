@@ -31,7 +31,7 @@ public class UserService : IUserService
 
         _session.Events.StartStream<User>(userCreated.UserId, userCreated);
         await _session.SaveChangesAsync();
-        _logger.LogDebug("Created new user {Id}", userCreated.UserId);
+        _logger.LogInformation("Created new user {Id}", userCreated.UserId);
 
         var user = await _session.Events.AggregateStreamAsync<User>(userCreated.UserId);
         return user!;
