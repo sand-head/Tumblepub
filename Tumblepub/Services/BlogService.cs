@@ -1,6 +1,6 @@
 ﻿using Marten;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Projections;
+using Tumblepub.Events;
+using Tumblepub.Projections;
 using Tumblepub.Infrastructure;
 using Tumblepub.Themes;
 
@@ -9,6 +9,7 @@ namespace Tumblepub.Services;
 public interface IBlogService
 {
     Task<Blog> CreateAsync(Guid userId, string name);
+    Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default);
     Task<IResult> RenderAsync(string name);
 }
 
@@ -37,12 +38,20 @@ public class BlogService : IBlogService
         return blog!;
     }
 
+    public async Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default)
+    {
+        // todo: also filter by domain
+        return await _session.Query<Blog>()
+            .Where(b => b.BlogName == name)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<IResult> RenderAsync(string name)
     {
-        // todo: get blog from projection
+        var blog = await GetByNameAsync(name, null);
         var data = new
         {
-            Title = name,
+            Title = blog.BlogName,
             Avatar = $"/api/assets/avatar/{name}",
             Posts = new List<object>()
         };

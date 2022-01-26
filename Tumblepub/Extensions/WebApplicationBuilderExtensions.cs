@@ -1,15 +1,12 @@
 ﻿using Marten;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
 using Serilog;
-using Tumblepub.Database.Projections;
 using Weasel.Postgresql;
 
-namespace Tumblepub.Database.Extensions;
+namespace Tumblepub.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static WebApplicationBuilder AddEventSourcing(this WebApplicationBuilder builder, string connectionString)
+    public static WebApplicationBuilder AddEventSourcing(this WebApplicationBuilder builder, string connectionString, Action<StoreOptions>? configure = null)
     {
         builder.Services.AddMarten(options =>
         {
@@ -31,7 +28,7 @@ public static class WebApplicationBuilderExtensions
                     });
             });
 
-            options.Projections.SelfAggregate<User>();
+            configure?.Invoke(options);
         });
 
         return builder;

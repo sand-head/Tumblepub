@@ -1,4 +1,4 @@
-﻿namespace Tumblepub.Database.Events;
+﻿namespace Tumblepub.Events;
 
 /// <summary>
 /// A <see cref="Projections.User"/> has been created.

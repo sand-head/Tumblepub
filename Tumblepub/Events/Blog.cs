@@ -1,4 +1,6 @@
-﻿namespace Tumblepub.Database.Events;
+﻿using System.Text.Json;
+
+namespace Tumblepub.Events;
 
 /// <summary>
 /// A <see cref="Projections.Blog"/> has been created on this instance.
@@ -18,6 +20,16 @@ public record BlogDiscovered(
     Guid BlogId,
     string BlogName,
     string PublicKey,
+    DateTimeOffset At);
+
+/// <summary>
+/// A <see cref="Projections.Blog"/>'s metadata has been updated.
+/// </summary>
+public record BlogMetadataUpdated(
+    Guid BlogId,
+    string? Title,
+    string? Description,
+    JsonElement? Metadata,
     DateTimeOffset At);
 
 /// <summary>

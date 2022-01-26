@@ -1,7 +1,7 @@
 ﻿using Marten;
 using Sodium;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Projections;
+using Tumblepub.Events;
+using Tumblepub.Projections;
 
 namespace Tumblepub.Services;
 

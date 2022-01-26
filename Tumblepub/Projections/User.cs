@@ -1,9 +1,6 @@
-﻿using Marten.Events.Projections;
-using Marten.Schema;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Models;
+﻿using Tumblepub.Events;
 
-namespace Tumblepub.Database.Projections;
+namespace Tumblepub.Projections;
 
 public class User
 {
@@ -30,29 +27,5 @@ public class User
         IsDeleted = true;
         UpdatedAt = @event.At;
         Version++;
-    }
-}
-
-public class UserBlogsProjection : ViewProjection<UserBlogs, Guid>
-{
-    public UserBlogsProjection()
-    {
-        Identity<UserCreated>(u => u.UserId);
-        Identity<BlogCreated>(b => b.UserId);
-    }
-
-    public void Apply(UserCreated @event, UserBlogs view)
-    {
-        view.UserEmail = @event.Email;
-    }
-
-    public void Apply(BlogCreated @event, UserBlogs view)
-    {
-        view.Blogs.Add(@event.BlogId);
-    }
-
-    public void Apply(BlogDeleted @event, UserBlogs view)
-    {
-        view.Blogs.Remove(@event.BlogId);
     }
 }

@@ -4,12 +4,13 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using System.Text;
-using Tumblepub.Database.Extensions;
-using Tumblepub.GraphQL;
 using Tumblepub.Infrastructure;
-using Tumblepub.Models;
+using Tumblepub.Configuration;
 using Tumblepub.Services;
 using Tumblepub.Themes;
+using Tumblepub.Extensions;
+using Tumblepub;
+using Tumblepub.Projections;
 
 Helpers.Register();
 
@@ -30,10 +31,18 @@ builder.Services
 // add domain services
 builder.Services
     .AddScoped<IUserService, UserService>()
+    .AddScoped<IUserDtoService, UserDtoService>()
     .AddScoped<IBlogService, BlogService>();
 
 // configure event sourcing
-builder.AddEventSourcing(config.GetConnectionString("Database"));
+builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
+{
+    options.Projections.SelfAggregate<User>();
+    options.Projections.SelfAggregate<Blog>();
+
+    options.Projections.Add(new UserDtoProjection());
+    //options.Projections.Add(new BlogDtoProjection());
+});
 
 // add GraphQL support using HotChocolate
 builder.Services

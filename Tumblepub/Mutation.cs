@@ -1,7 +1,8 @@
 ﻿using Tumblepub.Infrastructure;
+using Tumblepub.Projections;
 using Tumblepub.Services;
 
-namespace Tumblepub.GraphQL;
+namespace Tumblepub;
 
 public record AuthResult(string AccessToken, string RefreshToken);
 
@@ -12,11 +13,11 @@ public class Mutation
         string password,
         string name,
         [Service] IUserService userService,
+        [Service] IBlogService blogService,
         [Service] JwtAuthenticationManager authenticationManager)
     {
         var user = await userService.CreateAsync(email, password);
-
-        // todo: create blog
+        await blogService.CreateAsync(user.Id, name);
 
         var result = authenticationManager.GenerateTokens(user);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
@@ -32,11 +33,16 @@ public class Mutation
         }
 
         var user = await userService.GetByEmailAsync(email);
-        var result = authenticationManager.GenerateTokens(user);
+        var result = authenticationManager.GenerateTokens(user!);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
 
     public async Task RefreshAccessToken(string refreshToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Blog> CreateBlog()
     {
         throw new NotImplementedException();
     }

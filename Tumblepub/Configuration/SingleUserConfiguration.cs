@@ -1,4 +1,4 @@
-namespace Tumblepub.Models;
+namespace Tumblepub.Configuration;
 
 public class SingleUserConfiguration
 {
