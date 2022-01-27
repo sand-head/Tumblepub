@@ -1,60 +1,62 @@
-﻿using System.Text.Json;
+﻿using Marten.Events.Aggregation;
+using System.Text.Json;
 using Tumblepub.Events;
 
 namespace Tumblepub.Projections;
 
 public class Blog
 {
-    public Guid Id { get; private set; }
-    public Guid? UserId { get; private set; }
-    public string BlogName { get; private set; } = default!;
-    public string? Title { get; private set; }
-    public string? Description { get; private set; }
-    public JsonElement? Metadata { get; private set; }
-    public string PublicKey { get; private set; } = default!;
-    public string? PrivateKey { get; private set; }
-    public bool IsDeleted { get; private set; }
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset UpdatedAt { get; private set; }
-    public int Version { get; private set; }
+    public Guid Id { get; set; }
+    public Guid? UserId { get; set; }
+    public string BlogName { get; set; } = default!;
+    public string? Title { get; set; }
+    public string? Description { get; set; }
+    public JsonElement? Metadata { get; set; }
+    public string PublicKey { get; set; } = default!;
+    public string? PrivateKey { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public int Version { get; set; }
+}
 
-    #region Event handlers
-
-    public void Apply(BlogCreated @event)
+public class BlogProjection : AggregateProjection<Blog>
+{
+    public BlogProjection()
     {
-        Id = @event.BlogId;
-        UserId = @event.UserId;
-        BlogName = @event.BlogName;
-        PublicKey = @event.PublicKey;
-        PrivateKey = @event.PrivateKey;
-        IsDeleted = false;
-        UpdatedAt = CreatedAt = @event.At;
-        Version++;
+        DeleteEvent<BlogDeleted>();
     }
 
-    public void Apply(BlogDiscovered @event)
+    public Blog Create(BlogCreated e)
     {
-        Id = @event.BlogId;
-        BlogName = @event.BlogName;
-        PublicKey = @event.PublicKey;
-        IsDeleted = false;
-        UpdatedAt = CreatedAt = @event.At;
-        Version++;
+        return new Blog
+        {
+            Id = e.BlogId,
+            UserId = e.UserId,
+            BlogName = e.BlogName,
+            PublicKey = e.PublicKey,
+            PrivateKey = e.PrivateKey,
+            UpdatedAt = e.At,
+            CreatedAt = e.At
+        };
     }
 
-    public void Apply(BlogMetadataUpdated @event)
+    public Blog Create(BlogDiscovered e)
     {
-        Title = @event.Title ?? Title;
-        Description = @event.Description ?? Description;
-        Metadata = @event.Metadata ?? Metadata;
-        Version++;
+        return new Blog
+        {
+            Id = e.BlogId,
+            BlogName = e.BlogName,
+            PublicKey = e.PublicKey,
+            UpdatedAt = e.At,
+            CreatedAt = e.At
+        };
     }
 
-    public void Apply(BlogDeleted @event)
+    public void Apply(BlogMetadataUpdated e, Blog blog)
     {
-        IsDeleted = true;
-        UpdatedAt = @event.At;
+        blog.Title = e.Title ?? blog.Title;
+        blog.Description = e.Description ?? blog.Description;
+        blog.Metadata = e.Metadata ?? blog.Metadata;
+        blog.Version++;
     }
-
-    #endregion
 }

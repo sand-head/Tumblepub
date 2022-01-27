@@ -33,7 +33,7 @@ public class UserService : IUserService
         await _session.SaveChangesAsync();
         _logger.LogInformation("Created new user {Id}", userCreated.UserId);
 
-        var user = await _session.Events.AggregateStreamAsync<User>(userCreated.UserId);
+        var user = await _session.LoadAsync<User>(userCreated.UserId);
         return user!;
     }
 

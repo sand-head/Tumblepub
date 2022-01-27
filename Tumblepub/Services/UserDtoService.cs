@@ -21,8 +21,6 @@ public class UserDtoService : IUserDtoService
 
     public async Task<UserDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _session.Query<UserDto>()
-            .Where(u => u.Id == id)
-            .FirstOrDefaultAsync(cancellationToken);
+        return await _session.LoadAsync<UserDto>(id, cancellationToken);
     }
 }

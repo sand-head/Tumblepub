@@ -1,8 +1,7 @@
 ﻿using Marten;
 using Tumblepub.Events;
-using Tumblepub.Projections;
 using Tumblepub.Infrastructure;
-using Tumblepub.Themes;
+using Tumblepub.Projections;
 
 namespace Tumblepub.Services;
 
@@ -10,7 +9,6 @@ public interface IBlogService
 {
     Task<Blog> CreateAsync(Guid userId, string name);
     Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default);
-    Task<IResult> RenderAsync(string name);
 }
 
 public class BlogService : IBlogService
@@ -34,7 +32,7 @@ public class BlogService : IBlogService
         await _session.SaveChangesAsync();
         _logger.LogInformation("Created new blog {Id} with name {Name}", blogCreated.BlogId, blogCreated.BlogName);
 
-        var blog = await _session.Events.AggregateStreamAsync<Blog>(blogCreated.BlogId);
+        var blog = await _session.LoadAsync<Blog>(blogCreated.BlogId);
         return blog!;
     }
 
@@ -44,25 +42,5 @@ public class BlogService : IBlogService
         return await _session.Query<Blog>()
             .Where(b => b.BlogName == name)
             .FirstOrDefaultAsync(cancellationToken);
-    }
-
-    public async Task<IResult> RenderAsync(string name)
-    {
-        var blog = await GetByNameAsync(name, null);
-        if (blog == null)
-        {
-            return Results.NotFound();
-        }
-
-        var data = new
-        {
-            Title = blog.BlogName,
-            Avatar = $"/api/assets/avatar/{blog.BlogName}",
-            Posts = new List<object>()
-        };
-
-        // todo: add ThemeService to allow for custom themes
-        var page = DefaultTheme.Template.Value(data);
-        return Results.Content(page, "text/html");
     }
 }

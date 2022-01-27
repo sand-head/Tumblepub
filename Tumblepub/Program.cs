@@ -11,6 +11,7 @@ using Tumblepub.Themes;
 using Tumblepub.Extensions;
 using Tumblepub;
 using Tumblepub.Projections;
+using System.Diagnostics;
 
 Helpers.Register();
 
@@ -32,16 +33,16 @@ builder.Services
 builder.Services
     .AddScoped<IUserService, UserService>()
     .AddScoped<IUserDtoService, UserDtoService>()
-    .AddScoped<IBlogService, BlogService>();
+    .AddScoped<IBlogService, BlogService>()
+    .AddScoped<IRenderService, RenderService>();
 
 // configure event sourcing
 builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
 {
-    options.Projections.SelfAggregate<User>();
-    options.Projections.SelfAggregate<Blog>(Marten.Events.Projections.ProjectionLifecycle.Live);
+    options.Projections.Add<UserProjection>();
+    options.Projections.Add<BlogProjection>();
 
-    options.Projections.Add(new UserDtoProjection());
-    //options.Projections.Add(new BlogDtoProjection());
+    options.Projections.Add<UserDtoProjection>();
 });
 
 // add GraphQL support using HotChocolate
@@ -88,6 +89,7 @@ using (var scope = app.Services.CreateScope())
     var singleUserConfig = scope.ServiceProvider.GetService<IOptions<SingleUserConfiguration>>()?.Value;
     if (singleUserConfig != null)
     {
+        var userDtoService = scope.ServiceProvider.GetService<IUserDtoService>()!;
         var userService = scope.ServiceProvider.GetService<IUserService>()!;
         var blogService = scope.ServiceProvider.GetService<IBlogService>()!;
 
@@ -95,7 +97,10 @@ using (var scope = app.Services.CreateScope())
         if (await userService.GetByEmailAsync(singleUserConfig.Email) == null)
         {
             var user = await userService.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
-            await blogService.CreateAsync(user.Id, singleUserConfig.Username);
+            var blog = await blogService.CreateAsync(user.Id, singleUserConfig.Username);
+
+            var userDto = await userDtoService.GetByIdAsync(user.Id);
+            Debugger.Break();
         }
     }
 }
@@ -105,16 +110,16 @@ app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/@{name}", async (string name, IBlogService blogService) =>
+app.MapGet("/@{name}", async (string name, IRenderService renderService) =>
 {
-    return await blogService.RenderAsync(name);
+    return await renderService.RenderBlogAsync(name);
 });
 
-// todo: show blog in "single user" mode
-app.MapGet("/", async (IOptions<SingleUserConfiguration> singleUserConfig, IBlogService blogService) =>
+// show blog in "single user" mode
+app.MapGet("/", async (IOptions<SingleUserConfiguration> singleUserConfig, IRenderService renderService) =>
 {
     return singleUserConfig.Value is not null
-        ? await blogService.RenderAsync(singleUserConfig.Value.Username)
+        ? await renderService.RenderBlogAsync(singleUserConfig.Value.Username)
         : Results.NotFound();
 });
 

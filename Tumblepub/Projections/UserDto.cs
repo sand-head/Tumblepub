@@ -29,20 +29,28 @@ public class UserDtoProjection : ViewProjection<UserDto, Guid>
     {
         Identity<UserCreated>(u => u.UserId);
         Identity<BlogCreated>(b => b.UserId);
+
+        //DeleteEvent<UserDeleted>();
     }
 
-    public void Apply(UserCreated @event, UserDto view)
+    public UserDto Create(UserCreated @event)
     {
-        view.Email = @event.Email;
+        return new UserDto
+        {
+            Id = @event.UserId,
+            Email = @event.Email,
+        };
     }
 
-    public void Apply(BlogCreated @event, UserDto view)
+    public void Apply(UserDto state, BlogCreated @event)
     {
-        view.Blogs.Add(@event.BlogId);
+        state.Blogs.Add(@event.BlogId);
     }
 
+    /*
     public void Apply(BlogDeleted @event, UserDto view)
     {
         view.Blogs.Remove(@event.BlogId);
     }
+    */
 }

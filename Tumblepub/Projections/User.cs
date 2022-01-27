@@ -1,31 +1,34 @@
-﻿using Tumblepub.Events;
+﻿using Marten.Events.Aggregation;
+using Tumblepub.Events;
 
 namespace Tumblepub.Projections;
 
 public class User
 {
-    public Guid Id { get; private set; }
-    public string Email { get; private set; } = string.Empty;
-    public string PasswordHash { get; private set; } = string.Empty;
-    public bool IsDeleted { get; private set; }
-    public DateTimeOffset CreatedAt { get; private set; }
-    public DateTimeOffset UpdatedAt { get; private set; }
-    public int Version { get; private set; }
+    public Guid Id { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public int Version { get; set; }
+}
 
-    public void Apply(UserCreated @event)
+public class UserProjection : AggregateProjection<User>
+{
+    public UserProjection()
     {
-        Id = @event.UserId;
-        Email = @event.Email;
-        PasswordHash = @event.PasswordHash;
-        IsDeleted = false;
-        UpdatedAt = CreatedAt = @event.At;
-        Version++;
+        DeleteEvent<UserDeleted>();
     }
 
-    public void Apply(UserDeleted @event)
+    public User Create(UserCreated e)
     {
-        IsDeleted = true;
-        UpdatedAt = @event.At;
-        Version++;
+        return new User
+        {
+            Id = e.UserId,
+            Email = e.Email,
+            PasswordHash = e.PasswordHash,
+            UpdatedAt = e.At,
+            CreatedAt = e.At
+        };
     }
 }
