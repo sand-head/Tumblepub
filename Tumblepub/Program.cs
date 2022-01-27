@@ -12,6 +12,7 @@ using Tumblepub.Extensions;
 using Tumblepub;
 using Tumblepub.Projections;
 using System.Diagnostics;
+using Marten.Events.Projections;
 
 Helpers.Register();
 
@@ -42,7 +43,7 @@ builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
     options.Projections.Add<UserProjection>();
     options.Projections.Add<BlogProjection>();
 
-    options.Projections.Add<UserDtoProjection>();
+    options.Projections.Add<UserDtoProjection>(ProjectionLifecycle.Inline);
 });
 
 // add GraphQL support using HotChocolate
@@ -97,10 +98,7 @@ using (var scope = app.Services.CreateScope())
         if (await userService.GetByEmailAsync(singleUserConfig.Email) == null)
         {
             var user = await userService.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
-            var blog = await blogService.CreateAsync(user.Id, singleUserConfig.Username);
-
-            var userDto = await userDtoService.GetByIdAsync(user.Id);
-            Debugger.Break();
+            await blogService.CreateAsync(user.Id, singleUserConfig.Username);
         }
     }
 }
