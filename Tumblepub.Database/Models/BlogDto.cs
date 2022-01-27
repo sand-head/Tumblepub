@@ -1,4 +1,4 @@
-﻿namespace Tumblepub.Projections;
+﻿namespace Tumblepub.Database.Models;
 
 public class BlogDto
 {

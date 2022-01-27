@@ -1,6 +1,6 @@
-﻿using Tumblepub.Infrastructure;
-using Tumblepub.Projections;
-using Tumblepub.Services;
+﻿using Tumblepub.Database.Models;
+using Tumblepub.Database.Repositories;
+using Tumblepub.Infrastructure;
 
 namespace Tumblepub;
 
@@ -12,27 +12,27 @@ public class Mutation
         string email,
         string password,
         string name,
-        [Service] IUserService userService,
-        [Service] IBlogService blogService,
+        [Service] IUserRepository userRepository,
+        [Service] IBlogRepository blogRepository,
         [Service] JwtAuthenticationManager authenticationManager)
     {
-        var user = await userService.CreateAsync(email, password);
-        await blogService.CreateAsync(user.Id, name);
+        var user = await userRepository.CreateAsync(email, password);
+        await blogRepository.CreateAsync(user.Id, name);
 
         var result = authenticationManager.GenerateTokens(user);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
 
     public async Task<AuthResult> Login(string email, string password,
-        [Service] IUserService userService,
+        [Service] IUserRepository userRepository,
         [Service] JwtAuthenticationManager authenticationManager)
     {
-        if (!await userService.ValidateCredentialsAsync(email, password))
+        if (!await userRepository.ValidateCredentialsAsync(email, password))
         {
             throw new Exception("bad");
         }
 
-        var user = await userService.GetByEmailAsync(email);
+        var user = await userRepository.GetByEmailAsync(email);
         var result = authenticationManager.GenerateTokens(user!);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }

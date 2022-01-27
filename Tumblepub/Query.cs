@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
-using Tumblepub.Projections;
-using Tumblepub.Services;
+using Tumblepub.Database.Models;
+using Tumblepub.Database.Repositories;
 
 namespace Tumblepub;
 
@@ -11,12 +11,12 @@ public class Query
     public string ApiVersion() => "0.2";
 
     [Authorize]
-    public async Task<UserDto> GetCurrentUser(ClaimsPrincipal claimsPrincipal, [Service] IUserDtoService userDtoService)
+    public async Task<UserDto> GetCurrentUser(ClaimsPrincipal claimsPrincipal, [Service] IUserDtoRepository userDtoRepository)
     {
         var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
         var userId = Guid.Parse(userIdClaimValue);
 
-        var userDto = await userDtoService.GetByIdAsync(userId);
+        var userDto = await userDtoRepository.GetByIdAsync(userId);
         return userDto!;
     }
 }

@@ -1,11 +1,12 @@
 ﻿using Marten;
+using Microsoft.Extensions.Logging;
 using Sodium;
-using Tumblepub.Events;
-using Tumblepub.Projections;
+using Tumblepub.Database.Events;
+using Tumblepub.Database.Models;
 
-namespace Tumblepub.Services;
+namespace Tumblepub.Database.Repositories;
 
-public interface IUserService
+public interface IUserRepository
 {
     Task<User> CreateAsync(string email, string password);
     Task<bool> ValidateCredentialsAsync(string email, string password, CancellationToken cancellationToken = default);
@@ -13,12 +14,12 @@ public interface IUserService
     Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }
 
-public class UserService : IUserService
+public class UserRepository : IUserRepository
 {
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<UserRepository> _logger;
     private readonly IDocumentSession _session;
 
-    public UserService(ILogger<UserService> logger, IDocumentSession session)
+    public UserRepository(ILogger<UserRepository> logger, IDocumentSession session)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _session = session ?? throw new ArgumentNullException(nameof(session));

@@ -1,4 +1,5 @@
-﻿using Tumblepub.Themes;
+﻿using Tumblepub.Database.Repositories;
+using Tumblepub.Themes;
 
 namespace Tumblepub.Services;
 
@@ -9,16 +10,16 @@ public interface IRenderService
 
 public class RenderService : IRenderService
 {
-    private readonly IBlogService _blogService;
+    private readonly IBlogRepository _blogRepository;
 
-    public RenderService(IBlogService blogService)
+    public RenderService(IBlogRepository blogRepository)
     {
-        _blogService = blogService ?? throw new ArgumentNullException(nameof(blogService));
+        _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
     }
 
     public async Task<IResult> RenderBlogAsync(string name, CancellationToken token = default)
     {
-        var blog = await _blogService.GetByNameAsync(name, null, token);
+        var blog = await _blogRepository.GetByNameAsync(name, null, token);
         if (blog == null)
         {
             return Results.NotFound();

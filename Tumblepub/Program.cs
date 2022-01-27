@@ -1,18 +1,18 @@
+using Marten.Events.Projections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using System.Text;
-using Tumblepub.Infrastructure;
+using Tumblepub;
 using Tumblepub.Configuration;
+using Tumblepub.Database.Extensions;
+using Tumblepub.Database.Projections;
+using Tumblepub.Database.Repositories;
+using Tumblepub.Infrastructure;
 using Tumblepub.Services;
 using Tumblepub.Themes;
-using Tumblepub.Extensions;
-using Tumblepub;
-using Tumblepub.Projections;
-using System.Diagnostics;
-using Marten.Events.Projections;
 
 Helpers.Register();
 
@@ -32,9 +32,9 @@ builder.Services
 
 // add domain services
 builder.Services
-    .AddScoped<IUserService, UserService>()
-    .AddScoped<IUserDtoService, UserDtoService>()
-    .AddScoped<IBlogService, BlogService>()
+    .AddScoped<IUserRepository, UserRepository>()
+    .AddScoped<IUserDtoRepository, UserDtoRepository>()
+    .AddScoped<IBlogRepository, BlogRepository>()
     .AddScoped<IRenderService, RenderService>();
 
 // configure event sourcing
@@ -49,6 +49,7 @@ builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
 // add GraphQL support using HotChocolate
 builder.Services
     .AddGraphQLServer()
+    .AddAuthorization()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>();
 
@@ -90,15 +91,14 @@ using (var scope = app.Services.CreateScope())
     var singleUserConfig = scope.ServiceProvider.GetService<IOptions<SingleUserConfiguration>>()?.Value;
     if (singleUserConfig != null)
     {
-        var userDtoService = scope.ServiceProvider.GetService<IUserDtoService>()!;
-        var userService = scope.ServiceProvider.GetService<IUserService>()!;
-        var blogService = scope.ServiceProvider.GetService<IBlogService>()!;
+        var userRepository = scope.ServiceProvider.GetService<IUserRepository>()!;
+        var blogRepository = scope.ServiceProvider.GetService<IBlogRepository>()!;
 
         // if "single user" user doesn't exist, create new user and blog
-        if (await userService.GetByEmailAsync(singleUserConfig.Email) == null)
+        if (await userRepository.GetByEmailAsync(singleUserConfig.Email) == null)
         {
-            var user = await userService.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
-            await blogService.CreateAsync(user.Id, singleUserConfig.Username);
+            var user = await userRepository.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
+            await blogRepository.CreateAsync(user.Id, singleUserConfig.Username);
         }
     }
 }

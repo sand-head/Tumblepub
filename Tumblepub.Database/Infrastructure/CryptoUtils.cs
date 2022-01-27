@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Tumblepub.Infrastructure;
+namespace Tumblepub.Database.Infrastructure;
 
 public static class CryptoUtils
 {

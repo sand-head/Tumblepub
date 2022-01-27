@@ -1,8 +1,10 @@
 ﻿using Marten;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Weasel.Postgresql;
 
-namespace Tumblepub.Extensions;
+namespace Tumblepub.Database.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {

@@ -1,22 +1,23 @@
 ﻿using Marten;
-using Tumblepub.Events;
-using Tumblepub.Infrastructure;
-using Tumblepub.Projections;
+using Microsoft.Extensions.Logging;
+using Tumblepub.Database.Events;
+using Tumblepub.Database.Infrastructure;
+using Tumblepub.Database.Models;
 
-namespace Tumblepub.Services;
+namespace Tumblepub.Database.Repositories;
 
-public interface IBlogService
+public interface IBlogRepository
 {
     Task<Blog> CreateAsync(Guid userId, string name);
     Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default);
 }
 
-public class BlogService : IBlogService
+public class BlogRepository : IBlogRepository
 {
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<UserRepository> _logger;
     private readonly IDocumentSession _session;
 
-    public BlogService(ILogger<UserService> logger, IDocumentSession session)
+    public BlogRepository(ILogger<UserRepository> logger, IDocumentSession session)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _session = session ?? throw new ArgumentNullException(nameof(session));

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Tumblepub.Events;
+namespace Tumblepub.Database.Events;
 
 /// <summary>
 /// A <see cref="Projections.Blog"/> has been created on this instance.

@@ -1,27 +1,8 @@
 ﻿using Marten.Events.Projections;
-using Tumblepub.Events;
-using Tumblepub.Services;
+using Tumblepub.Database.Events;
+using Tumblepub.Database.Models;
 
-namespace Tumblepub.Projections;
-
-public class UserDto
-{
-    [GraphQLIgnore]
-    public Guid Id { get; set; }
-    public string Email { get; set; } = default!;
-    public List<Guid> Blogs { get; set; } = new();
-
-    #region GraphQL resolvers
-
-    /*
-    public async Task<IEnumerable<BlogDto>> GetBlogs([Service] IBlogService blogService)
-    {
-
-    }
-    */
-
-    #endregion
-}
+namespace Tumblepub.Database.Projections;
 
 public class UserDtoProjection : ViewProjection<UserDto, Guid>
 {

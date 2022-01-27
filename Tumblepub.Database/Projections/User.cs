@@ -1,17 +1,8 @@
 ﻿using Marten.Events.Aggregation;
-using Tumblepub.Events;
+using Tumblepub.Database.Events;
+using Tumblepub.Database.Models;
 
-namespace Tumblepub.Projections;
-
-public class User
-{
-    public Guid Id { get; set; }
-    public string Email { get; set; } = string.Empty;
-    public string PasswordHash { get; set; } = string.Empty;
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
-    public int Version { get; set; }
-}
+namespace Tumblepub.Database.Projections;
 
 public class UserProjection : AggregateProjection<User>
 {

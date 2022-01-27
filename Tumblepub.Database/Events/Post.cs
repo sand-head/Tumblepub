@@ -1,4 +1,4 @@
-﻿namespace Tumblepub.Events;
+﻿namespace Tumblepub.Database.Events;
 
 public record PostCreated(
     Guid PostId,
