@@ -7,6 +7,8 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["Tumblepub/Tumblepub.csproj", "Tumblepub/"]
+COPY ["Tumblepub.Themes/Tumblepub.Themes.csproj", "Tumblepub.Themes/"]
+COPY ["Tumblepub.ActivityPub/Tumblepub.ActivityPub.csproj", "Tumblepub.ActivityPub/"]
 RUN dotnet restore "Tumblepub/Tumblepub.csproj"
 COPY . .
 WORKDIR "/src/Tumblepub"
