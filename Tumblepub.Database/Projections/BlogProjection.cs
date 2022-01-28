@@ -17,7 +17,7 @@ public class BlogProjection : AggregateProjection<Blog>
         {
             Id = e.BlogId,
             UserId = e.UserId,
-            BlogName = e.BlogName,
+            Name = e.BlogName,
             PublicKey = e.PublicKey,
             PrivateKey = e.PrivateKey,
             UpdatedAt = e.At,
@@ -30,7 +30,7 @@ public class BlogProjection : AggregateProjection<Blog>
         return new Blog
         {
             Id = e.BlogId,
-            BlogName = e.BlogName,
+            Name = e.BlogName,
             PublicKey = e.PublicKey,
             UpdatedAt = e.At,
             CreatedAt = e.At

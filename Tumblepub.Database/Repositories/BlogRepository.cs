@@ -43,7 +43,7 @@ public class BlogRepository : IBlogRepository
     {
         // todo: also filter by domain
         return await _session.Query<Blog>()
-            .Where(b => b.BlogName == name)
+            .Where(b => b.Name == name)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

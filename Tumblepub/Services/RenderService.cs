@@ -27,9 +27,9 @@ public class RenderService : IRenderService
 
         var data = new
         {
-            Title = blog.Title ?? blog.BlogName,
+            Title = blog.Title ?? blog.Name,
             Description = blog.Description,
-            Avatar = $"/api/assets/avatar/{blog.BlogName}",
+            Avatar = $"/api/assets/avatar/{blog.Name}",
             Posts = new List<object>()
         };
 

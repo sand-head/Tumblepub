@@ -19,7 +19,7 @@ public class UserTypeExtensions
             {
                 var userBlogs = await userBlogsRepository.GetByIdsAsync(keys, token);
                 var allBlogs = await blogRepository.GetByIdsAsync(userBlogs.SelectMany(ub => ub.BlogIds), token);
-                return allBlogs.ToLookup(b => b.UserId ?? Guid.Empty);
+                return allBlogs.ToLookup(b => b.UserId!.Value);
             })
             .LoadAsync(user.Id);
     }
