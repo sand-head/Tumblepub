@@ -10,6 +10,7 @@ public interface IBlogRepository
 {
     Task<Blog> CreateAsync(Guid userId, string name);
     Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default);
+    Task<Blog?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }
 
 public class BlogRepository : IBlogRepository
@@ -43,5 +44,10 @@ public class BlogRepository : IBlogRepository
         return await _session.Query<Blog>()
             .Where(b => b.BlogName == name)
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<Blog?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _session.LoadAsync<Blog>(id, cancellationToken);
     }
 }

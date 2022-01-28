@@ -10,6 +10,7 @@ using Tumblepub.Configuration;
 using Tumblepub.Database.Extensions;
 using Tumblepub.Database.Projections;
 using Tumblepub.Database.Repositories;
+using Tumblepub.Extensions;
 using Tumblepub.Infrastructure;
 using Tumblepub.Services;
 using Tumblepub.Themes;
@@ -35,6 +36,7 @@ builder.Services
     .AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IUserDtoRepository, UserDtoRepository>()
     .AddScoped<IBlogRepository, BlogRepository>()
+    .AddScoped<IBlogDtoRepository, BlogDtoRepository>()
     .AddScoped<IRenderService, RenderService>();
 
 // configure event sourcing
@@ -51,7 +53,8 @@ builder.Services
     .AddGraphQLServer()
     .AddAuthorization()
     .AddQueryType<Query>()
-    .AddMutationType<Mutation>();
+    .AddMutationType<Mutation>()
+    .AddTypeExtension<UserDtoTypeExtensions>();
 
 builder.Services
     .AddSingleton<JwtTokenConfig>(new JwtTokenConfig(
