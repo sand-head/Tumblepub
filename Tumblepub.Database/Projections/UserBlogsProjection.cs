@@ -4,9 +4,9 @@ using Tumblepub.Database.Models;
 
 namespace Tumblepub.Database.Projections;
 
-public class UserDtoProjection : ViewProjection<UserDto, Guid>
+public class UserBlogsProjection : ViewProjection<UserBlogs, Guid>
 {
-    public UserDtoProjection()
+    public UserBlogsProjection()
     {
         Identity<UserCreated>(u => u.UserId);
         Identity<BlogCreated>(b => b.UserId);
@@ -14,18 +14,17 @@ public class UserDtoProjection : ViewProjection<UserDto, Guid>
         //DeleteEvent<UserDeleted>();
     }
 
-    public UserDto Create(UserCreated @event)
+    public UserBlogs Create(UserCreated @event)
     {
-        return new UserDto
+        return new UserBlogs
         {
             Id = @event.UserId,
-            Email = @event.Email,
         };
     }
 
-    public void Apply(UserDto state, BlogCreated @event)
+    public void Apply(UserBlogs state, BlogCreated @event)
     {
-        state.Blogs.Add(@event.BlogId);
+        state.BlogIds.Add(@event.BlogId);
     }
 
     /*

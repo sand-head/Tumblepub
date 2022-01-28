@@ -41,7 +41,7 @@ public class BlogProjection : AggregateProjection<Blog>
     {
         blog.Title = e.Title ?? blog.Title;
         blog.Description = e.Description ?? blog.Description;
-        //blog.Metadata = e.Metadata ?? blog.Metadata;
+        blog.Metadata = e.Metadata ?? blog.Metadata;
         blog.Version++;
     }
 }

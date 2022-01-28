@@ -9,7 +9,7 @@ public class Blog
     public string BlogName { get; set; } = default!;
     public string? Title { get; set; }
     public string? Description { get; set; }
-    //public JsonElement? Metadata { get; set; }
+    public JsonDocument? Metadata { get; set; }
     public string PublicKey { get; set; } = default!;
     public string? PrivateKey { get; set; }
     public DateTimeOffset CreatedAt { get; set; }

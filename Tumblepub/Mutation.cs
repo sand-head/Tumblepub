@@ -42,7 +42,7 @@ public class Mutation
         throw new NotImplementedException();
     }
 
-    public async Task<BlogDto> CreateBlog()
+    public async Task<BlogPosts> CreateBlog()
     {
         throw new NotImplementedException();
     }

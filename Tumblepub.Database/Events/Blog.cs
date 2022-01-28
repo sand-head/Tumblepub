@@ -29,7 +29,7 @@ public record BlogMetadataUpdated(
     Guid BlogId,
     string? Title,
     string? Description,
-    JsonElement? Metadata,
+    JsonDocument? Metadata,
     DateTimeOffset At);
 
 /// <summary>

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
 using System.Text;
+using System.Text.Json;
 using Tumblepub;
 using Tumblepub.Configuration;
 using Tumblepub.Database.Extensions;
@@ -34,9 +35,9 @@ builder.Services
 // add domain services
 builder.Services
     .AddScoped<IUserRepository, UserRepository>()
-    .AddScoped<IUserDtoRepository, UserDtoRepository>()
+    .AddScoped<IUserBlogsRepository, UserBlogsRepository>()
     .AddScoped<IBlogRepository, BlogRepository>()
-    .AddScoped<IBlogDtoRepository, BlogDtoRepository>()
+    .AddScoped<IBlogPostsRepository, BlogPostsRepository>()
     .AddScoped<IRenderService, RenderService>();
 
 // configure event sourcing
@@ -45,7 +46,7 @@ builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
     options.Projections.Add<UserProjection>();
     options.Projections.Add<BlogProjection>();
 
-    options.Projections.Add<UserDtoProjection>(ProjectionLifecycle.Inline);
+    options.Projections.Add<UserBlogsProjection>(ProjectionLifecycle.Inline);
 });
 
 // add GraphQL support using HotChocolate
@@ -54,7 +55,8 @@ builder.Services
     .AddAuthorization()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
-    .AddTypeExtension<UserDtoTypeExtensions>();
+    .AddTypeExtension<UserTypeExtensions>()
+    .BindRuntimeType<JsonDocument, AnyType>();
 
 builder.Services
     .AddSingleton<JwtTokenConfig>(new JwtTokenConfig(

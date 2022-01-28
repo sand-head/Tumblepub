@@ -11,12 +11,12 @@ public class Query
     public string ApiVersion() => "0.2";
 
     [Authorize]
-    public async Task<UserDto> GetCurrentUser(ClaimsPrincipal claimsPrincipal, [Service] IUserDtoRepository userDtoRepository)
+    public async Task<User> GetCurrentUser(ClaimsPrincipal claimsPrincipal, [Service] IUserRepository userRepository)
     {
         var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
         var userId = Guid.Parse(userIdClaimValue);
 
-        var userDto = await userDtoRepository.GetByIdAsync(userId);
+        var userDto = await userRepository.GetByIdAsync(userId);
         return userDto!;
     }
 }
