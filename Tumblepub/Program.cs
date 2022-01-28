@@ -56,6 +56,7 @@ builder.Services
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
     .AddTypeExtension<UserTypeExtensions>()
+    .AddTypeExtension<BlogTypeExtensions>()
     .BindRuntimeType<JsonDocument, AnyType>();
 
 builder.Services
