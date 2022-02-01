@@ -8,38 +8,38 @@ namespace Tumblepub.ActivityPub.Controllers;
 [ServiceFilter(typeof(JsonLDAsyncActionFilter))]
 public class UsersController : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetUser()
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUser(Guid userId)
     {
         throw new NotImplementedException();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetUserActivity()
+    [HttpGet("{userId}/followers")]
+    public async Task<IActionResult> GetUserFollowers(Guid userId)
     {
         throw new NotImplementedException();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetUserPost()
+    [HttpGet("{userId}/outbox")]
+    public async Task<IActionResult> GetUserOutbox(Guid userId)
     {
         throw new NotImplementedException();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetUserFollowers()
+    [HttpGet("{userId}/activity/{activityId}")]
+    public async Task<IActionResult> GetUserActivity(Guid userId, Guid activityId)
     {
         throw new NotImplementedException();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetUserOutbox()
+    [HttpGet("{userId}/post/{postId}")]
+    public async Task<IActionResult> GetUserPost(Guid userId, Guid postId)
     {
         throw new NotImplementedException();
     }
 
-    [HttpPost]
-    public async Task<IActionResult> PostUserInbox()
+    [HttpPost("{userId}/inbox")]
+    public async Task<IActionResult> PostUserInbox(Guid userId)
     {
         throw new NotImplementedException();
     }
