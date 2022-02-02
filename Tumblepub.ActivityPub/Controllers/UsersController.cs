@@ -9,9 +9,14 @@ namespace Tumblepub.ActivityPub.Controllers;
 public class UsersController : ControllerBase
 {
     [HttpGet("{userId}")]
-    public async Task<IActionResult> GetUser(Guid userId)
+    public async Task<IActionResult> GetUser(Guid userId, [FromServices] IActivityPubService activityPubService)
     {
-        throw new NotImplementedException();
+        var user = await activityPubService.GetUser(userId);
+        if (user == null)
+        {
+            return NotFound();
+        }
+        return Ok(user);
     }
 
     [HttpGet("{userId}/followers")]

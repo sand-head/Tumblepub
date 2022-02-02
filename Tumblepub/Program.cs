@@ -7,6 +7,7 @@ using Serilog.Events;
 using System.Text;
 using System.Text.Json;
 using Tumblepub;
+using Tumblepub.ActivityPub.Extensions;
 using Tumblepub.Configuration;
 using Tumblepub.Database.Extensions;
 using Tumblepub.Database.Projections;
@@ -84,6 +85,8 @@ builder.Services
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
+
+builder.Services.AddActivityPub<ActivityPubService>();
 
 builder.Services.AddControllers();
 
