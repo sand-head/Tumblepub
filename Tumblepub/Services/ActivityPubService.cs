@@ -13,9 +13,9 @@ public class ActivityPubService : IActivityPubService
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     }
 
-    public async Task<Actor> GetUser(Guid id)
+    public async Task<Actor> GetUser(Guid id, CancellationToken token = default)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _userRepository.GetByIdAsync(id, token);
         throw new NotImplementedException();
     }
 }

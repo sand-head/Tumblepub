@@ -9,5 +9,5 @@ namespace Tumblepub.ActivityPub;
 
 public interface IActivityPubService
 {
-    Task<Actor> GetUser(Guid id);
+    Task<Actor> GetUser(Guid id, CancellationToken token = default);
 }

@@ -117,6 +117,8 @@ app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseActivityPub();
+
 app.MapGet("/@{name}", async (string name, IRenderService renderService) =>
 {
     return await renderService.RenderBlogAsync(name);

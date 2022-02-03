@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Tumblepub.ActivityPub.Filters;
+using Tumblepub.ActivityPub.Endpoints;
 
 namespace Tumblepub.ActivityPub.Extensions;
 
@@ -10,6 +10,20 @@ public static class IServiceCollectionExtensions
     {
         return services
             .AddScoped<IActivityPubService, TAPUserService>()
-            .AddScoped<JsonLDAsyncActionFilter>();
+            .AddEndpoints();
+    }
+
+    public static IServiceCollection AddEndpoints(this IServiceCollection services)
+    {
+        return services
+            .AddEndpoint<UserEndpoint>(HttpMethod.Get, "/users/{userId}");
+    }
+
+    public static IServiceCollection AddEndpoint<TEndpoint>(this IServiceCollection services, HttpMethod method, string path)
+        where TEndpoint : class, IEndpoint
+    {
+        return services
+            .AddSingleton(new EndpointPointer(method, path, typeof(TEndpoint)))
+            .AddTransient<TEndpoint>();
     }
 }
