@@ -1,6 +1,6 @@
-﻿using Marten;
+﻿using Isopoh.Cryptography.Argon2;
+using Marten;
 using Microsoft.Extensions.Logging;
-using Sodium;
 using Tumblepub.Database.Events;
 using Tumblepub.Database.Models;
 
@@ -27,7 +27,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User> CreateAsync(string email, string password)
     {
-        var hashedPassword = PasswordHash.ArgonHashString(password, PasswordHash.StrengthArgon.Medium).TrimEnd('\0');
+        var hashedPassword = Argon2.Hash(password).TrimEnd('\0');
         var userCreated = new UserCreated(Guid.NewGuid(), email, hashedPassword, DateTimeOffset.UtcNow);
 
         _session.Events.StartStream<User>(userCreated.UserId, userCreated);
@@ -47,7 +47,7 @@ public class UserRepository : IUserRepository
             return false;
         }
 
-        if (!PasswordHash.ArgonHashStringVerify(user.PasswordHash, password))
+        if (!Argon2.Verify(user.PasswordHash, password))
         {
             return false;
         }

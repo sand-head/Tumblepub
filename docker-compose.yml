@@ -6,3 +6,6 @@ services:
     build:
       context: .
       dockerfile: Tumblepub/Dockerfile
+
+  database:
+    image: postgres:latest
