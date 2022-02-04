@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Tumblepub.ActivityPub.Endpoints;
+using Tumblepub.ActivityPub.Services;
 
 namespace Tumblepub.ActivityPub.Extensions;
 
@@ -10,13 +11,16 @@ public static class IServiceCollectionExtensions
     {
         return services
             .AddScoped<IActivityPubService, TAPUserService>()
+            .AddHostedService<ActivityDeliveryService>()
             .AddEndpoints();
     }
 
     public static IServiceCollection AddEndpoints(this IServiceCollection services)
     {
         return services
-            .AddEndpoint<UserEndpoint>(HttpMethod.Get, "/users/{userId}");
+            .AddEndpoint<GetActorEndpoint>(HttpMethod.Get, "/actors/{userId}")
+            .AddEndpoint<GetActorFollowersEndpoint>(HttpMethod.Get, "/actors/{userId}/followers")
+            .AddEndpoint<PostActorInboxEndpoint>(HttpMethod.Post, "/actors/{userId}/inbox");
     }
 
     public static IServiceCollection AddEndpoint<TEndpoint>(this IServiceCollection services, HttpMethod method, string path)

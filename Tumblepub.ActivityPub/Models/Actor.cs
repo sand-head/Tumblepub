@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Tumblepub.ActivityPub.Models;
 
 public class PublicKey
 {
-    public string Id { get; set; }
-    public string Owner { get; set; }
-    public string PublicKeyPem { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Owner { get; set; } = string.Empty;
+    public string PublicKeyPem { get; set; } = string.Empty;
 }
 
 public class Actor
 {
     [JsonPropertyName("@context")]
-    public JsonElement Context { get; set; }
-    [JsonPropertyName("type")]
-    public string Kind { get; set; }
+    public List<string> Context { get; set; } = new();
+    // todo: make this an enum
+    public string Type { get; set; } = "Person";
 
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string PreferredUsername { get; set; } = string.Empty;
     public string? Summary { get; set; }
@@ -30,9 +25,9 @@ public class Actor
     public DateTimeOffset CreatedOn { get; set; }
 
     [JsonPropertyName("inbox")]
-    public string InboxUrl { get; set; }
-    [JsonPropertyName("outbox")]
-    public string OutboxUrl { get; set; }
+    public string InboxUrl { get; set; } = default!;
+    [JsonPropertyName("followers")]
+    public string FollowersUrl { get; set; } = default!;
 
     public PublicKey PublicKey { get; set; } = default!;
 }

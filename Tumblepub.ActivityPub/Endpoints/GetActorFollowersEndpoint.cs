@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Tumblepub.ActivityPub.Endpoints;
 
-public sealed class UserFollowersEndpoint : Endpoint
+public sealed class GetActorFollowersEndpoint : Endpoint
 {
     private readonly IActivityPubService _activityPubService;
 
-    public UserFollowersEndpoint(IActivityPubService activityPubService)
+    public GetActorFollowersEndpoint(IActivityPubService activityPubService)
     {
         _activityPubService = activityPubService ?? throw new ArgumentNullException(nameof(activityPubService));
     }

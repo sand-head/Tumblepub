@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tumblepub.ActivityPub.Models;
+﻿using Tumblepub.ActivityPub.Models;
 
 namespace Tumblepub.ActivityPub;
 
 public interface IActivityPubService
 {
-    Task<Actor> GetUser(Guid id, CancellationToken token = default);
+    Task<Actor?> GetActor(Guid id, CancellationToken token = default);
+    Task GetActorFollowers(Guid id, CancellationToken token = default);
 }

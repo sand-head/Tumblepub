@@ -12,7 +12,7 @@ public static class IApplicationBuilderExtensions
 {
     public static IApplicationBuilder UseActivityPub(this IApplicationBuilder app)
     {
-        // todo: map well-known endpoints
+        app.MapWellKnownEndpoints();
 
         // map ActivityPub endpoints
         // we only want to route to these if the client supports some specific content types
@@ -50,6 +50,21 @@ public static class IApplicationBuilderExtensions
             });
 
         return app;
+    }
+
+    private static void MapWellKnownEndpoints(this IApplicationBuilder app)
+    {
+        var builder = new RouteBuilder(app);
+
+        builder.MapGet("/.well-known/webfinger", async context => {
+            throw new NotImplementedException();
+        });
+
+        builder.MapGet("/.well-known/nodeinfo", async context => {
+            throw new NotImplementedException();
+        });
+
+        app.UseRouter(builder.Build());
     }
 
     private static bool ClientSupportsActivityPub(HttpContext context)

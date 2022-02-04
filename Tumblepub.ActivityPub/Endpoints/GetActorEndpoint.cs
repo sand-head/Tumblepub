@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Tumblepub.ActivityPub.Endpoints;
 
-public sealed class UserEndpoint : Endpoint
+public sealed class GetActorEndpoint : Endpoint
 {
     private readonly IActivityPubService _activityPubService;
-    private readonly ILogger<UserEndpoint> _logger;
+    private readonly ILogger<GetActorEndpoint> _logger;
 
-    public UserEndpoint(IActivityPubService activityPubService, ILogger<UserEndpoint> logger)
+    public GetActorEndpoint(IActivityPubService activityPubService, ILogger<GetActorEndpoint> logger)
     {
         _activityPubService = activityPubService ?? throw new ArgumentNullException(nameof(activityPubService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -19,15 +19,15 @@ public sealed class UserEndpoint : Endpoint
     public override async Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default)
     {
         var userId = Guid.Parse(routeData!.Values["userId"]!.ToString()!);
-        var user = await _activityPubService.GetUser(userId, token);
+        var user = await _activityPubService.GetActor(userId, token);
 
         if (user == null)
         {
-            _logger.LogInformation("User {Id} not found.", userId);
+            _logger.LogInformation("Actor {Id} not found.", userId);
             return NotFound();
         }
 
-        _logger.LogInformation("User {Id} found.", userId);
+        _logger.LogInformation("Actor {Id} found.", userId);
         return Ok(user);
     }
 }
