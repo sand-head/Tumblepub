@@ -1,5 +1,6 @@
 ﻿using Tumblepub.ActivityPub;
 using Tumblepub.ActivityPub.Models;
+using Tumblepub.Database.Models;
 using Tumblepub.Database.Repositories;
 
 namespace Tumblepub.Services;
@@ -16,8 +17,32 @@ public class ActivityPubService : IActivityPubService
     public async Task<Actor?> GetActor(Guid id, CancellationToken token = default)
     {
         var blog = await _blogRepository.GetByIdAsync(id, token);
-        if (blog == null) return null;
+        if (blog == null)
+        {
+            return null;
+        }
 
+        return MapBlogToActor(blog);
+    }
+
+    public async Task<Actor?> GetActorByName(string name, CancellationToken token = default)
+    {
+        var blog = await _blogRepository.GetByNameAsync(name, null, token);
+        if (blog == null)
+        {
+            return null;
+        }
+
+        return MapBlogToActor(blog);
+    }
+
+    public Task GetActorFollowers(Guid id, CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static Actor MapBlogToActor(Blog blog)
+    {
         return new Actor
         {
             Context = new()
@@ -27,26 +52,21 @@ public class ActivityPubService : IActivityPubService
             },
 
             // todo: get domain
-            Id = $"/actors/{blog.Id}",
+            Id = new Uri($"/actors/{blog.Id}", UriKind.Relative),
             Type = "Person",
             Name = blog.Name,
             PreferredUsername = blog.Title ?? blog.Name,
             Summary = blog.Description,
 
-            InboxUrl = $"/actors/{blog.Id}/inbox",
-            FollowersUrl = $"/actors/{blog.Id}/followers",
+            InboxUrl = new Uri($"/actors/{blog.Id}/inbox", UriKind.Relative),
+            FollowersUrl = new Uri($"/actors/{blog.Id}/followers", UriKind.Relative),
 
             PublicKey = new()
             {
-                Id = $"/actors/{blog.Id}#main-key",
-                Owner = $"/actors/{blog.Id}",
+                Id = new Uri($"/actors/{blog.Id}#main-key", UriKind.Relative),
+                Owner = new Uri($"/actors/{blog.Id}", UriKind.Relative),
                 PublicKeyPem = blog.PublicKey
             }
         };
-    }
-
-    public Task GetActorFollowers(Guid id, CancellationToken token = default)
-    {
-        throw new NotImplementedException();
     }
 }

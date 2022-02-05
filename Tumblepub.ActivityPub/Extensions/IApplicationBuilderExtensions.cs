@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
+using System.Net;
 using Tumblepub.ActivityPub.Endpoints;
+using Tumblepub.ActivityPub.Models;
 
 namespace Tumblepub.ActivityPub.Extensions;
 
@@ -52,7 +54,9 @@ public static class IApplicationBuilderExtensions
         // map endpoints not locked behind ActivityPub headers
         var builder = new RouteBuilder(app);
 
-        builder.MapWellKnownEndpoints();
+        builder
+            .MapWellKnownWebfingerEndpoint()
+            .MapWellKnownNodeInfoEndpoint();
 
         if (options.MapActorProfileUrl != null)
         {
@@ -78,13 +82,62 @@ public static class IApplicationBuilderExtensions
         return app.UseRouter(builder.Build());
     }
 
-    private static void MapWellKnownEndpoints(this RouteBuilder builder)
+    private static IRouteBuilder MapWellKnownWebfingerEndpoint(this IRouteBuilder builder)
     {
-        builder.MapGet("/.well-known/webfinger", async context => {
-            var resource = context.Request.Query["resource"];
-        });
+        return builder.MapGet("/.well-known/webfinger", async context => {
+            if (!context.Request.Query.TryGetValue("resource", out var resourceValues) || resourceValues.Count != 1)
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return;
+            }
 
-        builder.MapGet("/.well-known/nodeinfo", async context => {
+            // get the username and domain out of the resource string
+            var resource = resourceValues.ToString()
+                .Replace("acct:", string.Empty)
+                .Split('@');
+            var name = resource[0];
+            var domain = resource[1];
+
+            // check to make sure that the domain is the same one the request has been made to
+            var currentDomain = context.Request.Host.Host;
+            if (currentDomain.StartsWith("www."))
+            {
+                currentDomain = currentDomain["www.".Length..];
+            }
+            if (currentDomain != domain)
+            {
+                return;
+            }
+
+            // get the actor by their name
+            using var scope = context.RequestServices.CreateScope();
+            var activityPubContext = scope.ServiceProvider.GetRequiredService<IActivityPubService>();
+            var actor = await activityPubContext.GetActorByName(name, context.RequestAborted);
+            if (actor == null)
+            {
+                return;
+            }
+
+            var domainWithSchemeAndPort = $"{context.Request.Scheme}://{context.Request.Host.Value}";
+            await context.Response.WriteAsJsonAsync(new WebfingerActor
+            {
+                Subject = $"acct:{name}@{domain}",
+                Links = new()
+                {
+                    new WebfingerLink
+                    {
+                        Rel = "self",
+                        Type = "application/activity+json",
+                        Href = domainWithSchemeAndPort + actor.Id
+                    }
+                }
+            });
+        });
+    }
+
+    private static IRouteBuilder MapWellKnownNodeInfoEndpoint(this IRouteBuilder builder)
+    {
+        return builder.MapGet("/.well-known/nodeinfo", async context => {
             throw new NotImplementedException();
         });
     }

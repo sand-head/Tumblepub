@@ -5,9 +5,22 @@ namespace Tumblepub.ActivityPub.Models;
 
 public class PublicKey
 {
-    public string Id { get; set; } = string.Empty;
-    public string Owner { get; set; } = string.Empty;
+    public Uri Id { get; set; } = default!;
+    public Uri Owner { get; set; } = default!;
     public string PublicKeyPem { get; set; } = string.Empty;
+
+    internal void AddDomain(Uri domain)
+    {
+        if (!Id.IsAbsoluteUri)
+        {
+            Id = new Uri(domain, Id);
+        }
+
+        if (!Owner.IsAbsoluteUri)
+        {
+            Owner = new Uri(domain, Owner);
+        }
+    }
 }
 
 public class Actor
@@ -17,7 +30,7 @@ public class Actor
     // todo: make this an enum
     public string Type { get; set; } = "Person";
 
-    public string Id { get; set; } = string.Empty;
+    public Uri Id { get; set; } = default!;
     public string Name { get; set; } = string.Empty;
     public string PreferredUsername { get; set; } = string.Empty;
     public string? Summary { get; set; }
@@ -25,9 +38,29 @@ public class Actor
     public DateTimeOffset CreatedOn { get; set; }
 
     [JsonPropertyName("inbox")]
-    public string InboxUrl { get; set; } = default!;
+    public Uri InboxUrl { get; set; } = default!;
     [JsonPropertyName("followers")]
-    public string FollowersUrl { get; set; } = default!;
+    public Uri FollowersUrl { get; set; } = default!;
 
     public PublicKey PublicKey { get; set; } = default!;
+
+    internal void AddDomain(Uri domain)
+    {
+        if (!Id.IsAbsoluteUri)
+        {
+            Id = new Uri(domain, Id);
+        }
+
+        if (!InboxUrl.IsAbsoluteUri)
+        {
+            InboxUrl = new Uri(domain, InboxUrl);
+        }
+
+        if (!FollowersUrl.IsAbsoluteUri)
+        {
+            FollowersUrl = new Uri(domain, FollowersUrl);
+        }
+
+        PublicKey.AddDomain(domain);
+    }
 }

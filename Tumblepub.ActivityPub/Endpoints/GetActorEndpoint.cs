@@ -19,15 +19,17 @@ public sealed class GetActorEndpoint : Endpoint
     public override async Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default)
     {
         var userId = Guid.Parse(routeData!.Values["userId"]!.ToString()!);
-        var user = await _activityPubService.GetActor(userId, token);
+        var actor = await _activityPubService.GetActor(userId, token);
 
-        if (user == null)
+        if (actor == null)
         {
             _logger.LogInformation("Actor {Id} not found.", userId);
             return NotFound();
         }
 
         _logger.LogInformation("Actor {Id} found.", userId);
-        return Ok(user);
+        var domainWithSchemeAndPort = new Uri($"{context.Request.Scheme}://{context.Request.Host.Value}/");
+        actor.AddDomain(domainWithSchemeAndPort);
+        return Ok(actor);
     }
 }
