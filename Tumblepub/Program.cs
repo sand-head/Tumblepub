@@ -86,7 +86,13 @@ builder.Services
         };
     });
 
-builder.Services.AddActivityPub<ActivityPubService>();
+builder.Services.AddActivityPub<ActivityPubService>(options =>
+{
+    options.MapActorProfileUrl = (actor) =>
+    {
+        return $"/@{actor.Name}";
+    };
+});
 
 builder.Services.AddControllers();
 

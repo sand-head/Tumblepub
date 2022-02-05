@@ -13,8 +13,8 @@ public static class CryptoUtils
 
         // get the appropriately formatted public and private key bits
         // these are chunked into 64 character lines to conform with RFC 1421
-        var publicKey = Convert.ToBase64String(rsa.ExportSubjectPublicKeyInfo()).Chunk(64);
-        var privateKey = Convert.ToBase64String(rsa.ExportPkcs8PrivateKey()).Chunk(64);
+        var publicKey = Convert.ToBase64String(rsa.ExportSubjectPublicKeyInfo()).Chunk(64).Select(c => new string(c));
+        var privateKey = Convert.ToBase64String(rsa.ExportPkcs8PrivateKey()).Chunk(64).Select(c => new string(c));
 
         return (
             $"-----BEGIN RSA PUBLIC KEY-----\n{string.Join('\n', publicKey)}\n-----END RSA PUBLIC KEY-----\n",

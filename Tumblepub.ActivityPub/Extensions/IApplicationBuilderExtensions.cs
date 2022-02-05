@@ -12,7 +12,7 @@ public static class IApplicationBuilderExtensions
 {
     public static IApplicationBuilder UseActivityPub(this IApplicationBuilder app)
     {
-        app.MapWellKnownEndpoints();
+        var options = app.ApplicationServices.GetRequiredService<ActivityPubOptions>();
 
         // map ActivityPub endpoints
         // we only want to route to these if the client supports some specific content types
@@ -49,22 +49,44 @@ public static class IApplicationBuilderExtensions
                 app.UseRouter(builder.Build());
             });
 
-        return app;
-    }
-
-    private static void MapWellKnownEndpoints(this IApplicationBuilder app)
-    {
+        // map endpoints not locked behind ActivityPub headers
         var builder = new RouteBuilder(app);
 
+        builder.MapWellKnownEndpoints();
+
+        if (options.MapActorProfileUrl != null)
+        {
+            builder.MapGet(options.ActorRouteTemplate, async context =>
+            {
+                using var scope = context.RequestServices.CreateScope();
+                var activityPubService = scope.ServiceProvider.GetRequiredService<IActivityPubService>();
+
+                // get userId from route values
+                var userId = Guid.Parse(context.GetRouteData().Values["userId"]!.ToString()!);
+                var actor = await activityPubService.GetActor(userId, context.RequestAborted);
+                if (actor == null)
+                {
+                    return;
+                }
+
+                // redirect to the generated URL
+                var redirectUrl = options.MapActorProfileUrl(actor);
+                context.Response.Redirect(redirectUrl);
+            });
+        }
+
+        return app.UseRouter(builder.Build());
+    }
+
+    private static void MapWellKnownEndpoints(this RouteBuilder builder)
+    {
         builder.MapGet("/.well-known/webfinger", async context => {
-            throw new NotImplementedException();
+            var resource = context.Request.Query["resource"];
         });
 
         builder.MapGet("/.well-known/nodeinfo", async context => {
             throw new NotImplementedException();
         });
-
-        app.UseRouter(builder.Build());
     }
 
     private static bool ClientSupportsActivityPub(HttpContext context)
