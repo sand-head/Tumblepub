@@ -55,6 +55,7 @@ public class ActivityPubService : IActivityPubService
             Id = new Uri($"/actors/{blog.Id}", UriKind.Relative),
             Type = "Person",
             Name = blog.Name,
+            PublishedAt = blog.CreatedAt,
             PreferredUsername = blog.Title ?? blog.Name,
             Summary = blog.Description,
 
