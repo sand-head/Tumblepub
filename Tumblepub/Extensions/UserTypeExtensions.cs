@@ -11,15 +11,13 @@ public class UserTypeExtensions
     public async Task<IEnumerable<Blog>> GetBlogs(
         IResolverContext context,
         [Parent] User user,
-        [Service] IUserBlogsRepository userBlogsRepository,
         [Service] IBlogRepository blogRepository)
     {
         return await context.GroupDataLoader<Guid, Blog>(
-            async (keys, token) =>
+            async (userIds, token) =>
             {
-                var userBlogs = await userBlogsRepository.GetByIdsAsync(keys, token);
-                var allBlogs = await blogRepository.GetByIdsAsync(userBlogs.SelectMany(ub => ub.BlogIds), token);
-                return allBlogs.ToLookup(b => b.UserId!.Value);
+                var getBlogsResults = await Task.WhenAll(userIds.Select(async id => await blogRepository.GetByUserIdAsync(id, token)));
+                return getBlogsResults.SelectMany(r => r).ToLookup(b => b.UserId!.Value);
             })
             .LoadAsync(user.Id);
     }

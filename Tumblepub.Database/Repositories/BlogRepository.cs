@@ -12,6 +12,7 @@ public interface IBlogRepository
     Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default);
     Task<Blog?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Blog>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Blog>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 }
 
 public class BlogRepository : IBlogRepository
@@ -55,5 +56,12 @@ public class BlogRepository : IBlogRepository
     public async Task<IEnumerable<Blog>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
     {
         return await _session.LoadManyAsync<Blog>(cancellationToken, ids);
+    }
+
+    public async Task<IEnumerable<Blog>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _session.Query<Blog>()
+            .Where(b => b.UserId == userId)
+            .ToListAsync(cancellationToken);
     }
 }

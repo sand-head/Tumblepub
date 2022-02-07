@@ -1,10 +1,12 @@
-﻿using System.Text.Json;
+﻿using Marten.Schema;
+using System.Text.Json;
 
 namespace Tumblepub.Database.Models;
 
 public class Blog
 {
     public Guid Id { get; set; }
+    [ForeignKey(typeof(User))]
     public Guid? UserId { get; set; }
     public string Name { get; set; } = default!;
     public string? Title { get; set; }

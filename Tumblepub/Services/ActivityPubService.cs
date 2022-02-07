@@ -43,7 +43,7 @@ public class ActivityPubService : IActivityPubService
 
     private static Actor MapBlogToActor(Blog blog)
     {
-        return new Actor
+        return new Actor("Person")
         {
             Context = new()
             {

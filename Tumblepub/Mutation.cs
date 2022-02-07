@@ -1,4 +1,6 @@
-﻿using Tumblepub.Database.Models;
+﻿using HotChocolate.AspNetCore.Authorization;
+using System.Security.Claims;
+using Tumblepub.Database.Models;
 using Tumblepub.Database.Repositories;
 using Tumblepub.Infrastructure;
 
@@ -42,8 +44,21 @@ public class Mutation
         throw new NotImplementedException();
     }
 
-    public async Task<BlogPosts> CreateBlog()
+    [Authorize]
+    public async Task<Blog> CreateBlog(ClaimsPrincipal claimsPrincipal, string name,
+        [Service] IUserRepository userRepository,
+        [Service] IBlogRepository blogRepository)
     {
-        throw new NotImplementedException();
+        var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        var userId = Guid.Parse(userIdClaimValue);
+
+        var user = await userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("bad");
+        }
+
+        var blog = await blogRepository.CreateAsync(user.Id, name);
+        return blog;
     }
 }
