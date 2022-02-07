@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Tumblepub.ActivityPub.Models;
+namespace Tumblepub.ActivityPub.ActivityStreams;
 
 public class PublicKey
 {
@@ -22,7 +22,7 @@ public class PublicKey
     }
 }
 
-public record Actor(string Type) : ActivityPubObject(Type)
+public record Actor(string Type) : Object(Type)
 {
     public string Name { get; set; } = string.Empty;
     public string PreferredUsername { get; set; } = string.Empty;

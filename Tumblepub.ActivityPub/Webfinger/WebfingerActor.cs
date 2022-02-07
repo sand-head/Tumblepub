@@ -1,4 +1,4 @@
-﻿namespace Tumblepub.ActivityPub.Models;
+﻿namespace Tumblepub.ActivityPub.Webfinger;
 
 public class WebfingerActor
 {

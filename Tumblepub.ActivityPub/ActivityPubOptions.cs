@@ -1,4 +1,4 @@
-﻿using Tumblepub.ActivityPub.Models;
+﻿using Tumblepub.ActivityPub.ActivityStreams;
 
 namespace Tumblepub.ActivityPub;
 

@@ -1,5 +1,5 @@
 ﻿using Tumblepub.ActivityPub;
-using Tumblepub.ActivityPub.Models;
+using Tumblepub.ActivityPub.ActivityStreams;
 using Tumblepub.Database.Models;
 using Tumblepub.Database.Repositories;
 
@@ -45,7 +45,7 @@ public class ActivityPubService : IActivityPubService
     {
         return new Actor("Person")
         {
-            Context = new()
+            Context = new List<string>()
             {
                 "https://www.w3.org/ns/activitystreams",
                 "https://w3id.org/security/v1"

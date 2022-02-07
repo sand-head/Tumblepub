@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Net;
 using Tumblepub.ActivityPub.Endpoints;
-using Tumblepub.ActivityPub.Models;
+using Tumblepub.ActivityPub.Webfinger;
 
 namespace Tumblepub.ActivityPub.Extensions;
 

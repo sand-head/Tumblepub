@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Tumblepub.ActivityPub.Models;
+namespace Tumblepub.ActivityPub.ActivityStreams;
 
-public record OrderedCollection() : ActivityPubObject("OrderedCollection")
+public record OrderedCollection() : Object("OrderedCollection")
 {
     public int TotalItems { get; set; }
     [JsonPropertyName("next")]
