@@ -5,8 +5,12 @@ namespace Tumblepub.ActivityPub;
 public class ActivityPubOptions
 {
     public string ActorRouteTemplate { get; set; } = ActivityPubConstants.ActorRoute;
+    
+    public string ActorActivityRouteTemplate { get; set; } = ActivityPubConstants.ActorActivityRoute;
 
-    public string ActorFollowersRouteTemplate { get; set; } = ActivityPubConstants.ActorFollwersRoute;
+    public string ActorFollowersRouteTemplate { get; set; } = ActivityPubConstants.ActorFollowersRoute;
+
+    public string ActorObjectRouteTemplate { get; set; } = ActivityPubConstants.ActorObjectRoute;
 
     public string ActorInboxRouteTemplate { get; set; } = ActivityPubConstants.ActorInboxRoute;
 

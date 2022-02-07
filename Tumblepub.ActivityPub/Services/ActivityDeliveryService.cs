@@ -23,12 +23,6 @@ internal class ActivityDeliveryService : BackgroundService
         return base.StartAsync(cancellationToken);
     }
 
-    public override Task StopAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Stopping ActivityDeliveryService...");
-        return base.StopAsync(cancellationToken);
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -36,5 +30,7 @@ internal class ActivityDeliveryService : BackgroundService
             // todo: implement
             break;
         }
+
+        _logger.LogInformation("Stopping ActivityDeliveryService...");
     }
 }

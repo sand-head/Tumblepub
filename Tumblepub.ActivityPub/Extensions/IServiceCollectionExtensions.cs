@@ -23,8 +23,10 @@ public static class IServiceCollectionExtensions
     internal static IServiceCollection AddDefaultEndpoints(this IServiceCollection services, ActivityPubOptions options)
     {
         return services
+            .AddEndpoint<GetActorActivityEndpoint>(HttpMethod.Get, options.ActorActivityRouteTemplate)
             .AddEndpoint<GetActorEndpoint>(HttpMethod.Get, options.ActorRouteTemplate)
             .AddEndpoint<GetActorFollowersEndpoint>(HttpMethod.Get, options.ActorFollowersRouteTemplate)
+            .AddEndpoint<GetActorObjectEndpoint>(HttpMethod.Get, options.ActorObjectRouteTemplate)
             .AddEndpoint<PostActorInboxEndpoint>(HttpMethod.Post, options.ActorInboxRouteTemplate);
     }
 
