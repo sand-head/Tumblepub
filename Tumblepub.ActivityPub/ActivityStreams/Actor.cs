@@ -2,33 +2,20 @@
 
 namespace Tumblepub.ActivityPub.ActivityStreams;
 
-public class PublicKey
+public record PublicKey
 {
-    public Uri Id { get; set; } = default!;
-    public Uri Owner { get; set; } = default!;
-    public string PublicKeyPem { get; set; } = string.Empty;
-
-    internal void AddDomain(Uri domain)
-    {
-        if (!Id.IsAbsoluteUri)
-        {
-            Id = new Uri(domain, Id);
-        }
-
-        if (!Owner.IsAbsoluteUri)
-        {
-            Owner = new Uri(domain, Owner);
-        }
-    }
+    public Uri Id { get; init; } = default!;
+    public Uri Owner { get; init; } = default!;
+    public string PublicKeyPem { get; init; } = string.Empty;
 }
 
 public record Actor(string Type) : Object(Type)
 {
-    public string Name { get; set; } = string.Empty;
-    public string PreferredUsername { get; set; } = string.Empty;
-    public string? Summary { get; set; }
+    public string Name { get; init; } = string.Empty;
+    public string PreferredUsername { get; init; } = string.Empty;
+    public string? Summary { get; init; }
     [JsonPropertyName("published")]
-    public DateTimeOffset PublishedAt { get; set; }
+    public DateTimeOffset PublishedAt { get; init; }
 
     /// <summary>
     /// The inbox URL for the given actor.
@@ -37,7 +24,7 @@ public record Actor(string Type) : Object(Type)
     /// If relative, the scheme, domain, and port will be added in from the ActivityPub request.
     /// </remarks>
     [JsonPropertyName("inbox")]
-    public Uri InboxUrl { get; set; } = default!;
+    public Uri InboxUrl { get; init; } = default!;
 
     /// <summary>
     /// The followers URL for the given actor.
@@ -46,27 +33,7 @@ public record Actor(string Type) : Object(Type)
     /// If relative, the scheme, domain, and port will be added in from the ActivityPub request.
     /// </remarks>
     [JsonPropertyName("followers")]
-    public Uri FollowersUrl { get; set; } = default!;
+    public Uri FollowersUrl { get; init; } = default!;
 
-    public PublicKey PublicKey { get; set; } = default!;
-
-    internal void AddDomain(Uri domain)
-    {
-        if (!Id.IsAbsoluteUri)
-        {
-            Id = new Uri(domain, Id);
-        }
-
-        if (!InboxUrl.IsAbsoluteUri)
-        {
-            InboxUrl = new Uri(domain, InboxUrl);
-        }
-
-        if (!FollowersUrl.IsAbsoluteUri)
-        {
-            FollowersUrl = new Uri(domain, FollowersUrl);
-        }
-
-        PublicKey.AddDomain(domain);
-    }
+    public PublicKey PublicKey { get; init; } = default!;
 }

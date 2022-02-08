@@ -11,7 +11,7 @@ namespace Tumblepub.ActivityPub.Endpoints;
 
 public sealed class GetActorActivityEndpoint : Endpoint
 {
-    public override Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default)
+    public override Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default)
     {
         throw new NotImplementedException();
     }

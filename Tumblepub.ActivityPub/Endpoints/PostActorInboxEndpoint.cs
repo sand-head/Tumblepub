@@ -6,7 +6,7 @@ namespace Tumblepub.ActivityPub.Endpoints;
 
 public sealed class PostActorInboxEndpoint : Endpoint
 {
-    public override Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default)
+    public override Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default)
     {
         throw new NotImplementedException();
     }

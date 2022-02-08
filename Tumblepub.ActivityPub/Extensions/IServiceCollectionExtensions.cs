@@ -17,6 +17,7 @@ public static class IServiceCollectionExtensions
             .AddSingleton(options)
             .AddScoped<IActivityPubService, TAPUserService>()
             .AddHostedService<ActivityDeliveryService>()
+            .AddHttpContextAccessor()
             .AddDefaultEndpoints(options);
     }
 

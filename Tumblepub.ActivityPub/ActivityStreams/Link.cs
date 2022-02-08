@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Tumblepub.ActivityPub.Converters;
+using Tumblepub.ActivityPub.Extensions;
 
 namespace Tumblepub.ActivityPub.ActivityStreams;
 
@@ -7,11 +8,11 @@ namespace Tumblepub.ActivityPub.ActivityStreams;
 public record Link(Uri Href) : ActivityStreamsValue("Link")
 {
     [JsonConverter(typeof(MaybeSingleMaybeArrayConverterFactory))]
-    public IEnumerable<string>? Rel { get; set; }
-    public string? MediaType { get; set; }
-    public string? Name { get; set; }
-    public string? Hreflang { get; set; }
-    public int? Height { get; set; }
-    public int? Width { get; set; }
-    public Uri? Preview { get; set; }
+    public IEnumerable<string>? Rel { get; init; }
+    public string? MediaType { get; init; }
+    public string? Name { get; init; }
+    public string? Hreflang { get; init; }
+    public int? Height { get; init; }
+    public int? Width { get; init; }
+    public Uri? Preview { get; init; }
 }

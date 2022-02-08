@@ -37,8 +37,9 @@ public static class IApplicationBuilderExtensions
 
                             if (possibleEndpoint is IEndpoint endpoint)
                             {
+                                endpoint.Context = context;
                                 var routeData = context.GetRouteData();
-                                var result = await endpoint.InvokeAsync(context, routeData, context.RequestAborted);
+                                var result = await endpoint.InvokeAsync(routeData, context.RequestAborted);
 
                                 if (result != null)
                                 {

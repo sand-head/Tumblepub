@@ -2,16 +2,19 @@
 using Tumblepub.ActivityPub.ActivityStreams;
 using Tumblepub.Database.Models;
 using Tumblepub.Database.Repositories;
+using Object = Tumblepub.ActivityPub.ActivityStreams.Object;
 
 namespace Tumblepub.Services;
 
 public class ActivityPubService : IActivityPubService
 {
     private readonly IBlogRepository _blogRepository;
+    private readonly IPostRepository _postRepository;
 
-    public ActivityPubService(IBlogRepository blogRepository)
+    public ActivityPubService(IBlogRepository blogRepository, IPostRepository postRepository)
     {
         _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
+        _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
     }
 
     public async Task<Actor?> GetActor(Guid id, CancellationToken token = default)
@@ -36,9 +39,25 @@ public class ActivityPubService : IActivityPubService
         return MapBlogToActor(blog);
     }
 
-    public Task GetActorFollowers(Guid id, CancellationToken token = default)
+    public Task<Activity> GetActivity(Guid actorId, Guid activityId, CancellationToken token = default)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<Object?> GetObject(Guid actorId, Guid objectId, CancellationToken token = default)
+    {
+        var post = await _postRepository.GetPost(objectId, token);
+        if (post == null || post.BlogId != actorId)
+        {
+            return null;
+        }
+
+        var mappedPost = MapPost(post);
+        if (mappedPost is not Object mappedPostObject)
+        {
+            return null;
+        }
+        return mappedPostObject;
     }
 
     private static Actor MapBlogToActor(Blog blog)
@@ -47,13 +66,11 @@ public class ActivityPubService : IActivityPubService
         {
             Context = new List<string>()
             {
-                "https://www.w3.org/ns/activitystreams",
-                "https://w3id.org/security/v1"
+                "https://www.w3.org/ns/activitystreams"
             },
 
             // todo: get domain
             Id = new Uri($"/actors/{blog.Id}", UriKind.Relative),
-            Type = "Person",
             Name = blog.Name,
             PublishedAt = blog.CreatedAt,
             PreferredUsername = blog.Title ?? blog.Name,
@@ -69,5 +86,40 @@ public class ActivityPubService : IActivityPubService
                 PublicKeyPem = blog.PublicKey
             }
         };
+    }
+
+    private static ActivityStreamsValue MapPost(Post post)
+    {
+        if (post.Content is PostContent.External externalContent)
+        {
+            return new Link(externalContent.ExternalId);
+        }
+
+        // I should simplify how these objects are constructed a bit...
+        var postObject = new Object("Note")
+        {
+            Context = new List<string>()
+            {
+                "https://www.w3.org/ns/activitystreams"
+            },
+
+            Id = new Uri($"/actors/{post.BlogId}/objects/{post.Id}", UriKind.Relative),
+            AttributedTo = new()
+            {
+                new Link(new Uri($"/actors/{post.BlogId}", UriKind.Relative))
+            },
+
+            To = new()
+            {
+                new Link(new Uri("https://www.w3.org/ns/activitystreams#Public"))
+            }
+        };
+
+        if (post.Content is PostContent.Text textContent)
+        {
+            postObject.Content = textContent.Content;
+        }
+
+        return postObject;
     }
 }

@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Tumblepub.ActivityPub.ActivityStreams;
+using Tumblepub.ActivityPub.Converters;
 
 namespace Tumblepub.ActivityPub.Endpoints;
 
@@ -8,18 +13,32 @@ public record EndpointPointer(HttpMethod Method, string Path, Type EndpointType)
 
 public interface IEndpoint
 {
-    Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default);
+    HttpContext Context { get; set; }
+    Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default);
 }
 
 public abstract class Endpoint : IEndpoint
 {
-    public abstract Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default);
+    public HttpContext Context { get; set; } = default!;
 
-    public virtual OkResult Ok() => new();
-
-    public virtual OkObjectResult Ok(object value) => new(value);
+    public abstract Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default);
 
     public virtual NotFoundResult NotFound() => new();
-
     public virtual NotFoundObjectResult NotFound(object value) => new(value);
+
+    public virtual ContentResult Ok(object value)
+    {
+        var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        options.Converters.Add(new RelativeToAbsoluteUriConverter(Context));
+
+        return new ContentResult
+        {
+            Content = JsonSerializer.Serialize(value, options),
+            ContentType = ActivityPubConstants.ContentType,
+            StatusCode = (int)HttpStatusCode.OK
+        };
+    }
 }

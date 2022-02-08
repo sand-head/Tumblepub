@@ -4,6 +4,8 @@ namespace Tumblepub.ActivityPub;
 
 public static class ActivityPubConstants
 {
+    public const string ContentType = "application/activity+json";
+
     /// <summary>
     /// The default route for getting an <see cref="Actor"/>.
     /// </summary>

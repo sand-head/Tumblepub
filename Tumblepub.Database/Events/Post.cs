@@ -1,8 +1,11 @@
-﻿namespace Tumblepub.Database.Events;
+﻿using Tumblepub.Database.Models;
+
+namespace Tumblepub.Database.Events;
 
 public record PostCreated(
     Guid PostId,
     Guid BlogId,
+    PostContent Content,
     DateTimeOffset At);
 
 public record PostDiscovered(

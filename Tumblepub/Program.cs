@@ -37,6 +37,7 @@ builder.Services
 builder.Services
     .AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IBlogRepository, BlogRepository>()
+    .AddScoped<IPostRepository, PostRepository>()
     .AddScoped<IRenderService, RenderService>();
 
 // configure event sourcing
@@ -44,6 +45,7 @@ builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
 {
     options.Projections.Add<UserProjection>();
     options.Projections.Add<BlogProjection>();
+    options.Projections.Add<PostProjection>();
 
     //options.Projections.Add<UserBlogsProjection>(ProjectionLifecycle.Inline);
 });

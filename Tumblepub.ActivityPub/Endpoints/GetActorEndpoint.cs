@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
@@ -16,7 +15,7 @@ public sealed class GetActorEndpoint : Endpoint
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public override async Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default)
+    public override async Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default)
     {
         var userId = Guid.Parse(routeData!.Values["userId"]!.ToString()!);
         var actor = await _activityPubService.GetActor(userId, token);
@@ -28,8 +27,6 @@ public sealed class GetActorEndpoint : Endpoint
         }
 
         _logger.LogInformation("Actor {Id} found.", userId);
-        var domainWithSchemeAndPort = new Uri($"{context.Request.Scheme}://{context.Request.Host.Value}/");
-        actor.AddDomain(domainWithSchemeAndPort);
         return Ok(actor);
     }
 }

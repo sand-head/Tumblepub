@@ -13,7 +13,7 @@ public sealed class GetActorFollowersEndpoint : Endpoint
         _activityPubService = activityPubService ?? throw new ArgumentNullException(nameof(activityPubService));
     }
 
-    public override async Task<IActionResult> InvokeAsync(HttpContext context, RouteData? routeData, CancellationToken token = default)
+    public override async Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default)
     {
         return NotFound();
     }

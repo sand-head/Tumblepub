@@ -4,7 +4,7 @@ namespace Tumblepub.ActivityPub.ActivityStreams;
 
 public record OrderedCollection() : Object("OrderedCollection")
 {
-    public int TotalItems { get; set; }
+    public int TotalItems { get; init; }
     [JsonPropertyName("next")]
-    public Uri NextUrl { get; set; } = default!;
+    public Uri NextUrl { get; init; } = default!;
 }

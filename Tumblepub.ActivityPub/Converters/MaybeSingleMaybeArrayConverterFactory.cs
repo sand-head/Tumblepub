@@ -30,6 +30,15 @@ internal class MaybeSingleMaybeArrayConverterFactory : JsonConverterFactory
 
     private class MaybeSingleMaybeArrayConverter<TValue> : JsonConverter<IEnumerable<TValue>>
     {
+        private readonly JsonConverter<TValue> _valueConverter;
+        private readonly Type _valueType;
+
+        public MaybeSingleMaybeArrayConverter(JsonSerializerOptions options)
+        {
+            _valueType = typeof(TValue);
+            _valueConverter = (JsonConverter<TValue>)options.GetConverter(_valueType);
+        }
+
         public override IEnumerable<TValue>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType == JsonTokenType.StartArray)
@@ -37,7 +46,10 @@ internal class MaybeSingleMaybeArrayConverterFactory : JsonConverterFactory
                 return JsonSerializer.Deserialize<IEnumerable<TValue>>(ref reader);
             }
 
-            var value = JsonSerializer.Deserialize<TValue>(ref reader, options);
+            var value = _valueConverter is null
+                ? JsonSerializer.Deserialize<TValue>(ref reader, options)
+                : _valueConverter.Read(ref reader, _valueType, options);
+
             if (value == null)
             {
                 return null;
@@ -57,11 +69,32 @@ internal class MaybeSingleMaybeArrayConverterFactory : JsonConverterFactory
             }
             else if (value.Count() == 1)
             {
-                JsonSerializer.Serialize(writer, value.First(), options);
+                if (_valueConverter is null)
+                {
+                    JsonSerializer.Serialize(writer, value.First(), options);
+                }
+                else
+                {
+                    _valueConverter.Write(writer, value.First(), options);
+                }
             }
             else
             {
-                JsonSerializer.Serialize(writer, value, options);
+                writer.WriteStartArray();
+
+                foreach (var item in value)
+                {
+                    if (_valueConverter is null)
+                    {
+                        JsonSerializer.Serialize(writer, item, options);
+                    }
+                    else
+                    {
+                        _valueConverter.Write(writer, item, options);
+                    }
+                }
+
+                writer.WriteEndArray();
             }
         }
     }
