@@ -117,7 +117,10 @@ public class ActivityPubService : IActivityPubService
 
         if (post.Content is PostContent.Text textContent)
         {
-            postObject.Content = textContent.Content;
+            postObject = postObject with
+            {
+                Content = textContent.Content
+            };
         }
 
         return postObject;

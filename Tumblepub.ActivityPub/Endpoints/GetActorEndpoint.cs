@@ -27,6 +27,6 @@ public sealed class GetActorEndpoint : Endpoint
         }
 
         _logger.LogInformation("Actor {Id} found.", userId);
-        return Ok(actor);
+        return ActivityStreams(actor);
     }
 }

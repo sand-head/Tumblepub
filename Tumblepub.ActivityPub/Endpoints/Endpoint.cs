@@ -26,7 +26,8 @@ public abstract class Endpoint : IEndpoint
     public virtual NotFoundResult NotFound() => new();
     public virtual NotFoundObjectResult NotFound(object value) => new(value);
 
-    public virtual ContentResult Ok(object value)
+    public virtual ContentResult ActivityStreams<TValue>(TValue value)
+        where TValue : ActivityStreamsValue
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
         {

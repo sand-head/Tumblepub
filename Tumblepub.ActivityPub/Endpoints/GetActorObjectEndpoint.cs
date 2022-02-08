@@ -28,6 +28,6 @@ public sealed class GetActorObjectEndpoint : Endpoint
         }
 
         _logger.LogInformation("Object {Id} found.", objectId);
-        return Ok(@object);
+        return ActivityStreams(@object);
     }
 }
