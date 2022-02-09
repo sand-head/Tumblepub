@@ -8,13 +8,21 @@ namespace Tumblepub.Services;
 
 public class ActivityPubService : IActivityPubService
 {
+    private readonly ActivityPubOptions _options;
     private readonly IBlogRepository _blogRepository;
     private readonly IPostRepository _postRepository;
+    private readonly IBlogActivityRepository _blogActivityRepository;
 
-    public ActivityPubService(IBlogRepository blogRepository, IPostRepository postRepository)
+    public ActivityPubService(
+        ActivityPubOptions options,
+        IBlogRepository blogRepository,
+        IPostRepository postRepository,
+        IBlogActivityRepository blogActivityRepository)
     {
+        _options = options ?? throw new ArgumentNullException(nameof(options));
         _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
         _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
+        _blogActivityRepository = blogActivityRepository ?? throw new ArgumentNullException(nameof(blogActivityRepository));
     }
 
     public async Task<Actor?> GetActor(Guid id, CancellationToken token = default)
@@ -39,9 +47,23 @@ public class ActivityPubService : IActivityPubService
         return MapBlogToActor(blog);
     }
 
-    public Task<Activity> GetActivity(Guid actorId, Guid activityId, CancellationToken token = default)
+    public async Task<Activity?> GetActivity(Guid actorId, Guid activityId, CancellationToken token = default)
     {
-        throw new NotImplementedException();
+        var blogActivity = await _blogActivityRepository.GetByIdAsync(activityId, token);
+        if (blogActivity == null || blogActivity.BlogId != actorId)
+        {
+            return null;
+        }
+
+        return new Activity(blogActivity.Type)
+        {
+            Id = new Uri(string.Format(_options.ActorActivityRouteTemplate, blogActivity.BlogId, blogActivity.Id), UriKind.Relative),
+            Actor = new List<ActivityStreamsValue>
+            {
+                new Link(new Uri(string.Format(_options.ActorRouteTemplate, blogActivity.BlogId), UriKind.Relative))
+            },
+            PublishedAt = blogActivity.PublishedAt,
+        };
     }
 
     public async Task<Object?> GetObject(Guid actorId, Guid objectId, CancellationToken token = default)
@@ -60,8 +82,9 @@ public class ActivityPubService : IActivityPubService
         return mappedPostObject;
     }
 
-    private static Actor MapBlogToActor(Blog blog)
+    private Actor MapBlogToActor(Blog blog)
     {
+        var actorId = string.Format(_options.ActorRouteTemplate, blog.Id);
         return new Actor("Person")
         {
             Context = new List<string>()
@@ -70,25 +93,25 @@ public class ActivityPubService : IActivityPubService
             },
 
             // todo: get domain
-            Id = new Uri($"/actors/{blog.Id}", UriKind.Relative),
+            Id = new Uri(actorId, UriKind.Relative),
             Name = blog.Name,
             PublishedAt = blog.CreatedAt,
             PreferredUsername = blog.Title ?? blog.Name,
             Summary = blog.Description,
 
-            InboxUrl = new Uri($"/actors/{blog.Id}/inbox", UriKind.Relative),
-            FollowersUrl = new Uri($"/actors/{blog.Id}/followers", UriKind.Relative),
+            InboxUrl = new Uri(string.Format(_options.ActorInboxRouteTemplate, blog.Id), UriKind.Relative),
+            FollowersUrl = new Uri(string.Format(_options.ActorFollowersRouteTemplate, blog.Id), UriKind.Relative),
 
             PublicKey = new()
             {
-                Id = new Uri($"/actors/{blog.Id}#main-key", UriKind.Relative),
-                Owner = new Uri($"/actors/{blog.Id}", UriKind.Relative),
+                Id = new Uri($"{actorId}#main-key", UriKind.Relative),
+                Owner = new Uri(actorId, UriKind.Relative),
                 PublicKeyPem = blog.PublicKey
             }
         };
     }
 
-    private static ActivityStreamsValue MapPost(Post post)
+    private ActivityStreamsValue MapPost(Post post)
     {
         if (post.Content is PostContent.External externalContent)
         {
@@ -103,10 +126,10 @@ public class ActivityPubService : IActivityPubService
                 "https://www.w3.org/ns/activitystreams"
             },
 
-            Id = new Uri($"/actors/{post.BlogId}/objects/{post.Id}", UriKind.Relative),
+            Id = new Uri(string.Format(_options.ActorObjectRouteTemplate, post.BlogId, post.Id), UriKind.Relative),
             AttributedTo = new()
             {
-                new Link(new Uri($"/actors/{post.BlogId}", UriKind.Relative))
+                new Link(new Uri(string.Format(_options.ActorRouteTemplate, post.BlogId), UriKind.Relative))
             },
 
             To = new()
@@ -115,7 +138,7 @@ public class ActivityPubService : IActivityPubService
             }
         };
 
-        if (post.Content is PostContent.Text textContent)
+        if (post.Content is PostContent.Markdown textContent)
         {
             postObject = postObject with
             {

@@ -38,6 +38,7 @@ builder.Services
     .AddScoped<IUserRepository, UserRepository>()
     .AddScoped<IBlogRepository, BlogRepository>()
     .AddScoped<IPostRepository, PostRepository>()
+    .AddScoped<IBlogActivityRepository, BlogActivityRepository>()
     .AddScoped<IRenderService, RenderService>();
 
 // configure event sourcing
@@ -47,7 +48,7 @@ builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
     options.Projections.Add<BlogProjection>();
     options.Projections.Add<PostProjection>();
 
-    //options.Projections.Add<UserBlogsProjection>(ProjectionLifecycle.Inline);
+    options.Projections.Add<BlogActivityProjection>(ProjectionLifecycle.Inline);
 });
 
 // add GraphQL support using HotChocolate

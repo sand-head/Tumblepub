@@ -8,7 +8,7 @@ namespace Tumblepub.Database.Repositories;
 
 public interface IBlogRepository
 {
-    Task<Blog> CreateAsync(Guid userId, string name);
+    Task<Blog> CreateAsync(Guid userId, string name, CancellationToken cancellationToken = default);
     Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default);
     Task<Blog?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Blog>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
@@ -17,26 +17,26 @@ public interface IBlogRepository
 
 public class BlogRepository : IBlogRepository
 {
-    private readonly ILogger<UserRepository> _logger;
+    private readonly ILogger<BlogRepository> _logger;
     private readonly IDocumentSession _session;
 
-    public BlogRepository(ILogger<UserRepository> logger, IDocumentSession session)
+    public BlogRepository(ILogger<BlogRepository> logger, IDocumentSession session)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _session = session ?? throw new ArgumentNullException(nameof(session));
     }
 
-    public async Task<Blog> CreateAsync(Guid userId, string name)
+    public async Task<Blog> CreateAsync(Guid userId, string name, CancellationToken cancellationToken = default)
     {
         // generate public/private keys and create initial BlogCreated event
         var (publicKey, privateKey) = CryptoUtils.CreateKeyPair();
         var blogCreated = new BlogCreated(Guid.NewGuid(), userId, name, publicKey, privateKey, DateTimeOffset.UtcNow);
 
         _session.Events.StartStream<Blog>(blogCreated.BlogId, blogCreated);
-        await _session.SaveChangesAsync();
+        await _session.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Created new blog {Id} with name {Name}", blogCreated.BlogId, blogCreated.BlogName);
 
-        var blog = await _session.LoadAsync<Blog>(blogCreated.BlogId);
+        var blog = await _session.LoadAsync<Blog>(blogCreated.BlogId, cancellationToken);
         return blog!;
     }
 

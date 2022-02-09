@@ -15,6 +15,10 @@
 	  <PackageReference Include="Humanizer" Version="2.13.14" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Tumblepub.Database\Tumblepub.Database.csproj" />
+    </ItemGroup>
+
     <!--
       1. Install npm packages
       "Inputs" and "Outputs" are used for incremental builds. If all output items are up-to-date, MSBuild skips the target.

@@ -23,11 +23,11 @@ public static class IServiceCollectionExtensions
     internal static IServiceCollection AddDefaultEndpoints(this IServiceCollection services, ActivityPubOptions options)
     {
         return services
-            .AddEndpoint<GetActorActivityEndpoint>(HttpMethod.Get, options.ActorActivityRouteTemplate)
-            .AddEndpoint<GetActorEndpoint>(HttpMethod.Get, options.ActorRouteTemplate)
-            .AddEndpoint<GetActorFollowersEndpoint>(HttpMethod.Get, options.ActorFollowersRouteTemplate)
-            .AddEndpoint<GetActorObjectEndpoint>(HttpMethod.Get, options.ActorObjectRouteTemplate)
-            .AddEndpoint<PostActorInboxEndpoint>(HttpMethod.Post, options.ActorInboxRouteTemplate);
+            .AddEndpoint<GetActorActivityEndpoint>(HttpMethod.Get, string.Format(options.ActorActivityRouteTemplate, "{userId}", "{activityId}"))
+            .AddEndpoint<GetActorEndpoint>(HttpMethod.Get, string.Format(options.ActorRouteTemplate, "{userId}"))
+            .AddEndpoint<GetActorFollowersEndpoint>(HttpMethod.Get, string.Format(options.ActorFollowersRouteTemplate, "{userId}"))
+            .AddEndpoint<GetActorObjectEndpoint>(HttpMethod.Get, string.Format(options.ActorObjectRouteTemplate, "{userId}", "{objectId}"))
+            .AddEndpoint<PostActorInboxEndpoint>(HttpMethod.Post, string.Format(options.ActorInboxRouteTemplate, "{userId}"));
     }
 
     public static IServiceCollection AddEndpoint<TEndpoint>(this IServiceCollection services, HttpMethod method, string path)

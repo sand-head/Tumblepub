@@ -19,10 +19,10 @@ public abstract record PostContent()
 
     public record Deleted() : PostContent();
 
-    public record Internal() : PostContent()
+    public abstract record Internal() : PostContent()
     {
         public List<string> Tags { get; set; } = new();
     }
 
-    public record Text(string Content) : Internal();
+    public record Markdown(string Content) : Internal();
 }

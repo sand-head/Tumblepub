@@ -24,6 +24,12 @@ public record Object(string Type) : ActivityStreamsValue(Type)
     public string? Content { get; init; }
 
     /// <summary>
+    /// The date and time at which the object was published
+    /// </summary>
+    [JsonPropertyName("published")]
+    public DateTimeOffset PublishedAt { get; init; }
+
+    /// <summary>
     /// Identifies an entity considered to be part of the public primary audience of an Object.
     /// </summary>
     public List<ActivityStreamsValue>? To { get; init; }

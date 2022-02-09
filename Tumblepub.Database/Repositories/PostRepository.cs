@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Marten;
+using Microsoft.Extensions.Logging;
+using Tumblepub.Database.Events;
 using Tumblepub.Database.Models;
 
 namespace Tumblepub.Database.Repositories;
@@ -10,24 +8,41 @@ namespace Tumblepub.Database.Repositories;
 public interface IPostRepository
 {
     Task<Post> CreateExternalPost(Guid blogId, Uri externalPostUrl, CancellationToken token = default);
-    Task<Post> CreateTextPost(Guid blogId, string content, string? title, IEnumerable<string>? tags, CancellationToken token = default);
+    Task<Post> CreateMarkdownPost(Guid blogId, string content, IEnumerable<string>? tags, CancellationToken token = default);
     Task<Post?> GetPost(Guid id, CancellationToken token = default);
 }
 
 public class PostRepository : IPostRepository
 {
+    private readonly ILogger<PostRepository> _logger;
+    private readonly IDocumentSession _session;
+
+    public PostRepository(ILogger<PostRepository> logger, IDocumentSession session)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _session = session ?? throw new ArgumentNullException(nameof(session));
+    }
+
     public Task<Post> CreateExternalPost(Guid blogId, Uri externalPostUrl, CancellationToken token = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Post> CreateTextPost(Guid blogId, string content, string? title, IEnumerable<string>? tags, CancellationToken token = default)
+    public async Task<Post> CreateMarkdownPost(Guid blogId, string content, IEnumerable<string>? tags, CancellationToken token = default)
     {
-        throw new NotImplementedException();
+        var markdownContent = new PostContent.Markdown(content);
+        var postCreated = new PostCreated(Guid.NewGuid(), blogId, markdownContent, DateTimeOffset.UtcNow);
+
+        _session.Events.StartStream<Post>(postCreated.PostId, postCreated);
+        await _session.SaveChangesAsync(token);
+        _logger.LogInformation("Created new post {PostId} on blog {BlogId}", postCreated.PostId, postCreated.BlogId);
+
+        var post = await _session.LoadAsync<Post>(postCreated.PostId, token);
+        return post!;
     }
 
-    public Task<Post?> GetPost(Guid id, CancellationToken token = default)
+    public async Task<Post?> GetPost(Guid id, CancellationToken token = default)
     {
-        throw new NotImplementedException();
+        return await _session.LoadAsync<Post>(id, token);
     }
 }

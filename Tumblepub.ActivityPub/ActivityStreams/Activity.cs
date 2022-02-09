@@ -7,7 +7,7 @@ public record Activity(string Type) : Object(Type)
 {
     [JsonConverter(typeof(MaybeSingleMaybeArrayConverterFactory))]
     public IEnumerable<ActivityStreamsValue>? Actor { get; init; }
-    public Object? Object { get; init; }
+    public ActivityStreamsValue? Object { get; init; }
     [JsonConverter(typeof(MaybeSingleMaybeArrayConverterFactory))]
     public IEnumerable<ActivityStreamsValue>? Target { get; init; }
 }

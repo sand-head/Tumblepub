@@ -61,4 +61,23 @@ public class Mutation
         var blog = await blogRepository.CreateAsync(user.Id, name);
         return blog;
     }
+
+    [Authorize]
+    public async Task<Post> CreatePost(ClaimsPrincipal claimsPrincipal,
+        string blogName, string content, string[] tags,
+        [Service] IBlogRepository blogRepository,
+        [Service] IPostRepository postRepository)
+    {
+        var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        var userId = Guid.Parse(userIdClaimValue);
+
+        var blog = await blogRepository.GetByNameAsync(blogName, null);
+        if (blog == null || blog.UserId != userId)
+        {
+            throw new Exception("bad");
+        }
+
+        var post = await postRepository.CreateMarkdownPost(blog.Id, content, tags);
+        return post;
+    }
 }

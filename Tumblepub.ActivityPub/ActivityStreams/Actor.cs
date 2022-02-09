@@ -14,8 +14,6 @@ public record Actor(string Type) : Object(Type)
     public string Name { get; init; } = string.Empty;
     public string PreferredUsername { get; init; } = string.Empty;
     public string? Summary { get; init; }
-    [JsonPropertyName("published")]
-    public DateTimeOffset PublishedAt { get; init; }
 
     /// <summary>
     /// The inbox URL for the given actor.

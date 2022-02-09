@@ -1,4 +1,5 @@
-﻿using Tumblepub.Database.Repositories;
+﻿using Tumblepub.Database.Models;
+using Tumblepub.Database.Repositories;
 using Tumblepub.Themes;
 
 namespace Tumblepub.Services;
@@ -25,13 +26,11 @@ public class RenderService : IRenderService
             return Results.NotFound();
         }
 
-        var data = new
-        {
-            Title = blog.Title ?? blog.Name,
-            Description = blog.Description,
-            Avatar = $"/api/assets/avatar/{blog.Name}",
-            Posts = new List<object>()
-        };
+        var data = new ThemeVariables(
+            Title: blog.Title ?? blog.Name,
+            Description: blog.Description,
+            Avatar: $"/api/assets/avatar/{blog.Name}",
+            Posts: new List<Post>());
 
         // todo: add a ThemeService to allow for custom themes
         var page = DefaultTheme.Template.Value(data);
