@@ -14,24 +14,26 @@ internal class LinkConverter : JsonConverter<Link>
             return new Link(new Uri(link));
         }
 
+        // todo: fix this StackOverflowException
         return JsonSerializer.Deserialize<Link>(ref reader, options);
     }
 
     public override void Write(Utf8JsonWriter writer, Link value, JsonSerializerOptions options)
     {
-        // check all properties to see if any other than Href (and of course Context) are not null
+        // check all properties to see if any other than Href (and of course Context and Type) are not null
         var nullCondition = value.GetType().GetProperties()
-            .Where(p => p.Name != nameof(Link.Href) && p.Name != nameof(Link.Context))
+            .Where(p => p.Name != nameof(Link.Href) && p.Name != nameof(Link.Context) && p.Name != nameof(Link.Type))
             .Any(p => p.GetValue(value) != null);
 
         if (!nullCondition)
         {
             // just write Href as a string
-            writer.WriteStringValue(value.Href.ToString());
+            JsonSerializer.Serialize(writer, value.Href, options);
         }
         else
         {
             // serialize the whole thing
+            // todo: fix this StackOverflowException
             JsonSerializer.Serialize(writer, value, options);
         }
     }

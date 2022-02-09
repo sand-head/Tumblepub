@@ -4,6 +4,8 @@ namespace Tumblepub.ActivityPub.ActivityStreams;
 
 public record OrderedCollection() : Object("OrderedCollection")
 {
+    public static new readonly string[] Types = new[] { "OrderedCollection" };
+
     public int TotalItems { get; init; }
     [JsonPropertyName("next")]
     public Uri NextUrl { get; init; } = default!;

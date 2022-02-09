@@ -5,6 +5,12 @@ namespace Tumblepub.ActivityPub.ActivityStreams;
 
 public record Object(string Type) : ActivityStreamsValue(Type)
 {
+    public static readonly string[] Types = new[]
+    {
+        "Object", "Article", "Audio", "Document", "Event", "Image", "Note",
+        "Page", "Place", "Profile", "Relationship", "Tombstone", "Video"
+    };
+
     /// <summary>
     /// Identifies a resource attached or related to an object that potentially requires special handling. The intent is to provide a model that is at least semantically similar to attachments in email.
     /// </summary>

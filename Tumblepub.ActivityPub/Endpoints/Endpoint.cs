@@ -34,6 +34,7 @@ public abstract class Endpoint : IEndpoint
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
         options.Converters.Add(new RelativeToAbsoluteUriConverter(Context));
+        options.Converters.Add(new ActivityStreamsValueConverter());
 
         return new ContentResult
         {

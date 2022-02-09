@@ -11,6 +11,11 @@ public record PublicKey
 
 public record Actor(string Type) : Object(Type)
 {
+    public static new readonly string[] Types = new[]
+    {
+        "Application", "Group", "Organization", "Person", "Service"
+    };
+
     public string Name { get; init; } = string.Empty;
     public string PreferredUsername { get; init; } = string.Empty;
     public string? Summary { get; init; }

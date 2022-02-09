@@ -1,12 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using Tumblepub.ActivityPub.Converters;
-using Tumblepub.ActivityPub.Extensions;
 
 namespace Tumblepub.ActivityPub.ActivityStreams;
 
 [JsonConverter(typeof(LinkConverter))]
 public record Link(Uri Href) : ActivityStreamsValue("Link")
 {
+    public static readonly string[] Types = new[] { "Link", "Mention" };
+
     [JsonConverter(typeof(MaybeSingleMaybeArrayConverterFactory))]
     public IEnumerable<string>? Rel { get; init; }
     public string? MediaType { get; init; }
