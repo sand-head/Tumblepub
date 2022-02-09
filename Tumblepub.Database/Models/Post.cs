@@ -1,4 +1,5 @@
-﻿using Marten.Schema;
+﻿using HotChocolate.Types;
+using Marten.Schema;
 
 namespace Tumblepub.Database.Models;
 
@@ -13,6 +14,7 @@ public class Post
     public int Version { get; set; }
 }
 
+[UnionType("PostContent")]
 public abstract record PostContent()
 {
     public record External(Uri ExternalId) : PostContent();

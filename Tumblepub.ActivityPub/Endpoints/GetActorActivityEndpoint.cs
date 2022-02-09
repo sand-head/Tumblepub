@@ -18,7 +18,7 @@ public sealed class GetActorActivityEndpoint : Endpoint
     public override async Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default)
     {
         var userId = Guid.Parse(routeData!.Values["userId"]!.ToString()!);
-        var activityId = Guid.Parse(routeData!.Values["objectId"]!.ToString()!);
+        var activityId = Guid.Parse(routeData!.Values["activityId"]!.ToString()!);
         var activity = await _activityPubService.GetActivity(userId, activityId, token);
 
         if (activity == null)

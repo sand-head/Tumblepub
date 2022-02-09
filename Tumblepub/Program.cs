@@ -10,6 +10,7 @@ using Tumblepub;
 using Tumblepub.ActivityPub.Extensions;
 using Tumblepub.Configuration;
 using Tumblepub.Database.Extensions;
+using Tumblepub.Database.Models;
 using Tumblepub.Database.Projections;
 using Tumblepub.Database.Repositories;
 using Tumblepub.Extensions;
@@ -57,6 +58,8 @@ builder.Services
     .AddAuthorization()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
+    .AddType<PostContent.External>()
+    .AddType<PostContent.Markdown>()
     .AddTypeExtension<UserTypeExtensions>()
     .AddTypeExtension<BlogTypeExtensions>()
     .BindRuntimeType<JsonDocument, AnyType>();
