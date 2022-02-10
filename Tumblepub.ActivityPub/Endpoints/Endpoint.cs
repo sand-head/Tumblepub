@@ -31,10 +31,12 @@ public abstract class Endpoint : IEndpoint
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
         {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
+
         options.Converters.Add(new RelativeToAbsoluteUriConverter(Context));
         options.Converters.Add(new ActivityStreamsValueConverter());
+        options.Converters.Add(new LinkConverter());
 
         return new ContentResult
         {

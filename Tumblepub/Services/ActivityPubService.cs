@@ -3,6 +3,7 @@ using Tumblepub.ActivityPub.ActivityStreams;
 using Tumblepub.Database.Models;
 using Tumblepub.Database.Repositories;
 using Object = Tumblepub.ActivityPub.ActivityStreams.Object;
+using ObjectType = Tumblepub.Database.Models.ObjectType;
 
 namespace Tumblepub.Services;
 
@@ -57,24 +58,36 @@ public class ActivityPubService : IActivityPubService
 
         return new Activity(blogActivity.Type)
         {
+            Context = new List<string>()
+            {
+                "https://www.w3.org/ns/activitystreams"
+            },
+
             Id = new Uri(string.Format(_options.ActorActivityRouteTemplate, blogActivity.BlogId, blogActivity.Id), UriKind.Relative),
             Actor = new List<ActivityStreamsValue>
             {
                 new Link(new Uri(string.Format(_options.ActorRouteTemplate, blogActivity.BlogId), UriKind.Relative))
             },
             PublishedAt = blogActivity.PublishedAt,
+
+            Object = blogActivity.ObjectType switch
+            {
+                ObjectType.Blog => MapBlogToActor((await _blogRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
+                ObjectType.Post => MapPostToObject((await _postRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
+                _ => null
+            },
         };
     }
 
     public async Task<Object?> GetObject(Guid actorId, Guid objectId, CancellationToken token = default)
     {
-        var post = await _postRepository.GetPost(objectId, token);
+        var post = await _postRepository.GetByIdAsync(objectId, token);
         if (post == null || post.BlogId != actorId)
         {
             return null;
         }
 
-        var mappedPost = MapPost(post);
+        var mappedPost = MapPostToObject(post);
         if (mappedPost is not Object mappedPostObject)
         {
             return null;
@@ -111,7 +124,7 @@ public class ActivityPubService : IActivityPubService
         };
     }
 
-    private ActivityStreamsValue MapPost(Post post)
+    private ActivityStreamsValue MapPostToObject(Post post)
     {
         if (post.Content is PostContent.External externalContent)
         {
@@ -127,6 +140,7 @@ public class ActivityPubService : IActivityPubService
             },
 
             Id = new Uri(string.Format(_options.ActorObjectRouteTemplate, post.BlogId, post.Id), UriKind.Relative),
+            PublishedAt = post.CreatedAt,
             AttributedTo = new()
             {
                 new Link(new Uri(string.Format(_options.ActorRouteTemplate, post.BlogId), UriKind.Relative))
@@ -138,14 +152,13 @@ public class ActivityPubService : IActivityPubService
             }
         };
 
-        if (post.Content is PostContent.Markdown textContent)
+        return post.Content switch
         {
-            postObject = postObject with
+            PostContent.Markdown textContent => postObject with
             {
                 Content = textContent.Content
-            };
-        }
-
-        return postObject;
+            },
+            _ => postObject
+        };
     }
 }

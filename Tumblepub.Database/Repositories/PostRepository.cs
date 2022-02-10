@@ -9,7 +9,7 @@ public interface IPostRepository
 {
     Task<Post> CreateExternalPost(Guid blogId, Uri externalPostUrl, CancellationToken token = default);
     Task<Post> CreateMarkdownPost(Guid blogId, string content, IEnumerable<string>? tags, CancellationToken token = default);
-    Task<Post?> GetPost(Guid id, CancellationToken token = default);
+    Task<Post?> GetByIdAsync(Guid id, CancellationToken token = default);
 }
 
 public class PostRepository : IPostRepository
@@ -41,7 +41,7 @@ public class PostRepository : IPostRepository
         return post!;
     }
 
-    public async Task<Post?> GetPost(Guid id, CancellationToken token = default)
+    public async Task<Post?> GetByIdAsync(Guid id, CancellationToken token = default)
     {
         return await _session.LoadAsync<Post>(id, token);
     }

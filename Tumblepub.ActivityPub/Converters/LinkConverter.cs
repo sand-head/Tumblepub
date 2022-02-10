@@ -14,8 +14,7 @@ internal class LinkConverter : JsonConverter<Link>
             return new Link(new Uri(link));
         }
 
-        // todo: fix this StackOverflowException
-        return JsonSerializer.Deserialize<Link>(ref reader, options);
+        return JsonSerializer.Deserialize<Link>(ref reader);
     }
 
     public override void Write(Utf8JsonWriter writer, Link value, JsonSerializerOptions options)
@@ -33,8 +32,7 @@ internal class LinkConverter : JsonConverter<Link>
         else
         {
             // serialize the whole thing
-            // todo: fix this StackOverflowException
-            JsonSerializer.Serialize(writer, value, options);
+            JsonSerializer.Serialize(writer, value);
         }
     }
 }

@@ -3,7 +3,6 @@ using Tumblepub.ActivityPub.Converters;
 
 namespace Tumblepub.ActivityPub.ActivityStreams;
 
-[JsonConverter(typeof(LinkConverter))]
 public record Link(Uri Href) : ActivityStreamsValue("Link")
 {
     public static readonly string[] Types = new[] { "Link", "Mention" };
