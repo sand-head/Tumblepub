@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/sand-head/tumblepub/actions/workflows/ci.yml/badge.svg)](https://github.com/sand-head/tumblepub/actions/workflows/ci.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/sandhead/tumblepub)](https://hub.docker.com/r/sandhead/tumblepub)
-[![Matrix](https://img.shields.io/matrix/tumblepub:schweigert.dev?server_fqdn=schweigert.dev)](https://matrix.to/#/#tumblepub:schweigert.dev)
+[![Matrix](https://img.shields.io/matrix/tumblepub:schweigert.dev?server_fqdn=matrix.schweigert.dev)](https://matrix.to/#/#tumblepub:schweigert.dev)
 
 A federated tumbleblog hosting platform, designed so that users can take back ownership of their content.
 
