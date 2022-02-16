@@ -27,6 +27,7 @@ public static class IServiceCollectionExtensions
             .AddEndpoint<GetActorEndpoint>(HttpMethod.Get, string.Format(options.ActorRouteTemplate, "{userId}"))
             .AddEndpoint<GetActorFollowersEndpoint>(HttpMethod.Get, string.Format(options.ActorFollowersRouteTemplate, "{userId}"))
             .AddEndpoint<GetActorObjectEndpoint>(HttpMethod.Get, string.Format(options.ActorObjectRouteTemplate, "{userId}", "{objectId}"))
+            .AddEndpoint<GetActorOutboxEndpoint>(HttpMethod.Get, string.Format(options.ActorOutboxRouteTemplate, "{userId}"))
             .AddEndpoint<PostActorInboxEndpoint>(HttpMethod.Post, string.Format(options.ActorInboxRouteTemplate, "{userId}"));
     }
 

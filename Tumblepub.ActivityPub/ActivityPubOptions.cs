@@ -12,6 +12,8 @@ public class ActivityPubOptions
 
     public string ActorObjectRouteTemplate { get; set; } = ActivityPubConstants.ActorObjectRoute;
 
+    public string ActorOutboxRouteTemplate { get; set; } = ActivityPubConstants.ActorOutboxRoute;
+
     public string ActorInboxRouteTemplate { get; set; } = ActivityPubConstants.ActorInboxRoute;
 
     /// <summary>

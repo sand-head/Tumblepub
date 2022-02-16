@@ -56,27 +56,7 @@ public class ActivityPubService : IActivityPubService
             return null;
         }
 
-        return new Activity(blogActivity.Type)
-        {
-            Context = new List<string>()
-            {
-                "https://www.w3.org/ns/activitystreams"
-            },
-
-            Id = new Uri(string.Format(_options.ActorActivityRouteTemplate, blogActivity.BlogId, blogActivity.Id), UriKind.Relative),
-            Actor = new List<ActivityStreamsValue>
-            {
-                new Link(new Uri(string.Format(_options.ActorRouteTemplate, blogActivity.BlogId), UriKind.Relative))
-            },
-            PublishedAt = blogActivity.PublishedAt,
-
-            Object = blogActivity.ObjectType switch
-            {
-                ObjectType.Blog => MapBlogToActor((await _blogRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
-                ObjectType.Post => MapPostToObject((await _postRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
-                _ => null
-            },
-        };
+        return await MapBlogActivityToActivity(blogActivity, token);
     }
 
     public async Task<Object?> GetObject(Guid actorId, Guid objectId, CancellationToken token = default)
@@ -93,6 +73,31 @@ public class ActivityPubService : IActivityPubService
             return null;
         }
         return mappedPostObject;
+    }
+
+    public async Task<Object?> GetOutbox(Guid actorId, int? pageNumber = null, CancellationToken token = default)
+    {
+        var outboxUrl = string.Format(_options.ActorOutboxRouteTemplate, actorId);
+
+        if (pageNumber == null)
+        {
+            return new OrderedCollection
+            {
+                Id = new Uri(outboxUrl, UriKind.Relative),
+                FirstUrl = new Uri($"{outboxUrl}?page=0", UriKind.Relative),
+                TotalItems = await _blogActivityRepository.CountAsync(a => a.BlogId == actorId, token),
+            };
+        }
+
+        var blogActivities = await _blogActivityRepository.GetByBlogIdAsync(actorId, pageNumber.Value, token);
+        var activities = await Task.WhenAll(blogActivities.Select(async a => await MapBlogActivityToActivity(a)));
+
+        return new OrderedCollection<Activity>
+        {
+            Id = new Uri($"{outboxUrl}?page={pageNumber}", UriKind.Relative),
+            NextUrl = new Uri($"{outboxUrl}?page={pageNumber + 1}", UriKind.Relative),
+            OrderedItems = activities.ToList(),
+        };
     }
 
     private Actor MapBlogToActor(Blog blog)
@@ -159,6 +164,32 @@ public class ActivityPubService : IActivityPubService
                 Content = textContent.Content
             },
             _ => postObject
+        };
+    }
+
+    private async Task<Activity> MapBlogActivityToActivity(BlogActivity blogActivity, CancellationToken token = default)
+    {
+        return new Activity(blogActivity.Type)
+        {
+            Context = new List<string>()
+            {
+                "https://www.w3.org/ns/activitystreams"
+            },
+
+            Id = new Uri(string.Format(_options.ActorActivityRouteTemplate, blogActivity.BlogId, blogActivity.Id), UriKind.Relative),
+            Actor = new List<ActivityStreamsValue>
+            {
+                new Link(new Uri(string.Format(_options.ActorRouteTemplate, blogActivity.BlogId), UriKind.Relative))
+            },
+            PublishedAt = blogActivity.PublishedAt,
+
+            Object = blogActivity.ObjectType switch
+            {
+                // maybe this kind of sucks and I should just make these links
+                ObjectType.Blog => MapBlogToActor((await _blogRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
+                ObjectType.Post => MapPostToObject((await _postRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
+                _ => null
+            },
         };
     }
 }

@@ -48,6 +48,10 @@ internal class ActivityStreamsValueConverter : JsonConverter<ActivityStreamsValu
         {
             type = typeof(OrderedCollection);
         }
+        else if (activityStreamsType == "OrderedCollectionPage")
+        {
+            type = typeof(OrderedCollection<>);
+        }
         else
         {
             throw new JsonException();

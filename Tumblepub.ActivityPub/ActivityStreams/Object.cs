@@ -33,7 +33,7 @@ public record Object(string Type) : ActivityStreamsValue(Type)
     /// The date and time at which the object was published
     /// </summary>
     [JsonPropertyName("published")]
-    public DateTimeOffset PublishedAt { get; init; }
+    public DateTimeOffset? PublishedAt { get; init; }
 
     /// <summary>
     /// Identifies an entity considered to be part of the public primary audience of an Object.

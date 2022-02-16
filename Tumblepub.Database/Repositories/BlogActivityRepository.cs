@@ -1,5 +1,6 @@
 ﻿using Marten;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 using Tumblepub.Database.Models;
 
 namespace Tumblepub.Database.Repositories;
@@ -8,6 +9,7 @@ public interface IBlogActivityRepository
 {
     Task<BlogActivity?> GetByIdAsync(Guid id, CancellationToken token = default);
     Task<IEnumerable<BlogActivity>> GetByBlogIdAsync(Guid blogId, int page = 0, CancellationToken token = default);
+    Task<int> CountAsync(Expression<Func<BlogActivity, bool>>? condition = null, CancellationToken token = default);
 }
 
 public class BlogActivityRepository : IBlogActivityRepository
@@ -34,5 +36,19 @@ public class BlogActivityRepository : IBlogActivityRepository
             .Skip(page * 25)
             .Take(25)
             .ToListAsync(token);
+    }
+
+    public async Task<int> CountAsync(Expression<Func<BlogActivity, bool>>? condition = null, CancellationToken token = default)
+    {
+        var query = _session.Query<BlogActivity>();
+
+        if (condition != null)
+        {
+            return await _session.Query<BlogActivity>()
+                .CountAsync(condition, token);
+        }
+
+        return await _session.Query<BlogActivity>()
+            .CountAsync(token);
     }
 }
