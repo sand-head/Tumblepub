@@ -1,21 +1,13 @@
 ﻿using Marten;
 using Microsoft.Extensions.Logging;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Infrastructure;
-using Tumblepub.Database.Models;
+using Tumblepub.Application.Events;
+using Tumblepub.Application.Interfaces;
+using Tumblepub.Application.Models;
+using Tumblepub.Infrastructure.Infrastructure;
 
-namespace Tumblepub.Database.Repositories;
+namespace Tumblepub.Infrastructure.Repositories;
 
-public interface IBlogRepository
-{
-    Task<Blog> CreateAsync(Guid userId, string name, CancellationToken cancellationToken = default);
-    Task<Blog?> GetByNameAsync(string name, string? domain, CancellationToken cancellationToken = default);
-    Task<Blog?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Blog>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Blog>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
-}
-
-public class BlogRepository : IBlogRepository
+internal class BlogRepository : IBlogRepository
 {
     private readonly ILogger<BlogRepository> _logger;
     private readonly IDocumentSession _session;

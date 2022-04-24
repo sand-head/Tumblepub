@@ -1,7 +1,7 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
-using Tumblepub.Database.Models;
-using Tumblepub.Database.Repositories;
+using Tumblepub.Application.Interfaces;
+using Tumblepub.Application.Models;
 using Tumblepub.Infrastructure;
 
 namespace Tumblepub;

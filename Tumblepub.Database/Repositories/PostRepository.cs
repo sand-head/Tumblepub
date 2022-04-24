@@ -1,18 +1,12 @@
 ﻿using Marten;
 using Microsoft.Extensions.Logging;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Models;
+using Tumblepub.Application.Events;
+using Tumblepub.Application.Interfaces;
+using Tumblepub.Application.Models;
 
-namespace Tumblepub.Database.Repositories;
+namespace Tumblepub.Infrastructure.Repositories;
 
-public interface IPostRepository
-{
-    Task<Post> CreateExternalPost(Guid blogId, Uri externalPostUrl, CancellationToken token = default);
-    Task<Post> CreateMarkdownPost(Guid blogId, string content, IEnumerable<string>? tags, CancellationToken token = default);
-    Task<Post?> GetByIdAsync(Guid id, CancellationToken token = default);
-}
-
-public class PostRepository : IPostRepository
+internal class PostRepository : IPostRepository
 {
     private readonly ILogger<PostRepository> _logger;
     private readonly IDocumentSession _session;

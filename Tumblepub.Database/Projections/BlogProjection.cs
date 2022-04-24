@@ -1,8 +1,8 @@
 ﻿using Marten.Events.Aggregation;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Models;
+using Tumblepub.Application.Events;
+using Tumblepub.Application.Models;
 
-namespace Tumblepub.Database.Projections;
+namespace Tumblepub.Infrastructure.Projections;
 
 public class BlogProjection : AggregateProjection<Blog>
 {

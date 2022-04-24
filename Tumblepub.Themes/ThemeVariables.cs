@@ -1,4 +1,4 @@
-﻿using Tumblepub.Database.Models;
+﻿using Tumblepub.Application.Models;
 
 namespace Tumblepub.Themes;
 

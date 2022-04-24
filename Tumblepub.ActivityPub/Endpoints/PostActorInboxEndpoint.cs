@@ -10,6 +10,7 @@ public sealed class PostActorInboxEndpoint : Endpoint
     public override async Task<IActionResult> InvokeAsync(RouteData? routeData, CancellationToken token = default)
     {
         var activity = await JsonSerializer.DeserializeAsync<Activity>(Context.Request.Body, cancellationToken: token);
+        // todo: if link retrieve actor
         // todo: handle activities
         throw new NotImplementedException();
     }

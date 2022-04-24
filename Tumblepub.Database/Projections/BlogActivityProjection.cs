@@ -1,15 +1,10 @@
 ﻿using Marten;
 using Marten.Events;
 using Marten.Events.Projections;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Models;
+using Tumblepub.Application.Events;
+using Tumblepub.Application.Models;
 
-namespace Tumblepub.Database.Projections;
+namespace Tumblepub.Infrastructure.Projections;
 
 public class BlogActivityProjection : EventProjection
 {

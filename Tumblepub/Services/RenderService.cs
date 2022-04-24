@@ -1,5 +1,5 @@
-﻿using Tumblepub.Database.Models;
-using Tumblepub.Database.Repositories;
+﻿using Tumblepub.Application.Interfaces;
+using Tumblepub.Application.Models;
 using Tumblepub.Themes;
 
 namespace Tumblepub.Services;

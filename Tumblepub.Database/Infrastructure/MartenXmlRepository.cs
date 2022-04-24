@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.DataProtection.Repositories;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 
-namespace Tumblepub.Database.Infrastructure;
+namespace Tumblepub.Infrastructure.Infrastructure;
 
 public class MartenXmlRepository : IXmlRepository
 {

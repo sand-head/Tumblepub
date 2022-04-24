@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tumblepub.Themes", "Tumblep
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2A20A5D0-1348-4FBE-892F-6E8812AC72EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.Database", "Tumblepub.Database\Tumblepub.Database.csproj", "{7701BB7B-CCF9-4720-92D2-326BA9939CA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tumblepub.Infrastructure", "Tumblepub.Database\Tumblepub.Infrastructure.csproj", "{7701BB7B-CCF9-4720-92D2-326BA9939CA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.Application", "Tumblepub.Application\Tumblepub.Application.csproj", "{F413917A-DFBD-48F9-8C00-A625FEA12C4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{7701BB7B-CCF9-4720-92D2-326BA9939CA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7701BB7B-CCF9-4720-92D2-326BA9939CA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7701BB7B-CCF9-4720-92D2-326BA9939CA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F413917A-DFBD-48F9-8C00-A625FEA12C4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F413917A-DFBD-48F9-8C00-A625FEA12C4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F413917A-DFBD-48F9-8C00-A625FEA12C4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F413917A-DFBD-48F9-8C00-A625FEA12C4C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

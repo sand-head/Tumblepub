@@ -1,4 +1,3 @@
-using Marten.Events.Projections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -8,13 +7,12 @@ using System.Text;
 using System.Text.Json;
 using Tumblepub;
 using Tumblepub.ActivityPub.Extensions;
+using Tumblepub.Application.Interfaces;
+using Tumblepub.Application.Models;
 using Tumblepub.Configuration;
-using Tumblepub.Database.Extensions;
-using Tumblepub.Database.Models;
-using Tumblepub.Database.Projections;
-using Tumblepub.Database.Repositories;
 using Tumblepub.Extensions;
 using Tumblepub.Infrastructure;
+using Tumblepub.Infrastructure.Extensions;
 using Tumblepub.Services;
 using Tumblepub.Themes;
 
@@ -36,21 +34,8 @@ builder.Services
 
 // add domain services
 builder.Services
-    .AddScoped<IUserRepository, UserRepository>()
-    .AddScoped<IBlogRepository, BlogRepository>()
-    .AddScoped<IPostRepository, PostRepository>()
-    .AddScoped<IBlogActivityRepository, BlogActivityRepository>()
+    .AddInfrastructure(config.GetConnectionString("Database"), builder.Environment.IsDevelopment())
     .AddScoped<IRenderService, RenderService>();
-
-// configure event sourcing
-builder.AddEventSourcing(config.GetConnectionString("Database"), options =>
-{
-    options.Projections.Add<UserProjection>();
-    options.Projections.Add<BlogProjection>();
-    options.Projections.Add<PostProjection>();
-
-    options.Projections.Add<BlogActivityProjection>(ProjectionLifecycle.Inline);
-});
 
 // add GraphQL support using HotChocolate
 builder.Services
@@ -58,6 +43,7 @@ builder.Services
     .AddAuthorization()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
+    .AddUnionType<PostContent>()
     .AddType<PostContent.External>()
     .AddType<PostContent.Markdown>()
     .AddTypeExtension<UserTypeExtensions>()
@@ -65,7 +51,7 @@ builder.Services
     .BindRuntimeType<JsonDocument, AnyType>();
 
 builder.Services
-    .AddSingleton<JwtTokenConfig>(new JwtTokenConfig(
+    .AddSingleton(new JwtTokenConfig(
         config["LocalDomain"],
         config["JwtSecret"],
         AccessTokenExpiration: (int)TimeSpan.FromHours(2).TotalMinutes,
