@@ -1,13 +1,8 @@
 ﻿using Marten.Events.Aggregation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Models;
+using Tumblepub.Application.Events;
+using Tumblepub.Application.Models;
 
-namespace Tumblepub.Database.Projections;
+namespace Tumblepub.Infrastructure.Projections;
 
 public class PostProjection : AggregateProjection<Post>
 {

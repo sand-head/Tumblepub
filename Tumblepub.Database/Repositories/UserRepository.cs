@@ -1,20 +1,13 @@
 ﻿using Isopoh.Cryptography.Argon2;
 using Marten;
 using Microsoft.Extensions.Logging;
-using Tumblepub.Database.Events;
-using Tumblepub.Database.Models;
+using Tumblepub.Application.Events;
+using Tumblepub.Application.Interfaces;
+using Tumblepub.Application.Models;
 
-namespace Tumblepub.Database.Repositories;
+namespace Tumblepub.Infrastructure.Repositories;
 
-public interface IUserRepository
-{
-    Task<User> CreateAsync(string email, string password);
-    Task<bool> ValidateCredentialsAsync(string email, string password, CancellationToken cancellationToken = default);
-    Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
-    Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-}
-
-public class UserRepository : IUserRepository
+internal class UserRepository : IUserRepository
 {
     private readonly ILogger<UserRepository> _logger;
     private readonly IDocumentSession _session;

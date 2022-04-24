@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Tumblepub.Database.Infrastructure;
+using Tumblepub.Infrastructure.Infrastructure;
 
-namespace Tumblepub.Database.Extensions;
+namespace Tumblepub.Infrastructure.Extensions;
 
 public static class IDataProtectionBuilderExtensions
 {

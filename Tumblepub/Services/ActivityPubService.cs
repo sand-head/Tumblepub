@@ -1,9 +1,9 @@
 ﻿using Tumblepub.ActivityPub;
 using Tumblepub.ActivityPub.ActivityStreams;
-using Tumblepub.Database.Models;
-using Tumblepub.Database.Repositories;
+using Tumblepub.Application.Interfaces;
+using Tumblepub.Application.Models;
 using Object = Tumblepub.ActivityPub.ActivityStreams.Object;
-using ObjectType = Tumblepub.Database.Models.ObjectType;
+using ObjectType = Tumblepub.Application.Models.ObjectType;
 
 namespace Tumblepub.Services;
 
