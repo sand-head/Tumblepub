@@ -16,11 +16,12 @@ RUN apt-get install curl gnupg -yq
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
+COPY ["Tumblepub.ActivityPub/Tumblepub.ActivityPub.csproj", "Tumblepub.ActivityPub/"]
+COPY ["Tumblepub.Application/Tumblepub.Application.csproj", "Tumblepub.Application/"]
+COPY ["Tumblepub.Infrastructure/Tumblepub.Infrastructure.csproj", "Tumblepub.Infrastructure/"]
+COPY ["Tumblepub.Themes/Tumblepub.Themes.csproj", "Tumblepub.Themes/"]
 COPY ["theme", "theme/"]
 COPY ["Tumblepub/Tumblepub.csproj", "Tumblepub/"]
-COPY ["Tumblepub.Themes/Tumblepub.Themes.csproj", "Tumblepub.Themes/"]
-COPY ["Tumblepub.ActivityPub/Tumblepub.ActivityPub.csproj", "Tumblepub.ActivityPub/"]
-COPY ["Tumblepub.Database/Tumblepub.Database.csproj", "Tumblepub.Database/"]
 RUN dotnet restore "Tumblepub/Tumblepub.csproj"
 COPY . .
 WORKDIR "/src/Tumblepub"
