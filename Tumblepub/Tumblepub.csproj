@@ -23,7 +23,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Tumblepub.ActivityPub\Tumblepub.ActivityPub.csproj" />
-		<ProjectReference Include="..\Tumblepub.Database\Tumblepub.Infrastructure.csproj" />
+		<ProjectReference Include="..\Tumblepub.Infrastructure\Tumblepub.Infrastructure.csproj" />
 		<ProjectReference Include="..\Tumblepub.Themes\Tumblepub.Themes.csproj" />
 	</ItemGroup>
 

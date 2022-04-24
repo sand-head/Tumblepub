@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Tumblepub.Database\Tumblepub.Infrastructure.csproj" />
+      <ProjectReference Include="..\Tumblepub.Infrastructure\Tumblepub.Infrastructure.csproj" />
     </ItemGroup>
 
     <!--
