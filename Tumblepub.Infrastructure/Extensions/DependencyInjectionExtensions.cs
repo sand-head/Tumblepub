@@ -2,8 +2,10 @@
 using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
 using Tumblepub.Infrastructure.Projections;
+using Tumblepub.Infrastructure.Repositories;
 using Weasel.Core;
 
 namespace Tumblepub.Infrastructure.Extensions;
@@ -46,6 +48,10 @@ public static class DependencyInjectionExtensions
             options.Projections.Add<BlogActivityProjection>(ProjectionLifecycle.Inline);
         });
         
-        return services;
+        return services
+            .AddScoped<IUserRepository, UserRepository>()
+            .AddScoped<IBlogRepository, BlogRepository>()
+            .AddScoped<IPostRepository, PostRepository>()
+            .AddScoped<IBlogActivityRepository, BlogActivityRepository>();
     }
 }

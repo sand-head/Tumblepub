@@ -1,6 +1,6 @@
 module.exports = {
   mode: "jit",
-  purge: ["./**/*.hbs"],
+  purge: ["./**/*.html"],
   darkMode: "media", // or false or 'class'
   theme: {
     extend: {

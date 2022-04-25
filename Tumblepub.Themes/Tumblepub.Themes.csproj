@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-	  <EmbeddedResource Include="DefaultTheme.hbs" />
-    </ItemGroup>
-
-    <ItemGroup>
 	  <PackageReference Include="Handlebars.Net" Version="2.1.2" />
 	  <PackageReference Include="Humanizer" Version="2.14.1" />
     </ItemGroup>
@@ -29,11 +25,11 @@
 	  <!--
 	    Use npm install or npm ci depending on RestorePackagesWithLockFile value.
 	    Uncomment the following lines if you want to use this feature:
-
-	    <PropertyGroup>
-		    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-	    </PropertyGroup>
 	  -->
+
+    <PropertyGroup>
+      <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    </PropertyGroup>
 	  <Exec Command="npm ci" WorkingDirectory="../theme/" Condition="$(RestorePackagesWithLockFile) == 'true'" />
 	  <Exec Command="npm install" WorkingDirectory="../theme/" Condition="$(RestorePackagesWithLockFile) != 'true'" />
 
@@ -47,7 +43,7 @@
     -->
     <Target Name="NpmRunBuild" DependsOnTargets="NpmInstall" BeforeTargets="BeforeBuild">
 	  <Exec Command="npm run build" WorkingDirectory="../theme/" />
-	  <Copy SourceFiles="../theme/dist/index.hbs" DestinationFiles="./DefaultTheme.hbs" />
+	  <Copy SourceFiles="../theme/dist/index.html" DestinationFiles="./DefaultTheme.hbs" />
     </Target>
 
 </Project>

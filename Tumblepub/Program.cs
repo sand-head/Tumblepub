@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using Tumblepub;
 using Tumblepub.ActivityPub.Extensions;
+using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
 using Tumblepub.Configuration;
@@ -34,6 +35,7 @@ builder.Services
 
 // add domain services
 builder.Services
+    .AddApplication()
     .AddInfrastructure(config.GetConnectionString("Database"), builder.Environment.IsDevelopment())
     .AddScoped<IRenderService, RenderService>();
 
