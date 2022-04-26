@@ -2,9 +2,8 @@
 
 namespace Tumblepub.Application.Models;
 
-public class Blog
+public class Blog : Aggregate
 {
-    public Guid Id { get; set; }
     public Guid? UserId { get; set; }
     public string Name { get; set; } = default!;
     public string? Title { get; set; }
@@ -14,5 +13,4 @@ public class Blog
     public string? PrivateKey { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
-    public int Version { get; set; }
 }

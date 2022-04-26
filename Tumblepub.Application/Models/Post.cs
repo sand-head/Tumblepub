@@ -1,13 +1,11 @@
 ﻿namespace Tumblepub.Application.Models;
 
-public class Post
+public class Post : Aggregate
 {
-    public Guid Id { get; set; }
     public Guid BlogId { get; set; }
     public PostContent Content { get; set; } = default!;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
-    public int Version { get; set; }
 }
 
 public abstract record PostContent()

@@ -80,10 +80,7 @@ builder.Services
 
 builder.Services.AddActivityPub<ActivityPubService>(options =>
 {
-    options.MapActorProfileUrl = (actor) =>
-    {
-        return $"/@{actor.Name}";
-    };
+    options.MapActorProfileUrl = (actor) => $"/@{actor.Name}";
 });
 
 builder.Services.AddControllers();

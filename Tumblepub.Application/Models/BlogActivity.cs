@@ -6,9 +6,8 @@ public enum ObjectType
     Post
 }
 
-public class BlogActivity
+public class BlogActivity : Aggregate
 {
-    public Guid Id { get; set; }
     public Guid BlogId { get; set; }
     public string Type { get; set; } = string.Empty;
     public DateTimeOffset PublishedAt { get; set; }
