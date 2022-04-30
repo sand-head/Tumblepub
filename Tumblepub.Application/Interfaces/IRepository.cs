@@ -16,7 +16,7 @@ public interface IRepository<TAggregate>
     /// 
     /// </summary>
     /// <returns></returns>
-    IQueryable<TAggregate> Query();
+    IAsyncQueryable<TAggregate> Query();
     /// <summary>
     /// 
     /// </summary>

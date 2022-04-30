@@ -14,14 +14,13 @@ public class MartenRepository<TAggregate> : IRepository<TAggregate>
         _session = session;
     }
 
-    /// <inheritdoc />
     public async Task<TAggregate?> GetByIdAsync(Guid id, CancellationToken token = default)
     {
-        return await _session.Events.AggregateStreamAsync<TAggregate>(id, token: token);
+        return await _session.LoadAsync<TAggregate>(id, token);
     }
 
     /// <inheritdoc />
-    public IQueryable<TAggregate> Query()
+    public IAsyncQueryable<TAggregate> Query()
     {
         return _session.Query<TAggregate>();
     }

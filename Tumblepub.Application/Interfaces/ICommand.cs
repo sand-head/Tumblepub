@@ -4,8 +4,8 @@ public interface ICommand<TResult>
 {
 }
 
-public interface ICommandHandler<in TCommand, out TResult>
+public interface ICommandHandler<in TCommand, TResult>
     where TCommand : ICommand<TResult>
 {
-    TResult Handle(TCommand command);
+    Task<TResult> Handle(TCommand command, CancellationToken token = default);
 }

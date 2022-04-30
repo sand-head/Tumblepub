@@ -53,9 +53,6 @@ public static class DependencyInjectionExtensions
             .AddScoped<IRepository<Blog>, MartenRepository<Blog>>()
             .AddScoped<IRepository<Post>, MartenRepository<Post>>()
             .AddScoped<IRepository<BlogActivity>, MartenRepository<BlogActivity>>()
-            .AddScoped<IUserRepository, UserRepository>()
-            .AddScoped<IBlogRepository, BlogRepository>()
-            .AddScoped<IPostRepository, PostRepository>()
             .AddScoped<IBlogActivityRepository, BlogActivityRepository>();
     }
 }
