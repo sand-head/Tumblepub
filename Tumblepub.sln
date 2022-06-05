@@ -21,6 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSharp", "CSharp", "{A7DC17
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tumblepub.FSharp", "Tumblepub.FSharp\Tumblepub.FSharp.fsproj", "{3D28A891-3911-4B55-ACE1-EC661D375EE7}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tumblepub.FSharp.Application", "Tumblepub.FSharp.Application\Tumblepub.FSharp.Application.fsproj", "{97665AF3-5BC9-4258-AE01-40C8618E228F}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tumblepub.FSharp.Infrastructure", "Tumblepub.FSharp.Infrastructure\Tumblepub.FSharp.Infrastructure.fsproj", "{75EC1CF5-899E-4EE6-9ED3-FC7754D9912C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,14 @@ Global
 		{3D28A891-3911-4B55-ACE1-EC661D375EE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D28A891-3911-4B55-ACE1-EC661D375EE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D28A891-3911-4B55-ACE1-EC661D375EE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97665AF3-5BC9-4258-AE01-40C8618E228F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97665AF3-5BC9-4258-AE01-40C8618E228F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97665AF3-5BC9-4258-AE01-40C8618E228F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97665AF3-5BC9-4258-AE01-40C8618E228F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75EC1CF5-899E-4EE6-9ED3-FC7754D9912C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75EC1CF5-899E-4EE6-9ED3-FC7754D9912C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75EC1CF5-899E-4EE6-9ED3-FC7754D9912C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75EC1CF5-899E-4EE6-9ED3-FC7754D9912C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

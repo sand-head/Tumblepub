@@ -14,4 +14,13 @@
       <Content Include="Dockerfile" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Giraffe" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Tumblepub.FSharp.Application\Tumblepub.FSharp.Application.fsproj" />
+      <ProjectReference Include="..\Tumblepub.FSharp.Infrastructure\Tumblepub.FSharp.Infrastructure.fsproj" />
+    </ItemGroup>
+
 </Project>

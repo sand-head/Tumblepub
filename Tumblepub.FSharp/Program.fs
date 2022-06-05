@@ -1,11 +1,14 @@
-open System
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.Hosting
+open Giraffe
 
 let builder = WebApplication.CreateBuilder()
 let app = builder.Build()
 
-app.MapGet("/", Func<string>(fun () -> "Hello World!")) |> ignore
+let webApp = choose [
+    route "/" >=> text "Hello World!"
+]
+
+app.UseGiraffe webApp
 
 app.Run()
-
