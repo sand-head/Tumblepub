@@ -1,8 +1,13 @@
-﻿namespace Tumblepub.Application.Models;
+﻿using StronglyTypedIds;
 
-public class Post : Aggregate
+namespace Tumblepub.Application.Models;
+
+[StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson)]
+public partial struct PostId { }
+
+public class Post : Aggregate<PostId>
 {
-    public Guid BlogId { get; set; }
+    public BlogId BlogId { get; set; }
     public PostContent Content { get; set; } = default!;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }

@@ -1,10 +1,12 @@
-﻿namespace Tumblepub.Application.Events;
+﻿using Tumblepub.Application.Models;
+
+namespace Tumblepub.Application.Events;
 
 /// <summary>
 /// A <see cref="Projections.User"/> has been created.
 /// </summary>
 public record UserCreated(
-    Guid UserId,
+    UserId UserId,
     string Email,
     string PasswordHash,
     DateTimeOffset At);
@@ -13,5 +15,5 @@ public record UserCreated(
 /// A <see cref="Projections.User"/> has been deleted.
 /// </summary>
 public record UserDeleted(
-    Guid UserId,
+    UserId UserId,
     DateTimeOffset At);

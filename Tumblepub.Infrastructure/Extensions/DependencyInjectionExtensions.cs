@@ -1,5 +1,6 @@
 ﻿using Marten;
 using Marten.Events.Projections;
+using Marten.Services.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Tumblepub.Application.Interfaces;
@@ -18,6 +19,8 @@ public static class DependencyInjectionExtensions
         {
             // configuration
             options.Connection(connectionString);
+            
+            options.UseDefaultSerialization(serializerType: SerializerType.SystemTextJson);
 
             options.AutoCreateSchemaObjects = isDevelopment
                 ? AutoCreate.All

@@ -5,25 +5,23 @@ namespace Tumblepub.Application.Extensions;
 
 public static class BlogRepositoryExtensions
 {
-    public static async Task<Blog?> GetByNameAsync(this IRepository<Blog> blogRepository, string name, string? domain, CancellationToken cancellationToken = default)
+    public static async Task<Models.Blog?> GetByNameAsync(this IRepository<Models.Blog, BlogId> blogRepository, string name, string? domain, CancellationToken cancellationToken = default)
     {
         // todo: also filter by domain
-        return await blogRepository.Query()
-            .Where(b => b.Name == name)
-            .FirstOrDefaultAsync(cancellationToken);
+        return await blogRepository.FirstOrDefaultAsync(b => b.Name == name, cancellationToken);
     }
 
-    public static async Task<IEnumerable<Blog>> GetByIdsAsync(this IRepository<Blog> blogRepository, IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    public static async Task<IEnumerable<Models.Blog>> GetByIdsAsync(this IRepositoryQueryable<Models.Blog, BlogId> blogRepository, IEnumerable<BlogId> ids, CancellationToken cancellationToken = default)
     {
-        return await blogRepository.Query()
+        return blogRepository.Query()
             .Where(b => ids.Contains(b.Id))
-            .ToListAsync(cancellationToken);
+            .ToList();
     }
 
-    public static async Task<IEnumerable<Blog>> GetByUserIdAsync(this IRepository<Blog> blogRepository, Guid userId, CancellationToken cancellationToken = default)
+    public static async Task<IEnumerable<Models.Blog>> GetByUserIdAsync(this IRepositoryQueryable<Models.Blog, BlogId> blogRepository, UserId userId, CancellationToken cancellationToken = default)
     {
-        return await blogRepository.Query()
-            .Where(b => b.UserId == userId)
-            .ToListAsync(cancellationToken);
+        return blogRepository.Query()
+            .Where(b => b.UserId.HasValue && b.UserId.Value == userId)
+            .ToList();
     }
 }

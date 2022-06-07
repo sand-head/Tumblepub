@@ -1,4 +1,9 @@
-﻿namespace Tumblepub.Application.Models;
+﻿using StronglyTypedIds;
+
+namespace Tumblepub.Application.Models;
+
+[StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson)]
+public partial struct BlogActivityId { }
 
 public enum ObjectType
 {
@@ -6,9 +11,9 @@ public enum ObjectType
     Post
 }
 
-public class BlogActivity : Aggregate
+public class BlogActivity : Aggregate<BlogActivityId>
 {
-    public Guid BlogId { get; set; }
+    public BlogId BlogId { get; set; }
     public string Type { get; set; } = string.Empty;
     public DateTimeOffset PublishedAt { get; set; }
 

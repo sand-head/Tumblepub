@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Tumblepub.Application.Models;
 
 namespace Tumblepub.Application.Events;
 
@@ -6,8 +7,8 @@ namespace Tumblepub.Application.Events;
 /// A <see cref="Projections.Blog"/> has been created on this instance.
 /// </summary>
 public record BlogCreated(
-    Guid BlogId,
-    Guid UserId,
+    BlogId BlogId,
+    UserId UserId,
     string BlogName,
     string PublicKey,
     string PrivateKey,
@@ -17,7 +18,7 @@ public record BlogCreated(
 /// A <see cref="Projections.Blog"/> has been discovered on another instance.
 /// </summary>
 public record BlogDiscovered(
-    Guid BlogId,
+    BlogId BlogId,
     string BlogName,
     string PublicKey,
     DateTimeOffset At);
@@ -26,7 +27,7 @@ public record BlogDiscovered(
 /// A <see cref="Projections.Blog"/>'s metadata has been updated.
 /// </summary>
 public record BlogMetadataUpdated(
-    Guid BlogId,
+    BlogId BlogId,
     string? Title,
     string? Description,
     JsonDocument? Metadata,
@@ -36,5 +37,5 @@ public record BlogMetadataUpdated(
 /// A <see cref="Projections.Blog"/> has been deleted.
 /// </summary>
 public record BlogDeleted(
-    Guid BlogId,
+    BlogId BlogId,
     DateTimeOffset At);
