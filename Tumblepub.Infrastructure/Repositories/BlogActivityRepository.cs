@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.ComponentModel;
+using System.Linq.Expressions;
 using Marten;
 using Microsoft.Extensions.Logging;
 using Tumblepub.Application.Interfaces;
@@ -6,7 +7,7 @@ using Tumblepub.Application.Models;
 
 namespace Tumblepub.Infrastructure.Repositories;
 
-internal class BlogActivityRepository : IBlogActivityRepository
+internal class BlogActivityRepository : IQueryableRepository<BlogActivity, BlogActivityId>, IReadOnlyRepository<BlogActivity, BlogActivityId>
 {
     private readonly ILogger<BlogActivityRepository> _logger;
     private readonly IDocumentSession _session;
@@ -17,32 +18,38 @@ internal class BlogActivityRepository : IBlogActivityRepository
         _session = session ?? throw new ArgumentNullException(nameof(session));
     }
 
-    public async Task<BlogActivity?> GetByIdAsync(Guid id, CancellationToken token = default)
+    public IQueryable<BlogActivity> Query()
     {
-        return await _session.LoadAsync<BlogActivity>(id, token);
+        throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<BlogActivity>> GetByBlogIdAsync(Guid blogId, int page = 0, CancellationToken token = default)
+    public Task<IEnumerable<BlogActivity>> GetAllAsync(Expression<Func<BlogActivity, bool>>? whereCondition, CancellationToken token = default)
     {
-        return await _session.Query<BlogActivity>()
-            .OrderByDescending(a => a.PublishedAt)
-            .Where(a => a.BlogId == blogId)
-            .Skip(page * 25)
-            .Take(25)
-            .ToListAsync(token);
+        throw new NotImplementedException();
     }
 
-    public async Task<int> CountAsync(Expression<Func<BlogActivity, bool>>? condition = null, CancellationToken token = default)
+    public async Task<BlogActivity?> GetByIdAsync(BlogActivityId id, CancellationToken token = default)
     {
-        var query = _session.Query<BlogActivity>();
+        return await _session.LoadAsync<BlogActivity>(GetGuid(id), token);
+    }
 
-        if (condition != null)
-        {
-            return await _session.Query<BlogActivity>()
-                .CountAsync(condition, token);
-        }
+    public Task<BlogActivity?> FirstOrDefaultAsync(Expression<Func<BlogActivity, bool>>? whereCondition, CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
 
-        return await _session.Query<BlogActivity>()
-            .CountAsync(token);
+    public Task SaveChangesAsync(CancellationToken token = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Dispose()
+    {
+        _session.Dispose();
+    }
+    
+    private Guid GetGuid(BlogActivityId id)
+    {
+        return (Guid)TypeDescriptor.GetConverter(typeof(BlogActivityId)).ConvertTo(id, typeof(Guid))!;
     }
 }

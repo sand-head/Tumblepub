@@ -17,8 +17,7 @@ public class BlogActivityProjection : EventProjection
             Type = "Create",
             PublishedAt = e.At,
 
-            ObjectType = ObjectType.Post,
-            ObjectId = e.PostId,
+            ObjectType = new ObjectType.Post(e.PostId),
         };
     }
 
@@ -32,13 +31,12 @@ public class BlogActivityProjection : EventProjection
 
         ops.Store(new BlogActivity
         {
-            Id = e.Id,
+            Id = new BlogActivityId(e.Id),
             BlogId = createActivity.BlogId,
             Type = "Update",
             PublishedAt = e.Data.At,
 
-            ObjectType = ObjectType.Post,
-            ObjectId = e.Data.PostId,
+            ObjectType = new ObjectType.Post(e.Data.PostId),
         });
     }
 }

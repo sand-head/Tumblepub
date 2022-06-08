@@ -5,26 +5,17 @@ namespace Tumblepub.Application.Interfaces;
 
 public interface IRepository : IDisposable
 {
-    Task<int> SaveChangesAsync(CancellationToken token = default);
+    Task SaveChangesAsync(CancellationToken token = default);
 }
 
-public interface IRepositoryQueryable<out TAggregate, in TId> : IRepository
+public interface IQueryableRepository<out TAggregate, in TId> : IRepository
     where TAggregate : class, IAggregate<TId>
     where TId : struct
 {
     IQueryable<TAggregate> Query();
 }
 
-public interface IRepositoryBulk<in TAggregate, in TId> : IRepository
-    where TAggregate : class, IAggregate<TId>
-    where TId : struct
-{
-    Task BulkInsertAsync(IEnumerable<TAggregate> entities, CancellationToken token = default);
-    Task BulkUpdateAsync(IEnumerable<TAggregate> entities, CancellationToken token = default);
-    Task BulkDeleteAsync(IEnumerable<TAggregate> entities, CancellationToken token = default);
-}
-
-public interface IRepository<TAggregate, in TId> : IRepository
+public interface IReadOnlyRepository<TAggregate, in TId> : IRepository
     where TAggregate : class, IAggregate<TId>
     where TId : struct
 {
@@ -49,6 +40,13 @@ public interface IRepository<TAggregate, in TId> : IRepository
     /// <param name="token"></param>
     /// <returns></returns>
     Task<TAggregate?> FirstOrDefaultAsync(Expression<Func<TAggregate, bool>>? whereCondition, CancellationToken token = default);
+}
+
+
+public interface IRepository<TAggregate, in TId> : IReadOnlyRepository<TAggregate, TId>
+    where TAggregate : class, ISelfAggregate<TId>
+    where TId : struct
+{
     /// <summary>
     /// 
     /// </summary>

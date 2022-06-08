@@ -11,16 +11,16 @@ public static class BlogRepositoryExtensions
         return await blogRepository.FirstOrDefaultAsync(b => b.Name == name, cancellationToken);
     }
 
-    public static async Task<IEnumerable<Models.Blog>> GetByIdsAsync(this IRepositoryQueryable<Models.Blog, BlogId> blogRepository, IEnumerable<BlogId> ids, CancellationToken cancellationToken = default)
+    public static async Task<IEnumerable<Models.Blog>> GetByIdsAsync(this IQueryableRepository<Models.Blog, BlogId> blogQueryableRepository, IEnumerable<BlogId> ids, CancellationToken cancellationToken = default)
     {
-        return blogRepository.Query()
+        return blogQueryableRepository.Query()
             .Where(b => ids.Contains(b.Id))
             .ToList();
     }
 
-    public static async Task<IEnumerable<Models.Blog>> GetByUserIdAsync(this IRepositoryQueryable<Models.Blog, BlogId> blogRepository, UserId userId, CancellationToken cancellationToken = default)
+    public static async Task<IEnumerable<Models.Blog>> GetByUserIdAsync(this IQueryableRepository<Models.Blog, BlogId> blogQueryableRepository, UserId userId, CancellationToken cancellationToken = default)
     {
-        return blogRepository.Query()
+        return blogQueryableRepository.Query()
             .Where(b => b.UserId.HasValue && b.UserId.Value == userId)
             .ToList();
     }

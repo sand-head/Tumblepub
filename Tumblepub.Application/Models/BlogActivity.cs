@@ -5,13 +5,13 @@ namespace Tumblepub.Application.Models;
 [StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson)]
 public partial struct BlogActivityId { }
 
-public enum ObjectType
+public abstract record ObjectType()
 {
-    Blog,
-    Post
+    public record Blog(BlogId BlogId) : ObjectType();
+    public record Post(PostId BlogId) : ObjectType();
 }
 
-public class BlogActivity : Aggregate<BlogActivityId>
+public class BlogActivity : ReadOnlyAggregate<BlogActivityId>
 {
     public BlogId BlogId { get; set; }
     public string Type { get; set; } = string.Empty;
@@ -21,8 +21,5 @@ public class BlogActivity : Aggregate<BlogActivityId>
     public Guid? ObjectId { get; set; }
 
     public ObjectType? TargetType { get; set; }
-    public IEnumerable<Guid>? TargetIds { get; set; }
-
     public ObjectType? OriginType { get; set; }
-    public Guid? OriginId { get; set; }
 }

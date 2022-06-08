@@ -44,18 +44,19 @@ public static class DependencyInjectionExtensions
             options.Schema.For<Post>().ForeignKey<Blog>(p => p.BlogId);
 
             // actual event sourcing junk
-            options.Projections.Add<UserProjection>();
-            options.Projections.Add<BlogProjection>();
-            options.Projections.Add<PostProjection>();
+            options.Projections.SelfAggregate<Blog>(ProjectionLifecycle.Inline);
+            options.Projections.SelfAggregate<User>(ProjectionLifecycle.Inline);
+            options.Projections.SelfAggregate<Post>(ProjectionLifecycle.Inline);
 
             options.Projections.Add<BlogActivityProjection>(ProjectionLifecycle.Inline);
         });
         
+        // register all repositories
         return services
-            .AddScoped<IRepository<User>, MartenRepository<User>>()
-            .AddScoped<IRepository<Blog>, MartenRepository<Blog>>()
-            .AddScoped<IRepository<Post>, MartenRepository<Post>>()
-            .AddScoped<IRepository<BlogActivity>, MartenRepository<BlogActivity>>()
-            .AddScoped<IBlogActivityRepository, BlogActivityRepository>();
+            .Scan(scan => scan
+                .FromAssembliesOf(typeof(MartenQueryableRepository<,>))
+                .AddClasses(classes => classes.AssignableTo(typeof(IRepository)))
+                    .AsImplementedInterfaces()
+                    .WithScopedLifetime());
     }
 }

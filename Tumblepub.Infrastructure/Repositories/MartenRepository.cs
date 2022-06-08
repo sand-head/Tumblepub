@@ -6,36 +6,64 @@ using Tumblepub.Application.Models;
 
 namespace Tumblepub.Infrastructure.Repositories;
 
-public class MartenRepository<TAggregate, TId> : IRepository<TAggregate, TId>, IRepositoryQueryable<TAggregate, TId>
-    where TAggregate : class, IAggregate<TId>
+internal abstract class MartenQueryableRepository<TAggregate, TId> : IQueryableRepository<TAggregate, TId>, IRepository<TAggregate, TId>
+    where TAggregate : class, ISelfAggregate<TId>
     where TId : struct
 {
-    private readonly IDocumentSession _session;
+    protected readonly IDocumentSession Session;
     
-    public MartenRepository(IDocumentSession session)
+    public MartenQueryableRepository(IDocumentSession session)
     {
-        _session = session;
-    }
-
-    public async Task<TAggregate?> GetByIdAsync(TId id, CancellationToken token = default)
-    {
-        return await _session.LoadAsync<TAggregate>(GetGuid(id), token);
+        Session = session;
     }
 
     /// <inheritdoc />
     public IQueryable<TAggregate> Query()
     {
-        return _session.Query<TAggregate>();
+        return Session.Query<TAggregate>();
     }
 
-    public Task<IEnumerable<TAggregate>> GetAllAsync(Expression<Func<TAggregate, bool>>? whereCondition, CancellationToken token = default)
+    /// <inheritdoc />
+    public virtual async Task<long> CreateAsync(TAggregate aggregate, CancellationToken token = default)
     {
-        throw new NotImplementedException();
+        var events = aggregate.DequeueUncommittedEvents();
+        
+        Session.Events.StartStream<TAggregate>(GetGuid(aggregate.Id), events);
+        
+        return events.Length;
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<long> UpdateAsync(TAggregate aggregate, CancellationToken token = default)
+    {
+        var events = aggregate.DequeueUncommittedEvents();
+        
+        Session.Events.Append(GetGuid(aggregate.Id), aggregate.Version, events);
+        
+        return aggregate.Version;
+    }
+
+    public abstract Task<long> DeleteAsync(TAggregate aggregate, CancellationToken token = default);
+
+    public async Task<IEnumerable<TAggregate>> GetAllAsync(Expression<Func<TAggregate, bool>>? whereCondition, CancellationToken token = default)
+    {
+        var queryable = Session.Query<TAggregate>();
+        if (whereCondition != null)
+        {
+            return await queryable.Where(whereCondition).ToListAsync(token);
+        }
+
+        return await queryable.ToListAsync(token);
+    }
+
+    public async Task<TAggregate?> GetByIdAsync(TId id, CancellationToken token = default)
+    {
+        return await Session.LoadAsync<TAggregate>(GetGuid(id), token);
     }
 
     public async Task<TAggregate?> FirstOrDefaultAsync(Expression<Func<TAggregate, bool>>? whereCondition, CancellationToken token = default)
     {
-        var queryable = _session.Query<TAggregate>();
+        var queryable = Session.Query<TAggregate>();
         if (whereCondition != null)
         {
             return await queryable.Where(whereCondition).FirstOrDefaultAsync(token);
@@ -44,41 +72,14 @@ public class MartenRepository<TAggregate, TId> : IRepository<TAggregate, TId>, I
         return await queryable.FirstOrDefaultAsync(token);
     }
 
-    /// <inheritdoc />
-    public async Task<long> CreateAsync(TAggregate aggregate, CancellationToken token = default)
+    public async Task SaveChangesAsync(CancellationToken token = default)
     {
-        var events = aggregate.DequeueUncommittedEvents();
-        
-        _session.Events.StartStream<TAggregate>(GetGuid(aggregate.Id), events);
-        
-        await _session.SaveChangesAsync(token);
-        return events.Length;
-    }
-
-    /// <inheritdoc />
-    public async Task<long> UpdateAsync(TAggregate aggregate, CancellationToken token = default)
-    {
-        var events = aggregate.DequeueUncommittedEvents();
-        
-        _session.Events.Append(GetGuid(aggregate.Id), aggregate.Version, events);
-        
-        await _session.SaveChangesAsync(token);
-        return aggregate.Version;
-    }
-
-    public Task<long> DeleteAsync(TAggregate aggregate, CancellationToken token = default)
-    {
-        throw new NotImplementedException();
+        await Session.SaveChangesAsync(token);
     }
 
     public void Dispose()
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<int> SaveChangesAsync(CancellationToken token = default)
-    {
-        throw new NotImplementedException();
+        Session.Dispose();
     }
     
     private Guid GetGuid(TId id)
