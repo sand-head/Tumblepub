@@ -13,6 +13,13 @@ public abstract record ObjectType()
 
 public class BlogActivity : ReadOnlyAggregate<BlogActivityId>
 {
+    public BlogActivity() { }
+    
+    public BlogActivity(BlogActivityId id)
+    {
+        Id = id;
+    }
+    
     public BlogId BlogId { get; set; }
     public string Type { get; set; } = string.Empty;
     public DateTimeOffset PublishedAt { get; set; }

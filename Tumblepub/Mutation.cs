@@ -1,5 +1,7 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Transactions;
+using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
 using Tumblepub.Infrastructure;
@@ -14,19 +16,25 @@ public class Mutation
         string email,
         string password,
         string name,
-        [Service] IUserRepository userRepository,
-        [Service] IBlogRepository blogRepository,
+        [Service] IRepository<User, UserId> userRepository,
+        [Service] IRepository<Blog, BlogId> blogRepository,
         [Service] JwtAuthenticationManager authenticationManager)
     {
-        var user = await userRepository.CreateAsync(email, password);
-        await blogRepository.CreateAsync(user.Id, name);
+        // todo: probably wrap these in a transaction
+        var user = new User(email, password);
+        await userRepository.CreateAsync(user);
+        await userRepository.SaveChangesAsync(); // not sure how much I like this...
+        
+        var blog = new Blog(user.Id, name);
+        await blogRepository.CreateAsync(blog);
+        await blogRepository.SaveChangesAsync();
 
         var result = authenticationManager.GenerateTokens(user);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
 
     public async Task<AuthResult> Login(string email, string password,
-        [Service] IUserRepository userRepository,
+        [Service] IReadOnlyRepository<User, UserId> userRepository,
         [Service] JwtAuthenticationManager authenticationManager)
     {
         if (!await userRepository.ValidateCredentialsAsync(email, password))
@@ -46,11 +54,11 @@ public class Mutation
 
     [Authorize]
     public async Task<Blog> CreateBlog(ClaimsPrincipal claimsPrincipal, string name,
-        [Service] IUserRepository userRepository,
-        [Service] IBlogRepository blogRepository)
+        [Service] IReadOnlyRepository<User, UserId> userRepository,
+        [Service] IRepository<Blog, BlogId> blogRepository)
     {
         var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var userId = Guid.Parse(userIdClaimValue);
+        var userId = new UserId(Guid.Parse(userIdClaimValue));
 
         var user = await userRepository.GetByIdAsync(userId);
         if (user == null)
@@ -58,18 +66,21 @@ public class Mutation
             throw new Exception("bad");
         }
 
-        var blog = await blogRepository.CreateAsync(user.Id, name);
+        var blog = new Blog(user.Id, name);
+        await blogRepository.CreateAsync(blog);
+        await blogRepository.SaveChangesAsync();
+        
         return blog;
     }
 
     [Authorize]
     public async Task<Post> CreatePost(ClaimsPrincipal claimsPrincipal,
-        string blogName, string content, string[] tags,
-        [Service] IBlogRepository blogRepository,
-        [Service] IPostRepository postRepository)
+        string blogName, string content, List<string> tags,
+        [Service] IReadOnlyRepository<Blog, BlogId> blogRepository,
+        [Service] IRepository<Post, PostId> postRepository)
     {
         var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var userId = Guid.Parse(userIdClaimValue);
+        var userId = new UserId(Guid.Parse(userIdClaimValue));
 
         var blog = await blogRepository.GetByNameAsync(blogName, null);
         if (blog == null || blog.UserId != userId)
@@ -77,7 +88,14 @@ public class Mutation
             throw new Exception("bad");
         }
 
-        var post = await postRepository.CreateMarkdownPost(blog.Id, content, tags);
+        var postContent = new PostContent.Markdown(content)
+        {
+            Tags = tags
+        };
+        var post = new Post(blog.Id, postContent);
+        await postRepository.CreateAsync(post);
+        await postRepository.SaveChangesAsync();
+        
         return post;
     }
 }

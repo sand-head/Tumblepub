@@ -5,7 +5,7 @@ namespace Tumblepub.Application.Extensions;
 
 public static class BlogRepositoryExtensions
 {
-    public static async Task<Models.Blog?> GetByNameAsync(this IRepository<Models.Blog, BlogId> blogRepository, string name, string? domain, CancellationToken cancellationToken = default)
+    public static async Task<Models.Blog?> GetByNameAsync(this IReadOnlyRepository<Models.Blog, BlogId> blogRepository, string name, string? domain, CancellationToken cancellationToken = default)
     {
         // todo: also filter by domain
         return await blogRepository.FirstOrDefaultAsync(b => b.Name == name, cancellationToken);

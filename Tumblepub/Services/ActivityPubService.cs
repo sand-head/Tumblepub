@@ -1,5 +1,6 @@
 ﻿using Tumblepub.ActivityPub;
 using Tumblepub.ActivityPub.ActivityStreams;
+using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
 using Object = Tumblepub.ActivityPub.ActivityStreams.Object;
@@ -10,48 +11,45 @@ namespace Tumblepub.Services;
 public class ActivityPubService : IActivityPubService
 {
     private readonly ActivityPubOptions _options;
-    private readonly IBlogRepository _blogRepository;
-    private readonly IPostRepository _postRepository;
-    private readonly IBlogActivityRepository _blogActivityRepository;
+    private readonly IReadOnlyRepository<Blog, BlogId> _blogRepository;
+    private readonly IReadOnlyRepository<Post, PostId> _postRepository;
+    private readonly IReadOnlyRepository<BlogActivity, BlogActivityId> _blogActivityRepository;
+    private readonly IQueryableRepository<BlogActivity, BlogActivityId> _queryableBlogActivityRepository;
 
     public ActivityPubService(
         ActivityPubOptions options,
-        IBlogRepository blogRepository,
-        IPostRepository postRepository,
-        IBlogActivityRepository blogActivityRepository)
+        IReadOnlyRepository<Blog, BlogId> blogRepository,
+        IReadOnlyRepository<Post, PostId> postRepository,
+        IReadOnlyRepository<BlogActivity, BlogActivityId> blogActivityRepository,
+        IQueryableRepository<BlogActivity, BlogActivityId> queryableBlogActivityRepository)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
         _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
         _blogActivityRepository = blogActivityRepository ?? throw new ArgumentNullException(nameof(blogActivityRepository));
+        _queryableBlogActivityRepository = queryableBlogActivityRepository ?? throw new ArgumentNullException(nameof(queryableBlogActivityRepository));
     }
 
     public async Task<Actor?> GetActor(Guid id, CancellationToken token = default)
     {
-        var blog = await _blogRepository.GetByIdAsync(id, token);
-        if (blog == null)
-        {
-            return null;
-        }
-
-        return MapBlogToActor(blog);
+        var blogId = new BlogId(id);
+        var blog = await _blogRepository.GetByIdAsync(blogId, token);
+        return blog == null ? null : MapBlogToActor(blog);
     }
 
     public async Task<Actor?> GetActorByName(string name, CancellationToken token = default)
     {
         var blog = await _blogRepository.GetByNameAsync(name, null, token);
-        if (blog == null)
-        {
-            return null;
-        }
-
-        return MapBlogToActor(blog);
+        return blog == null ? null : MapBlogToActor(blog);
     }
 
     public async Task<Activity?> GetActivity(Guid actorId, Guid activityId, CancellationToken token = default)
     {
-        var blogActivity = await _blogActivityRepository.GetByIdAsync(activityId, token);
-        if (blogActivity == null || blogActivity.BlogId != actorId)
+        var blogId = new BlogId(actorId);
+        var blogActivityId = new BlogActivityId(activityId);
+        
+        var blogActivity = await _blogActivityRepository.GetByIdAsync(blogActivityId, token);
+        if (blogActivity == null || blogActivity.BlogId != blogId)
         {
             return null;
         }
@@ -61,23 +59,23 @@ public class ActivityPubService : IActivityPubService
 
     public async Task<Object?> GetObject(Guid actorId, Guid objectId, CancellationToken token = default)
     {
-        var post = await _postRepository.GetByIdAsync(objectId, token);
-        if (post == null || post.BlogId != actorId)
+        var blogId = new BlogId(actorId);
+        var postId = new PostId(objectId);
+        
+        var post = await _postRepository.GetByIdAsync(postId, token);
+        if (post == null || post.BlogId != blogId)
         {
             return null;
         }
 
         var mappedPost = MapPostToObject(post);
-        if (mappedPost is not Object mappedPostObject)
-        {
-            return null;
-        }
-        return mappedPostObject;
+        return mappedPost as Object ?? null;
     }
 
     public async Task<Object?> GetOutbox(Guid actorId, int? pageNumber = null, CancellationToken token = default)
     {
-        var outboxUrl = string.Format(_options.ActorOutboxRouteTemplate, actorId);
+        var blogId = new BlogId(actorId);
+        var outboxUrl = string.Format(_options.ActorOutboxRouteTemplate, blogId);
 
         if (pageNumber == null)
         {
@@ -85,11 +83,11 @@ public class ActivityPubService : IActivityPubService
             {
                 Id = new Uri(outboxUrl, UriKind.Relative),
                 FirstUrl = new Uri($"{outboxUrl}?page=0", UriKind.Relative),
-                TotalItems = await _blogActivityRepository.CountAsync(a => a.BlogId == actorId, token),
+                TotalItems = await _queryableBlogActivityRepository.CountAsync(a => a.BlogId == blogId, token),
             };
         }
 
-        var blogActivities = await _blogActivityRepository.GetByBlogIdAsync(actorId, pageNumber.Value, token);
+        var blogActivities = await _queryableBlogActivityRepository.GetByBlogIdAsync(blogId, pageNumber.Value, token);
         var activities = await Task.WhenAll(blogActivities.Select(async a => await MapBlogActivityToActivity(a)));
 
         return new OrderedCollection<Activity>
@@ -186,8 +184,8 @@ public class ActivityPubService : IActivityPubService
             Object = blogActivity.ObjectType switch
             {
                 // maybe this kind of sucks and I should just make these links
-                ObjectType.Blog => MapBlogToActor((await _blogRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
-                ObjectType.Post => MapPostToObject((await _postRepository.GetByIdAsync(blogActivity.ObjectId!.Value, token))!),
+                ObjectType.Blog => MapBlogToActor((await _blogRepository.GetByIdAsync(new BlogId(blogActivity.ObjectId!.Value), token))!),
+                ObjectType.Post => MapPostToObject((await _postRepository.GetByIdAsync(new PostId(blogActivity.ObjectId!.Value), token))!),
                 _ => null
             },
         };

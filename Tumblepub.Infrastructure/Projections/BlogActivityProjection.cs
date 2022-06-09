@@ -1,4 +1,5 @@
-﻿using Marten;
+﻿using System.ComponentModel;
+using Marten;
 using Marten.Events;
 using Marten.Events.Projections;
 using Tumblepub.Application.Events;
@@ -10,9 +11,9 @@ public class BlogActivityProjection : EventProjection
 {
     public BlogActivity Create(PostCreated e)
     {
-        return new BlogActivity
+        var postId = GetPostIdGuid(e.PostId);
+        return new BlogActivity(new BlogActivityId(postId))
         {
-            Id = e.PostId,
             BlogId = e.BlogId,
             Type = "Create",
             PublishedAt = e.At,
@@ -23,20 +24,24 @@ public class BlogActivityProjection : EventProjection
 
     public async Task Project(IEvent<PostUpdated> e, IDocumentOperations ops)
     {
-        var createActivity = await ops.LoadAsync<BlogActivity>(e.Data.PostId);
+        var createActivity = await ops.LoadAsync<BlogActivity>(GetPostIdGuid(e.Data.PostId));
         if (createActivity == null)
         {
             return;
         }
 
-        ops.Store(new BlogActivity
+        ops.Store(new BlogActivity(new BlogActivityId(e.Id))
         {
-            Id = new BlogActivityId(e.Id),
             BlogId = createActivity.BlogId,
             Type = "Update",
             PublishedAt = e.Data.At,
 
             ObjectType = new ObjectType.Post(e.Data.PostId),
         });
+    }
+    
+    private Guid GetPostIdGuid(PostId id)
+    {
+        return (Guid)TypeDescriptor.GetConverter(typeof(PostId)).ConvertTo(id, typeof(Guid))!;
     }
 }

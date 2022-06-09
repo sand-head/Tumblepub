@@ -95,14 +95,19 @@ using (var scope = app.Services.CreateScope())
     var singleUserConfig = scope.ServiceProvider.GetService<IOptions<SingleUserConfiguration>>()?.Value;
     if (singleUserConfig != null)
     {
-        var userRepository = scope.ServiceProvider.GetService<IUserRepository>()!;
-        var blogRepository = scope.ServiceProvider.GetService<IBlogRepository>()!;
+        var userRepository = scope.ServiceProvider.GetService<IRepository<User, UserId>>()!;
+        var blogRepository = scope.ServiceProvider.GetService<IRepository<Blog, BlogId>>()!;
 
         // if "single user" user doesn't exist, create new user and blog
         if (await userRepository.GetByEmailAsync(singleUserConfig.Email) == null)
         {
-            var user = await userRepository.CreateAsync(singleUserConfig.Email, singleUserConfig.Password);
-            await blogRepository.CreateAsync(user.Id, singleUserConfig.Username);
+            var user = new User(singleUserConfig.Email, singleUserConfig.Password);
+            await userRepository.CreateAsync(user);
+            await userRepository.SaveChangesAsync();
+            
+            var blog = new Blog(user.Id, singleUserConfig.Username);
+            await blogRepository.CreateAsync(blog);
+            await blogRepository.SaveChangesAsync();
         }
     }
 }

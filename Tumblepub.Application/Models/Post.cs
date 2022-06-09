@@ -12,13 +12,8 @@ public class Post : Aggregate<PostId>
     public PostContent Content { get; set; } = default!;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
-    
-    public static Post Create(BlogId blogId, PostContent content)
-    {
-        return new Post(blogId, content);
-    }
 
-    private Post(BlogId blogId, PostContent content)
+    public Post(BlogId blogId, PostContent content)
     {
         var postCreated = new PostCreated(PostId.New(), blogId, content, DateTimeOffset.UtcNow);
         

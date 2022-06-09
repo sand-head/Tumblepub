@@ -22,7 +22,7 @@ public class Blog : Aggregate<BlogId>
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 
-    public static Blog Create(UserId userId, string name)
+    public Blog(UserId userId, string name)
     {
         // generate public/private keys and create initial BlogCreated event
         var rsa = RSA.Create(2048);
@@ -37,11 +37,6 @@ public class Blog : Aggregate<BlogId>
         var privateKey =
             $"-----BEGIN RSA PRIVATE KEY-----\n{string.Join('\n', privateKeyChunked)}\n-----END RSA PRIVATE KEY-----\n";
         
-        return new Blog(userId, name, publicKey, privateKey);
-    }
-
-    private Blog(UserId userId, string name, string publicKey, string privateKey)
-    {
         var blogCreated = new BlogCreated(BlogId.New(), userId, name, publicKey, privateKey, DateTimeOffset.UtcNow);
         
         Enqueue(blogCreated);

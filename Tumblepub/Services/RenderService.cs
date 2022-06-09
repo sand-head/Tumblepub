@@ -1,4 +1,5 @@
-﻿using Tumblepub.Application.Interfaces;
+﻿using Tumblepub.Application.Extensions;
+using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
 using Tumblepub.Themes;
 
@@ -11,9 +12,9 @@ public interface IRenderService
 
 public class RenderService : IRenderService
 {
-    private readonly IBlogRepository _blogRepository;
+    private readonly IReadOnlyRepository<Blog, BlogId> _blogRepository;
 
-    public RenderService(IBlogRepository blogRepository)
+    public RenderService(IReadOnlyRepository<Blog, BlogId> blogRepository)
     {
         _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
     }

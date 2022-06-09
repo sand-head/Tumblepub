@@ -1,4 +1,5 @@
-﻿using StronglyTypedIds;
+﻿using Isopoh.Cryptography.Argon2;
+using StronglyTypedIds;
 using Tumblepub.Application.Events;
 
 namespace Tumblepub.Application.Models;
@@ -12,14 +13,10 @@ public class User : Aggregate<UserId>
     public string PasswordHash { get; set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
-    
-    public static User Create(string email, string passwordHash)
-    {
-        return new User(email, passwordHash);
-    }
 
-    private User(string email, string passwordHash)
+    public User(string email, string password)
     {
+        var passwordHash = Argon2.Hash(password).TrimEnd('\0');
         var postCreated = new UserCreated(UserId.New(), email, passwordHash, DateTimeOffset.UtcNow);
         
         Enqueue(postCreated);
