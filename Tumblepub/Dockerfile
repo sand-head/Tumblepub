@@ -25,10 +25,10 @@ COPY ["Tumblepub/Tumblepub.csproj", "Tumblepub/"]
 RUN dotnet restore "Tumblepub/Tumblepub.csproj"
 COPY . .
 WORKDIR "/src/Tumblepub"
-RUN dotnet build "Tumblepub.csproj" -c Release -o /app/build
+RUN dotnet build "Tumblepub.csproj" -c Release -o /app/build --no-restore
 
 FROM build AS publish
-RUN dotnet publish "Tumblepub.csproj" -c Release -o /app/publish --no-restore
+RUN dotnet publish "Tumblepub.csproj" -c Release -o /app/publish --no-build
 
 FROM base AS final
 WORKDIR /app
