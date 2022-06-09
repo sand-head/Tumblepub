@@ -28,7 +28,7 @@ WORKDIR "/src/Tumblepub"
 RUN dotnet build "Tumblepub.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Tumblepub.csproj" -c Release -o /app/publish
+RUN dotnet publish "Tumblepub.csproj" -c Release -o /app/publish --no-restore
 
 FROM base AS final
 WORKDIR /app
