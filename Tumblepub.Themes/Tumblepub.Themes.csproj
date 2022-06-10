@@ -7,12 +7,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-	  <PackageReference Include="Handlebars.Net" Version="2.1.2" />
-	  <PackageReference Include="Humanizer" Version="2.14.1" />
+      <PackageReference Include="Handlebars.Net" Version="2.1.2" />
+      <PackageReference Include="Humanizer" Version="2.14.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Tumblepub.Infrastructure\Tumblepub.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="DefaultTheme.hbs" />
+      <EmbeddedResource Include="DefaultTheme.hbs">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
     <!--
@@ -22,19 +29,19 @@
       Documentation: https://docs.microsoft.com/en-us/visualstudio/msbuild/incremental-builds?WT.mc_id=DT-MVP-5003978
     -->
     <Target Name="NpmInstall" Inputs="../theme/package.json" Outputs="../theme/node_modules/.install-stamp">
-	  <!--
-	    Use npm install or npm ci depending on RestorePackagesWithLockFile value.
-	    Uncomment the following lines if you want to use this feature:
-	  -->
-
-    <PropertyGroup>
-      <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    </PropertyGroup>
-	  <Exec Command="npm ci" WorkingDirectory="../theme/" Condition="$(RestorePackagesWithLockFile) == 'true'" />
-	  <Exec Command="npm install" WorkingDirectory="../theme/" Condition="$(RestorePackagesWithLockFile) != 'true'" />
-
-	  <!-- Write the stamp file, so incremental builds work -->
-	  <Touch Files="../theme/node_modules/.install-stamp" AlwaysCreate="true" />
+      <!--
+        Use npm install or npm ci depending on RestorePackagesWithLockFile value.
+        Uncomment the following lines if you want to use this feature:
+      -->
+  
+      <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+      </PropertyGroup>
+      <Exec Command="npm ci" WorkingDirectory="../theme/" Condition="$(RestorePackagesWithLockFile) == 'true'" />
+      <Exec Command="npm install" WorkingDirectory="../theme/" Condition="$(RestorePackagesWithLockFile) != 'true'" />
+  
+      <!-- Write the stamp file, so incremental builds work -->
+      <Touch Files="../theme/node_modules/.install-stamp" AlwaysCreate="true" />
     </Target>
 
     <!--
@@ -42,8 +49,8 @@
       MSBuild runs NpmInstall before this task because of the DependsOnTargets attribute.
     -->
     <Target Name="NpmRunBuild" DependsOnTargets="NpmInstall" BeforeTargets="BeforeBuild">
-	  <Exec Command="npm run build" WorkingDirectory="../theme/" />
-	  <Copy SourceFiles="../theme/dist/index.html" DestinationFiles="./DefaultTheme.hbs" />
+      <Exec Command="npm run build" WorkingDirectory="../theme/" />
+      <Copy SourceFiles="../theme/dist/index.html" DestinationFiles="./DefaultTheme.hbs" />
     </Target>
 
 </Project>

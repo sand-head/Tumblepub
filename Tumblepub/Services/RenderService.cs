@@ -12,9 +12,9 @@ public interface IRenderService
 
 public class RenderService : IRenderService
 {
-    private readonly IReadOnlyRepository<Blog, BlogId> _blogRepository;
+    private readonly IReadOnlyRepository<Blog, Guid> _blogRepository;
 
-    public RenderService(IReadOnlyRepository<Blog, BlogId> blogRepository)
+    public RenderService(IReadOnlyRepository<Blog, Guid> blogRepository)
     {
         _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
     }

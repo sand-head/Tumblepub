@@ -1,18 +1,16 @@
-﻿using System.ComponentModel;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Marten;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
 
 namespace Tumblepub.Infrastructure.Repositories;
 
-internal abstract class MartenQueryableRepository<TAggregate, TId> : IQueryableRepository<TAggregate, TId>, IRepository<TAggregate, TId>
-    where TAggregate : class, ISelfAggregate<TId>
-    where TId : struct
+internal abstract class MartenRepository<TAggregate> : IQueryableRepository<TAggregate, Guid>, IRepository<TAggregate, Guid>
+    where TAggregate : class, ISelfAggregate<Guid>
 {
     protected readonly IDocumentSession Session;
-    
-    public MartenQueryableRepository(IDocumentSession session)
+
+    protected MartenRepository(IDocumentSession session)
     {
         Session = session;
     }
@@ -28,7 +26,7 @@ internal abstract class MartenQueryableRepository<TAggregate, TId> : IQueryableR
     {
         var events = aggregate.DequeueUncommittedEvents();
         
-        Session.Events.StartStream<TAggregate>(GetGuid(aggregate.Id), events);
+        Session.Events.StartStream<TAggregate>(aggregate.Id, events);
         
         return events.Length;
     }
@@ -38,7 +36,7 @@ internal abstract class MartenQueryableRepository<TAggregate, TId> : IQueryableR
     {
         var events = aggregate.DequeueUncommittedEvents();
         
-        Session.Events.Append(GetGuid(aggregate.Id), aggregate.Version, events);
+        Session.Events.Append(aggregate.Id, aggregate.Version, events);
         
         return aggregate.Version;
     }
@@ -56,9 +54,9 @@ internal abstract class MartenQueryableRepository<TAggregate, TId> : IQueryableR
         return await queryable.ToListAsync(token);
     }
 
-    public async Task<TAggregate?> GetByIdAsync(TId id, CancellationToken token = default)
+    public async Task<TAggregate?> GetByIdAsync(Guid id, CancellationToken token = default)
     {
-        return await Session.LoadAsync<TAggregate>(GetGuid(id), token);
+        return await Session.LoadAsync<TAggregate>(id, token);
     }
 
     public async Task<TAggregate?> FirstOrDefaultAsync(Expression<Func<TAggregate, bool>>? whereCondition, CancellationToken token = default)
@@ -80,10 +78,5 @@ internal abstract class MartenQueryableRepository<TAggregate, TId> : IQueryableR
     public void Dispose()
     {
         Session.Dispose();
-    }
-    
-    private Guid GetGuid(TId id)
-    {
-        return (Guid)TypeDescriptor.GetConverter(typeof(TId)).ConvertTo(id, typeof(Guid))!;
     }
 }

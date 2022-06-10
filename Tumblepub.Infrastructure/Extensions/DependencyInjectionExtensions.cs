@@ -54,7 +54,7 @@ public static class DependencyInjectionExtensions
         // register all repositories
         return services
             .Scan(scan => scan
-                .FromAssembliesOf(typeof(MartenQueryableRepository<,>))
+                .FromAssembliesOf(typeof(MartenRepository<>))
                 .AddClasses(classes => classes.AssignableTo(typeof(IRepository)))
                     .AsImplementedInterfaces()
                     .WithScopedLifetime());

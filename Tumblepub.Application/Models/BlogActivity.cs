@@ -1,26 +1,21 @@
-﻿using StronglyTypedIds;
-
-namespace Tumblepub.Application.Models;
-
-[StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson)]
-public partial struct BlogActivityId { }
+﻿namespace Tumblepub.Application.Models;
 
 public abstract record ObjectType()
 {
-    public record Blog(BlogId BlogId) : ObjectType();
-    public record Post(PostId BlogId) : ObjectType();
+    public record Blog(Guid BlogId) : ObjectType();
+    public record Post(Guid BlogId) : ObjectType();
 }
 
-public class BlogActivity : ReadOnlyAggregate<BlogActivityId>
+public class BlogActivity : ReadOnlyAggregate<Guid>
 {
     public BlogActivity() { }
     
-    public BlogActivity(BlogActivityId id)
+    public BlogActivity(Guid id)
     {
         Id = id;
     }
     
-    public BlogId BlogId { get; set; }
+    public Guid BlogId { get; set; }
     public string Type { get; set; } = string.Empty;
     public DateTimeOffset PublishedAt { get; set; }
 

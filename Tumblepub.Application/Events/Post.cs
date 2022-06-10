@@ -3,30 +3,30 @@
 namespace Tumblepub.Application.Events;
 
 public record PostCreated(
-    PostId PostId,
-    BlogId BlogId,
+    Guid PostId,
+    Guid BlogId,
     PostContent Content,
     DateTimeOffset At);
 
 public record PostDiscovered(
-    PostId PostId,
-    BlogId BlogId,
+    Guid PostId,
+    Guid BlogId,
     DateTimeOffset At);
 
 public record PostUpdated(
-    PostId PostId,
+    Guid PostId,
     DateTimeOffset At);
 
 public record PostLiked(
-    PostId PostId,
-    BlogId BlogId,
+    Guid PostId,
+    Guid BlogId,
     DateTimeOffset At);
 
 public record PostShared(
-    PostId PostId,
-    BlogId BlogId,
+    Guid PostId,
+    Guid BlogId,
     DateTimeOffset At);
 
 public record PostDeleted(
-    PostId PostId,
+    Guid PostId,
     DateTimeOffset At);

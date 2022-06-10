@@ -1,18 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text.Json;
-using StronglyTypedIds;
 using Tumblepub.Application.Events;
 
 namespace Tumblepub.Application.Models;
 
-[StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson)]
-public partial struct BlogId { }
-
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-public class Blog : Aggregate<BlogId>
+public class Blog : Aggregate<Guid>
 {
-    public UserId? UserId { get; set; }
+    public Guid? UserId { get; set; }
     public string Name { get; set; } = default!;
     public string? Title { get; set; }
     public string? Description { get; set; }
@@ -21,8 +17,10 @@ public class Blog : Aggregate<BlogId>
     public string? PrivateKey { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    
+    public Blog() { }
 
-    public Blog(UserId userId, string name)
+    public Blog(Guid userId, string name)
     {
         // generate public/private keys and create initial BlogCreated event
         var rsa = RSA.Create(2048);
@@ -37,17 +35,17 @@ public class Blog : Aggregate<BlogId>
         var privateKey =
             $"-----BEGIN RSA PRIVATE KEY-----\n{string.Join('\n', privateKeyChunked)}\n-----END RSA PRIVATE KEY-----\n";
         
-        var blogCreated = new BlogCreated(BlogId.New(), userId, name, publicKey, privateKey, DateTimeOffset.UtcNow);
+        var blogCreated = new BlogCreated(Guid.NewGuid(), userId, name, publicKey, privateKey, DateTimeOffset.UtcNow);
         
         Enqueue(blogCreated);
-        Apply(blogCreated);
+        Initialize(blogCreated);
     }
 
-    internal Blog(BlogCreated e)
+    public Blog(BlogCreated e)
     {
-        Apply(e);
+        Initialize(e);
     }
-    internal Blog(BlogDiscovered e)
+    public Blog(BlogDiscovered e)
     {
         Id = e.BlogId;
         Name = e.BlogName;
@@ -55,8 +53,7 @@ public class Blog : Aggregate<BlogId>
         UpdatedAt = CreatedAt = e.At;
     }
 
-
-    internal void Apply(BlogCreated e)
+    private void Initialize(BlogCreated e)
     {
         Id = e.BlogId;
         UserId = e.UserId;

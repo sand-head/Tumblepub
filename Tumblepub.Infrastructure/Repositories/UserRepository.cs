@@ -4,17 +4,17 @@ using Tumblepub.Application.Models;
 
 namespace Tumblepub.Infrastructure.Repositories;
 
-internal class PostRepository : MartenRepository<Post>
+internal class UserRepository : MartenRepository<User>
 {
-    private readonly ILogger<PostRepository> _logger;
+    private readonly ILogger<UserRepository> _logger;
 
-    public PostRepository(ILogger<PostRepository> logger, IDocumentSession session)
+    public UserRepository(ILogger<UserRepository> logger, IDocumentSession session)
         : base(session)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public override Task<long> DeleteAsync(Post aggregate, CancellationToken token = default)
+    public override Task<long> DeleteAsync(User aggregate, CancellationToken token = default)
     {
         throw new NotImplementedException();
     }

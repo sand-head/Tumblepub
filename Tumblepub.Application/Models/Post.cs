@@ -1,32 +1,30 @@
-﻿using StronglyTypedIds;
-using Tumblepub.Application.Events;
+﻿using Tumblepub.Application.Events;
 
 namespace Tumblepub.Application.Models;
 
-[StronglyTypedId(converters: StronglyTypedIdConverter.TypeConverter | StronglyTypedIdConverter.SystemTextJson | StronglyTypedIdConverter.NewtonsoftJson)]
-public partial struct PostId { }
-
-public class Post : Aggregate<PostId>
+public class Post : Aggregate<Guid>
 {
-    public BlogId BlogId { get; set; }
+    public Guid BlogId { get; set; }
     public PostContent Content { get; set; } = default!;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    
+    public Post() { }
 
-    public Post(BlogId blogId, PostContent content)
+    public Post(Guid blogId, PostContent content)
     {
-        var postCreated = new PostCreated(PostId.New(), blogId, content, DateTimeOffset.UtcNow);
+        var postCreated = new PostCreated(Guid.NewGuid(), blogId, content, DateTimeOffset.UtcNow);
         
         Enqueue(postCreated);
-        Apply(postCreated);
+        Initialize(postCreated);
     }
 
-    internal Post(PostCreated e)
+    public Post(PostCreated e)
     {
-        Apply(e);
+        Initialize(e);
     }
     
-    internal void Apply(PostCreated e)
+    private void Initialize(PostCreated e)
     {
         Id = e.PostId;
         BlogId = e.BlogId;

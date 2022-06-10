@@ -7,7 +7,7 @@ using Tumblepub.Application.Models;
 
 namespace Tumblepub.Infrastructure.Repositories;
 
-internal class BlogActivityRepository : IQueryableRepository<BlogActivity, BlogActivityId>, IReadOnlyRepository<BlogActivity, BlogActivityId>
+internal class BlogActivityRepository : IQueryableRepository<BlogActivity, Guid>, IReadOnlyRepository<BlogActivity, Guid>
 {
     private readonly ILogger<BlogActivityRepository> _logger;
     private readonly IDocumentSession _session;
@@ -20,36 +20,38 @@ internal class BlogActivityRepository : IQueryableRepository<BlogActivity, BlogA
 
     public IQueryable<BlogActivity> Query()
     {
-        throw new NotImplementedException();
+        return _session.Query<BlogActivity>();
     }
 
-    public Task<IEnumerable<BlogActivity>> GetAllAsync(Expression<Func<BlogActivity, bool>>? whereCondition, CancellationToken token = default)
+    public async Task<IEnumerable<BlogActivity>> GetAllAsync(Expression<Func<BlogActivity, bool>>? whereCondition, CancellationToken token = default)
     {
-        throw new NotImplementedException();
+        var queryable = _session.Query<BlogActivity>();
+        if (whereCondition != null)
+        {
+            return await queryable.Where(whereCondition).ToListAsync(token);
+        }
+
+        return await queryable.ToListAsync(token);
     }
 
-    public async Task<BlogActivity?> GetByIdAsync(BlogActivityId id, CancellationToken token = default)
+    public async Task<BlogActivity?> GetByIdAsync(Guid id, CancellationToken token = default)
     {
-        return await _session.LoadAsync<BlogActivity>(GetGuid(id), token);
+        return await _session.LoadAsync<BlogActivity>(id, token);
     }
 
-    public Task<BlogActivity?> FirstOrDefaultAsync(Expression<Func<BlogActivity, bool>>? whereCondition, CancellationToken token = default)
+    public async Task<BlogActivity?> FirstOrDefaultAsync(Expression<Func<BlogActivity, bool>>? whereCondition, CancellationToken token = default)
     {
-        throw new NotImplementedException();
-    }
+        var queryable = _session.Query<BlogActivity>();
+        if (whereCondition != null)
+        {
+            return await queryable.Where(whereCondition).FirstOrDefaultAsync(token);
+        }
 
-    public Task SaveChangesAsync(CancellationToken token = default)
-    {
-        throw new NotImplementedException();
+        return await queryable.FirstOrDefaultAsync(token);
     }
 
     public void Dispose()
     {
         _session.Dispose();
-    }
-    
-    private Guid GetGuid(BlogActivityId id)
-    {
-        return (Guid)TypeDescriptor.GetConverter(typeof(BlogActivityId)).ConvertTo(id, typeof(Guid))!;
     }
 }

@@ -16,8 +16,8 @@ public class Mutation
         string email,
         string password,
         string name,
-        [Service] IRepository<User, UserId> userRepository,
-        [Service] IRepository<Blog, BlogId> blogRepository,
+        [Service] IRepository<User, Guid> userRepository,
+        [Service] IRepository<Blog, Guid> blogRepository,
         [Service] JwtAuthenticationManager authenticationManager)
     {
         // todo: probably wrap these in a transaction
@@ -34,7 +34,7 @@ public class Mutation
     }
 
     public async Task<AuthResult> Login(string email, string password,
-        [Service] IReadOnlyRepository<User, UserId> userRepository,
+        [Service] IReadOnlyRepository<User, Guid> userRepository,
         [Service] JwtAuthenticationManager authenticationManager)
     {
         if (!await userRepository.ValidateCredentialsAsync(email, password))
@@ -54,11 +54,11 @@ public class Mutation
 
     [Authorize]
     public async Task<Blog> CreateBlog(ClaimsPrincipal claimsPrincipal, string name,
-        [Service] IReadOnlyRepository<User, UserId> userRepository,
-        [Service] IRepository<Blog, BlogId> blogRepository)
+        [Service] IReadOnlyRepository<User, Guid> userRepository,
+        [Service] IRepository<Blog, Guid> blogRepository)
     {
         var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var userId = new UserId(Guid.Parse(userIdClaimValue));
+        var userId = Guid.Parse(userIdClaimValue);
 
         var user = await userRepository.GetByIdAsync(userId);
         if (user == null)
@@ -76,11 +76,11 @@ public class Mutation
     [Authorize]
     public async Task<Post> CreatePost(ClaimsPrincipal claimsPrincipal,
         string blogName, string content, List<string> tags,
-        [Service] IReadOnlyRepository<Blog, BlogId> blogRepository,
-        [Service] IRepository<Post, PostId> postRepository)
+        [Service] IReadOnlyRepository<Blog, Guid> blogRepository,
+        [Service] IRepository<Post, Guid> postRepository)
     {
         var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var userId = new UserId(Guid.Parse(userIdClaimValue));
+        var userId = Guid.Parse(userIdClaimValue);
 
         var blog = await blogRepository.GetByNameAsync(blogName, null);
         if (blog == null || blog.UserId != userId)

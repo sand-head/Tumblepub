@@ -7,9 +7,9 @@ public sealed record GetUserByEmailQuery(string Email) : IQuery<Models.User?>;
 
 internal class GetUserByEmail : IQueryHandler<GetUserByEmailQuery, Models.User?>
 {
-    private readonly IRepository<Models.User, UserId> _userRepository;
+    private readonly IRepository<Models.User, Guid> _userRepository;
 
-    public GetUserByEmail(IRepository<Models.User, UserId> userRepository)
+    public GetUserByEmail(IRepository<Models.User, Guid> userRepository)
     {
         _userRepository = userRepository;
     }

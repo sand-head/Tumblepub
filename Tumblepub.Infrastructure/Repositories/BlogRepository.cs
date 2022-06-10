@@ -7,11 +7,11 @@ using Tumblepub.Infrastructure.Infrastructure;
 
 namespace Tumblepub.Infrastructure.Repositories;
 
-internal class BlogQueryableRepository : MartenQueryableRepository<Blog, BlogId>
+internal class BlogRepository : MartenRepository<Blog>
 {
-    private readonly ILogger<BlogQueryableRepository> _logger;
+    private readonly ILogger<BlogRepository> _logger;
 
-    public BlogQueryableRepository(ILogger<BlogQueryableRepository> logger, IDocumentSession session)
+    public BlogRepository(ILogger<BlogRepository> logger, IDocumentSession session)
         : base(session)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

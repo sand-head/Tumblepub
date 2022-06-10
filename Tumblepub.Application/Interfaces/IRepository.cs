@@ -3,15 +3,16 @@ using Tumblepub.Application.Models;
 
 namespace Tumblepub.Application.Interfaces;
 
-public interface IRepository : IDisposable
-{
-    Task SaveChangesAsync(CancellationToken token = default);
-}
+public interface IRepository : IDisposable { }
 
 public interface IQueryableRepository<out TAggregate, in TId> : IRepository
     where TAggregate : class, IAggregate<TId>
     where TId : struct
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     IQueryable<TAggregate> Query();
 }
 
@@ -68,4 +69,10 @@ public interface IRepository<TAggregate, in TId> : IReadOnlyRepository<TAggregat
     /// <param name="token"></param>
     /// <returns></returns>
     Task<long> DeleteAsync(TAggregate aggregate, CancellationToken token = default);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    Task SaveChangesAsync(CancellationToken token = default);
 }

@@ -12,9 +12,9 @@ public class UserTypeExtensions
     public async Task<IEnumerable<Blog>> GetBlogs(
         IResolverContext context,
         [Parent] User user,
-        [Service] IQueryableRepository<Blog, BlogId> blogRepository)
+        [Service] IQueryableRepository<Blog, Guid> blogRepository)
     {
-        return await context.GroupDataLoader<UserId, Blog>(
+        return await context.GroupDataLoader<Guid, Blog>(
             async (userIds, token) =>
             {
                 var getBlogsResults = await Task.WhenAll(userIds.Select(async id => await blogRepository.GetByUserIdAsync(id, token)));
