@@ -1,11 +1,14 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
 using Tumblepub.Application.Blog.Commands;
+using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
+using Tumblepub.Application.Post.Commands;
 using Tumblepub.Application.User.Commands;
 using Tumblepub.Application.User.Queries;
+using Tumblepub.Extensions;
 using Tumblepub.Infrastructure;
 
 namespace Tumblepub;
@@ -55,10 +58,9 @@ public class Mutation
         [Service] IReadOnlyRepository<User, Guid> userRepository,
         [Service] ICommandHandler<CreateBlogCommand, Blog> createBlogCommandHandler)
     {
-        var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var userId = Guid.Parse(userIdClaimValue);
-
+        var userId = claimsPrincipal.GetUserId();
         var user = await userRepository.GetByIdAsync(userId);
+        
         if (user == null)
         {
             throw new Exception("bad");
@@ -71,26 +73,19 @@ public class Mutation
     [Authorize]
     public async Task<Post> CreatePost(ClaimsPrincipal claimsPrincipal,
         string blogName, string content, List<string> tags,
-        [Service] IReadOnlyRepository<Blog, Guid> blogRepository,
-        [Service] IRepository<Post, Guid> postRepository)
+        [Service] IQueryHandler<GetBlogByNameQuery, Blog?> getBlogByNameQueryHandler,
+        [Service] ICommandHandler<CreatePostCommand, Post> createPostCommandHandler)
     {
-        var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var userId = Guid.Parse(userIdClaimValue);
+        var userId = claimsPrincipal.GetUserId();
 
-        var blog = await blogRepository.GetByNameAsync(blogName, null);
+        var query = new GetBlogByNameQuery(blogName);
+        var blog = await getBlogByNameQueryHandler.Handle(query);
         if (blog == null || blog.UserId != userId)
         {
             throw new Exception("bad");
         }
 
-        var postContent = new PostContent.Markdown(content)
-        {
-            Tags = tags
-        };
-        var post = new Post(blog.Id, postContent);
-        await postRepository.CreateAsync(post);
-        await postRepository.SaveChangesAsync();
-        
-        return post;
+        var command = new CreatePostCommand(blog.Id, content, tags);
+        return await createPostCommandHandler.Handle(command);
     }
 }

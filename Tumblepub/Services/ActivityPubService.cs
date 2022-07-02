@@ -1,5 +1,6 @@
 ﻿using Tumblepub.ActivityPub;
 using Tumblepub.ActivityPub.ActivityStreams;
+using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
@@ -11,6 +12,7 @@ namespace Tumblepub.Services;
 public class ActivityPubService : IActivityPubService
 {
     private readonly ActivityPubOptions _options;
+    private readonly IQueryHandler<GetBlogByNameQuery, Blog?> _getBlogByNameQueryHandler;
     private readonly IReadOnlyRepository<Blog, Guid> _blogRepository;
     private readonly IReadOnlyRepository<Post, Guid> _postRepository;
     private readonly IReadOnlyRepository<BlogActivity, Guid> _blogActivityRepository;
@@ -18,12 +20,14 @@ public class ActivityPubService : IActivityPubService
 
     public ActivityPubService(
         ActivityPubOptions options,
+        IQueryHandler<GetBlogByNameQuery, Blog?> getBlogByNameQueryHandler,
         IReadOnlyRepository<Blog, Guid> blogRepository,
         IReadOnlyRepository<Post, Guid> postRepository,
         IReadOnlyRepository<BlogActivity, Guid> blogActivityRepository,
         IQueryableRepository<BlogActivity, Guid> queryableBlogActivityRepository)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
+        _getBlogByNameQueryHandler = getBlogByNameQueryHandler ?? throw new ArgumentNullException(nameof(getBlogByNameQueryHandler));
         _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
         _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
         _blogActivityRepository = blogActivityRepository ?? throw new ArgumentNullException(nameof(blogActivityRepository));
@@ -38,7 +42,8 @@ public class ActivityPubService : IActivityPubService
 
     public async Task<Actor?> GetActorByName(string name, CancellationToken token = default)
     {
-        var blog = await _blogRepository.GetByNameAsync(name, null, token);
+        var query = new GetBlogByNameQuery(name);
+        var blog = await _getBlogByNameQueryHandler.Handle(query, token);
         return blog == null ? null : MapBlogToActor(blog);
     }
 
@@ -73,8 +78,8 @@ public class ActivityPubService : IActivityPubService
         {
             return new OrderedCollection
             {
-                Id = new Uri(outboxUrl, UriKind.Relative),
-                FirstUrl = new Uri($"{outboxUrl}?page=0", UriKind.Relative),
+                Id = new(outboxUrl, UriKind.Relative),
+                FirstUrl = new($"{outboxUrl}?page=0", UriKind.Relative),
                 TotalItems = await _queryableBlogActivityRepository.CountAsync(a => a.BlogId == actorId, token),
             };
         }
@@ -84,8 +89,8 @@ public class ActivityPubService : IActivityPubService
 
         return new OrderedCollection<Activity>
         {
-            Id = new Uri($"{outboxUrl}?page={pageNumber}", UriKind.Relative),
-            NextUrl = new Uri($"{outboxUrl}?page={pageNumber + 1}", UriKind.Relative),
+            Id = new($"{outboxUrl}?page={pageNumber}", UriKind.Relative),
+            NextUrl = new($"{outboxUrl}?page={pageNumber + 1}", UriKind.Relative),
             OrderedItems = activities.ToList(),
         };
     }
@@ -93,7 +98,7 @@ public class ActivityPubService : IActivityPubService
     private Actor MapBlogToActor(Blog blog)
     {
         var actorId = string.Format(_options.ActorRouteTemplate, blog.Id);
-        return new Actor("Person")
+        return new("Person")
         {
             Context = new List<string>()
             {
@@ -101,19 +106,19 @@ public class ActivityPubService : IActivityPubService
             },
 
             // todo: get domain
-            Id = new Uri(actorId, UriKind.Relative),
+            Id = new(actorId, UriKind.Relative),
             Name = blog.Name,
             PublishedAt = blog.CreatedAt,
             PreferredUsername = blog.Title ?? blog.Name,
             Summary = blog.Description,
 
-            InboxUrl = new Uri(string.Format(_options.ActorInboxRouteTemplate, blog.Id), UriKind.Relative),
-            FollowersUrl = new Uri(string.Format(_options.ActorFollowersRouteTemplate, blog.Id), UriKind.Relative),
+            InboxUrl = new(string.Format(_options.ActorInboxRouteTemplate, blog.Id), UriKind.Relative),
+            FollowersUrl = new(string.Format(_options.ActorFollowersRouteTemplate, blog.Id), UriKind.Relative),
 
             PublicKey = new()
             {
-                Id = new Uri($"{actorId}#main-key", UriKind.Relative),
-                Owner = new Uri(actorId, UriKind.Relative),
+                Id = new($"{actorId}#main-key", UriKind.Relative),
+                Owner = new(actorId, UriKind.Relative),
                 PublicKeyPem = blog.PublicKey
             }
         };
@@ -134,16 +139,16 @@ public class ActivityPubService : IActivityPubService
                 "https://www.w3.org/ns/activitystreams"
             },
 
-            Id = new Uri(string.Format(_options.ActorObjectRouteTemplate, post.BlogId, post.Id), UriKind.Relative),
+            Id = new(string.Format(_options.ActorObjectRouteTemplate, post.BlogId, post.Id), UriKind.Relative),
             PublishedAt = post.CreatedAt,
             AttributedTo = new()
             {
-                new Link(new Uri(string.Format(_options.ActorRouteTemplate, post.BlogId), UriKind.Relative))
+                new Link(new(string.Format(_options.ActorRouteTemplate, post.BlogId), UriKind.Relative))
             },
 
             To = new()
             {
-                new Link(new Uri("https://www.w3.org/ns/activitystreams#Public"))
+                new Link(new("https://www.w3.org/ns/activitystreams#Public"))
             }
         };
 
@@ -159,17 +164,17 @@ public class ActivityPubService : IActivityPubService
 
     private async Task<Activity> MapBlogActivityToActivity(BlogActivity blogActivity, CancellationToken token = default)
     {
-        return new Activity(blogActivity.Type)
+        return new(blogActivity.Type)
         {
             Context = new List<string>()
             {
                 "https://www.w3.org/ns/activitystreams"
             },
 
-            Id = new Uri(string.Format(_options.ActorActivityRouteTemplate, blogActivity.BlogId, blogActivity.Id), UriKind.Relative),
+            Id = new(string.Format(_options.ActorActivityRouteTemplate, blogActivity.BlogId, blogActivity.Id), UriKind.Relative),
             Actor = new List<ActivityStreamsValue>
             {
-                new Link(new Uri(string.Format(_options.ActorRouteTemplate, blogActivity.BlogId), UriKind.Relative))
+                new Link(new(string.Format(_options.ActorRouteTemplate, blogActivity.BlogId), UriKind.Relative))
             },
             PublishedAt = blogActivity.PublishedAt,
 

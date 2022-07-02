@@ -1,4 +1,4 @@
-﻿using Tumblepub.Application.Extensions;
+﻿using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
 using Tumblepub.Themes;
@@ -12,16 +12,17 @@ public interface IRenderService
 
 public class RenderService : IRenderService
 {
-    private readonly IReadOnlyRepository<Blog, Guid> _blogRepository;
+    private readonly IQueryHandler<GetBlogByNameQuery, Blog?> _queryHandler;
 
-    public RenderService(IReadOnlyRepository<Blog, Guid> blogRepository)
+    public RenderService(IQueryHandler<GetBlogByNameQuery, Blog?> queryHandler)
     {
-        _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
+        _queryHandler = queryHandler;
     }
 
     public async Task<IResult> RenderBlogAsync(string name, CancellationToken token = default)
     {
-        var blog = await _blogRepository.GetByNameAsync(name, null, token);
+        var query = new GetBlogByNameQuery(name);
+        var blog = await _queryHandler.Handle(query, token);
         if (blog == null)
         {
             return Results.NotFound();
