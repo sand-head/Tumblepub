@@ -45,10 +45,8 @@ public abstract record PostContent()
 
     public record Deleted() : PostContent();
 
-    public abstract record Internal() : PostContent()
+    public record Markdown(string Content) : PostContent()
     {
         public List<string> Tags { get; set; } = new();
     }
-
-    public record Markdown(string Content) : Internal();
 }

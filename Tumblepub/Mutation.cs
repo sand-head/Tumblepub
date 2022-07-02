@@ -1,9 +1,11 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
-using System.Transactions;
+using Tumblepub.Application.Blog.Commands;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
+using Tumblepub.Application.User.Commands;
+using Tumblepub.Application.User.Queries;
 using Tumblepub.Infrastructure;
 
 namespace Tumblepub;
@@ -16,33 +18,29 @@ public class Mutation
         string email,
         string password,
         string name,
-        [Service] IRepository<User, Guid> userRepository,
-        [Service] IRepository<Blog, Guid> blogRepository,
+        [Service] ICommandHandler<CreateUserCommand, User> createUserCommandHandler,
         [Service] JwtAuthenticationManager authenticationManager)
     {
-        // todo: probably wrap these in a transaction
-        var user = new User(email, password);
-        await userRepository.CreateAsync(user);
-        await userRepository.SaveChangesAsync(); // not sure how much I like this...
-        
-        var blog = new Blog(user.Id, name);
-        await blogRepository.CreateAsync(blog);
-        await blogRepository.SaveChangesAsync();
+        var command = new CreateUserCommand(email, name, password);
+        var user = await createUserCommandHandler.Handle(command);
 
         var result = authenticationManager.GenerateTokens(user);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
 
     public async Task<AuthResult> Login(string email, string password,
-        [Service] IReadOnlyRepository<User, Guid> userRepository,
+        [Service] ICommandHandler<ValidateUserCredentialsCommand, bool> validateCommandHandler,
+        [Service] IQueryHandler<GetUserByEmailQuery, User?> getByEmailQueryHandler,
         [Service] JwtAuthenticationManager authenticationManager)
     {
-        if (!await userRepository.ValidateCredentialsAsync(email, password))
+        var validateCommand = new ValidateUserCredentialsCommand(email, password);
+        if (!await validateCommandHandler.Handle(validateCommand))
         {
             throw new Exception("bad");
         }
 
-        var user = await userRepository.GetByEmailAsync(email);
+        var query = new GetUserByEmailQuery(email);
+        var user = await getByEmailQueryHandler.Handle(query);
         var result = authenticationManager.GenerateTokens(user!);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
@@ -55,7 +53,7 @@ public class Mutation
     [Authorize]
     public async Task<Blog> CreateBlog(ClaimsPrincipal claimsPrincipal, string name,
         [Service] IReadOnlyRepository<User, Guid> userRepository,
-        [Service] IRepository<Blog, Guid> blogRepository)
+        [Service] ICommandHandler<CreateBlogCommand, Blog> createBlogCommandHandler)
     {
         var userIdClaimValue = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
         var userId = Guid.Parse(userIdClaimValue);
@@ -66,11 +64,8 @@ public class Mutation
             throw new Exception("bad");
         }
 
-        var blog = new Blog(user.Id, name);
-        await blogRepository.CreateAsync(blog);
-        await blogRepository.SaveChangesAsync();
-        
-        return blog;
+        var command = new CreateBlogCommand(userId, name);
+        return await createBlogCommandHandler.Handle(command);
     }
 
     [Authorize]
