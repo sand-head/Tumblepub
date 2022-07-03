@@ -1,4 +1,5 @@
 ﻿using HotChocolate.Resolvers;
+using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Models;
@@ -12,12 +13,16 @@ public class UserTypeExtensions
     public async Task<IEnumerable<Blog>> GetBlogs(
         IResolverContext context,
         [Parent] User user,
-        [Service] IQueryableRepository<Blog, Guid> blogRepository)
+        [Service] IQueryHandler<GetBlogsByUserIdQuery, IEnumerable<Blog>> queryHandler)
     {
         return await context.GroupDataLoader<Guid, Blog>(
             async (userIds, token) =>
             {
-                var getBlogsResults = await Task.WhenAll(userIds.Select(async id => await blogRepository.GetByUserIdAsync(id, token)));
+                var getBlogsResults = await Task.WhenAll(userIds.Select(async id =>
+                {
+                    var query = new GetBlogsByUserIdQuery(id);
+                    return await queryHandler.Handle(query, token);
+                }));
                 return getBlogsResults.SelectMany(r => r).ToLookup(b => b.UserId!.Value);
             })
             .LoadAsync(user.Id);
