@@ -27,6 +27,9 @@ public class RenderService : IRenderService
         {
             return Results.NotFound();
         }
+        
+        // todo: get all posts by blog
+        // todo: resolve all external posts (using additional service)
 
         var data = new ThemeVariables(
             Title: blog.Title ?? blog.Name,
