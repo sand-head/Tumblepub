@@ -27,11 +27,7 @@
       {{#each Posts}}
       <article class="prose prose-sm w-full p-4 border border-gray-100 shadow-md flex flex-col lg:prose lg:rounded-xl"
         data-created-at="{{this.CreatedAt}}">
-        {{#each this.Content}}
-        {{#if (eq this.Type "Markdown")}}
         {{this.Content}}
-        {{/if}}
-        {{/each}}
         <!-- todo: tags go here -->
         <div class="flex justify-between">
           <time datetime="{{this.CreatedAt}}" title="{{formatDate this.CreatedAt '%A, %B %-d, %Y %-I:%M %p %Z'}}">
