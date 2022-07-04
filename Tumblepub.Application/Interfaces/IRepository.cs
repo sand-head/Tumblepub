@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Tumblepub.Application.Models;
+using Tumblepub.Application.Aggregates;
 
 namespace Tumblepub.Application.Interfaces;
 

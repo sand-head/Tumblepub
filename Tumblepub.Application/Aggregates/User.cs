@@ -1,7 +1,7 @@
 ﻿using Isopoh.Cryptography.Argon2;
 using Tumblepub.Application.Events;
 
-namespace Tumblepub.Application.Models;
+namespace Tumblepub.Application.Aggregates;
 
 public class User : Aggregate<Guid>
 {

@@ -1,20 +1,20 @@
-﻿using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
+﻿using Tumblepub.Application.Aggregates;
+using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.Post.Commands;
 
-public record CreatePostCommand(Guid BlogId, string Content, List<string> Tags) : ICommand<Models.Post>;
+public record CreatePostCommand(Guid BlogId, string Content, List<string> Tags) : ICommand<Aggregates.Post>;
 
-internal class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, Models.Post>
+internal class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, Aggregates.Post>
 {
-    private readonly IRepository<Models.Post, Guid> _postRepository;
+    private readonly IRepository<Aggregates.Post, Guid> _postRepository;
 
-    public CreatePostCommandHandler(IRepository<Models.Post, Guid> postRepository)
+    public CreatePostCommandHandler(IRepository<Aggregates.Post, Guid> postRepository)
     {
         _postRepository = postRepository;
     }
     
-    public async Task<Models.Post> Handle(CreatePostCommand command, CancellationToken token = default)
+    public async Task<Aggregates.Post> Handle(CreatePostCommand command, CancellationToken token = default)
     {
         var (blogId, content, tags) = command;
         
@@ -22,7 +22,7 @@ internal class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, Mod
         {
             Tags = tags
         };
-        var post = new Models.Post(blogId, postContent);
+        var post = new Aggregates.Post(blogId, postContent);
         
         await _postRepository.CreateAsync(post, token);
         await _postRepository.SaveChangesAsync(token);

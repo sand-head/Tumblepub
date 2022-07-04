@@ -1,4 +1,4 @@
-﻿namespace Tumblepub.Application.Models;
+﻿namespace Tumblepub.Application.Aggregates;
 
 public interface IAggregate<out TId>
 {

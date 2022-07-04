@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Tumblepub.Application.Models;
 
 namespace Tumblepub.Application.Events;
 

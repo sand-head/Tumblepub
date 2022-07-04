@@ -1,9 +1,9 @@
-﻿using Tumblepub.Application.Models;
+﻿namespace Tumblepub.Themes;
 
-namespace Tumblepub.Themes;
+public record RenderedPost(string Content, DateTime Date, string Author);
 
 public record ThemeVariables(
     string Title,
     string? Description,
     string Avatar,
-    List<Post> Posts);
+    IEnumerable<RenderedPost> Posts);

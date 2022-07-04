@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Marten;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 
 namespace Tumblepub.Infrastructure.Repositories;
 

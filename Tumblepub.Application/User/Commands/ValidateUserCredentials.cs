@@ -8,9 +8,9 @@ public record ValidateUserCredentialsCommand(string Email, string Password) : IC
 
 internal class ValidateUserCredentials : ICommandHandler<ValidateUserCredentialsCommand, bool>
 {
-    private readonly IQueryHandler<GetUserByEmailQuery, Models.User?> _getUserByEmailQuery;
+    private readonly IQueryHandler<GetUserByEmailQuery, Aggregates.User?> _getUserByEmailQuery;
 
-    public ValidateUserCredentials(IQueryHandler<GetUserByEmailQuery, Models.User?> getUserByEmailQuery)
+    public ValidateUserCredentials(IQueryHandler<GetUserByEmailQuery, Aggregates.User?> getUserByEmailQuery)
     {
         _getUserByEmailQuery = getUserByEmailQuery;
     }

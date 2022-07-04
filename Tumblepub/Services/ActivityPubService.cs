@@ -1,11 +1,11 @@
 ﻿using Tumblepub.ActivityPub;
 using Tumblepub.ActivityPub.ActivityStreams;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 using Object = Tumblepub.ActivityPub.ActivityStreams.Object;
-using ObjectType = Tumblepub.Application.Models.ObjectType;
+using ObjectType = Tumblepub.Application.Aggregates.ObjectType;
 
 namespace Tumblepub.Services;
 

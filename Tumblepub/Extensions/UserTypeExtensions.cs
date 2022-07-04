@@ -1,8 +1,8 @@
 ﻿using HotChocolate.Resolvers;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 
 namespace Tumblepub.Extensions;
 

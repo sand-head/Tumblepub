@@ -1,20 +1,19 @@
 ﻿using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 
 namespace Tumblepub.Application.User.Queries;
 
-public sealed record GetUserByEmailQuery(string Email) : IQuery<Models.User?>;
+public sealed record GetUserByEmailQuery(string Email) : IQuery<Aggregates.User?>;
 
-internal class GetUserByEmail : IQueryHandler<GetUserByEmailQuery, Models.User?>
+internal class GetUserByEmail : IQueryHandler<GetUserByEmailQuery, Aggregates.User?>
 {
-    private readonly IRepository<Models.User, Guid> _userRepository;
+    private readonly IRepository<Aggregates.User, Guid> _userRepository;
 
-    public GetUserByEmail(IRepository<Models.User, Guid> userRepository)
+    public GetUserByEmail(IRepository<Aggregates.User, Guid> userRepository)
     {
         _userRepository = userRepository;
     }
     
-    public async Task<Models.User?> Handle(GetUserByEmailQuery query, CancellationToken token = default)
+    public async Task<Aggregates.User?> Handle(GetUserByEmailQuery query, CancellationToken token = default)
     {
         return await _userRepository.FirstOrDefaultAsync(u => u.Email == query.Email, token);
     }

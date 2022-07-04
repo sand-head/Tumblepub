@@ -1,8 +1,8 @@
 ﻿using Marten;
 using Marten.Events;
 using Marten.Events.Projections;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Events;
-using Tumblepub.Application.Models;
 
 namespace Tumblepub.Infrastructure.Projections;
 

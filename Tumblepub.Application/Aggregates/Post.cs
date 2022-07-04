@@ -1,6 +1,6 @@
 ﻿using Tumblepub.Application.Events;
 
-namespace Tumblepub.Application.Models;
+namespace Tumblepub.Application.Aggregates;
 
 public class Post : Aggregate<Guid>
 {
@@ -44,6 +44,8 @@ public abstract record PostContent()
     public record External(Uri ExternalId) : PostContent();
 
     public record Deleted() : PostContent();
+
+    public record Shared(Guid OriginalPostId) : PostContent();
 
     public record Markdown(string Content) : PostContent()
     {

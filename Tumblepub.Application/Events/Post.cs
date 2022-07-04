@@ -1,4 +1,4 @@
-﻿using Tumblepub.Application.Models;
+﻿using Tumblepub.Application.Aggregates;
 
 namespace Tumblepub.Application.Events;
 
@@ -11,6 +11,7 @@ public record PostCreated(
 public record PostDiscovered(
     Guid PostId,
     Guid BlogId,
+    Uri ExternalId,
     DateTimeOffset At);
 
 public record PostUpdated(
@@ -23,8 +24,9 @@ public record PostLiked(
     DateTimeOffset At);
 
 public record PostShared(
-    Guid PostId,
+    Guid NewPostId,
     Guid BlogId,
+    Guid OriginalPostId,
     DateTimeOffset At);
 
 public record PostDeleted(

@@ -1,8 +1,8 @@
 ﻿using Marten;
 using Microsoft.Extensions.Logging;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Events;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 using Tumblepub.Infrastructure.Infrastructure;
 
 namespace Tumblepub.Infrastructure.Repositories;

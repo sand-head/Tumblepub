@@ -5,7 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Tumblepub.Application.Models;
+using Tumblepub.Application.Aggregates;
 
 namespace Tumblepub.Infrastructure;
 

@@ -1,6 +1,6 @@
 ﻿using Marten;
 using Microsoft.Extensions.Logging;
-using Tumblepub.Application.Models;
+using Tumblepub.Application.Aggregates;
 
 namespace Tumblepub.Infrastructure.Repositories;
 

@@ -1,6 +1,9 @@
-﻿using Tumblepub.Application.Blog.Queries;
+﻿using Ganss.XSS;
+using Markdig;
+using Tumblepub.Application.Aggregates;
+using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
+using Tumblepub.Application.Post.Queries;
 using Tumblepub.Themes;
 
 namespace Tumblepub.Services;
@@ -12,33 +15,58 @@ public interface IRenderService
 
 public class RenderService : IRenderService
 {
-    private readonly IQueryHandler<GetBlogByNameQuery, Blog?> _queryHandler;
+    private readonly IQueryHandler<GetBlogByNameQuery, Blog?> _getBlogByNameQueryHandler;
+    private readonly IQueryHandler<GetPostsByBlogIdQuery, IEnumerable<Post>> _getPostsByBlogIdQueryHandler;
 
-    public RenderService(IQueryHandler<GetBlogByNameQuery, Blog?> queryHandler)
+    public RenderService(
+        IQueryHandler<GetBlogByNameQuery, Blog?> getBlogByNameQueryHandler,
+        IQueryHandler<GetPostsByBlogIdQuery, IEnumerable<Post>> getPostsByBlogIdQueryHandler)
     {
-        _queryHandler = queryHandler;
+        _getBlogByNameQueryHandler = getBlogByNameQueryHandler;
+        _getPostsByBlogIdQueryHandler = getPostsByBlogIdQueryHandler;
     }
 
     public async Task<IResult> RenderBlogAsync(string name, CancellationToken token = default)
     {
-        var query = new GetBlogByNameQuery(name);
-        var blog = await _queryHandler.Handle(query, token);
+        var blogQuery = new GetBlogByNameQuery(name);
+        var blog = await _getBlogByNameQueryHandler.Handle(blogQuery, token);
         if (blog == null)
         {
             return Results.NotFound();
         }
         
-        // todo: get all posts by blog
-        // todo: resolve all external posts (using additional service)
+        var postsQuery = new GetPostsByBlogIdQuery(blog.Id, 0, 25);
+        var posts = await _getPostsByBlogIdQueryHandler.Handle(postsQuery, token);
 
+        var renderedPosts = await Task.WhenAll(posts.Select(p => RenderPostAsync(p, token)));
         var data = new ThemeVariables(
             Title: blog.Title ?? blog.Name,
             Description: blog.Description,
             Avatar: $"/api/assets/avatar/{blog.Name}",
-            Posts: new List<Post>());
+            Posts: renderedPosts);
 
         // todo: add a ThemeService to allow for custom themes
         var page = DefaultTheme.Template.Value(data);
         return Results.Content(page, "text/html");
+    }
+
+    private Task<RenderedPost> RenderPostAsync(Post post, CancellationToken token = default)
+    {
+        // todo: resolve all external posts (using additional service)
+        if (post.Content is not PostContent.Markdown markdown)
+        {
+            throw new Exception("Post content is not Markdown");
+        }
+        
+        // convert Markdown to HTML
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Build();
+        var html = Markdown.ToHtml(markdown.Content, pipeline);
+        
+        // sanitize the resulting HTML
+        var sanitizedHtml = new HtmlSanitizer().Sanitize(html);
+        
+        return Task.FromResult(new RenderedPost(sanitizedHtml, post.CreatedAt.UtcDateTime, post.BlogId.ToString()));
     }
 }

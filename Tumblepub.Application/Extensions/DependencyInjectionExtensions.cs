@@ -10,7 +10,7 @@ public static class DependencyInjectionExtensions
         // register all command/query handlers
         return services
             .Scan(scan => scan
-                .FromAssembliesOf(typeof(Models.Blog))
+                .FromAssembliesOf(typeof(Aggregates.Blog))
                 .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<,>)))
                     .AsImplementedInterfaces()
                     .WithScopedLifetime()

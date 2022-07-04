@@ -1,4 +1,4 @@
-﻿using Tumblepub.Application.Models;
+﻿using Tumblepub.Application.Aggregates;
 
 namespace Tumblepub.Extensions;
 

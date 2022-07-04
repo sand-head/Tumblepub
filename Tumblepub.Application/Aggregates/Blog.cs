@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Tumblepub.Application.Events;
 
-namespace Tumblepub.Application.Models;
+namespace Tumblepub.Application.Aggregates;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class Blog : Aggregate<Guid>

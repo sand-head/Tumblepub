@@ -1,10 +1,10 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Commands;
 using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 using Tumblepub.Application.Post.Commands;
 using Tumblepub.Application.User.Commands;
 using Tumblepub.Application.User.Queries;

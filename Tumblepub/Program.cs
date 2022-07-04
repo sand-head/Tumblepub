@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.Json;
 using Tumblepub;
 using Tumblepub.ActivityPub.Extensions;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 using Tumblepub.Configuration;
 using Tumblepub.Extensions;
 using Tumblepub.Infrastructure;
@@ -37,6 +37,7 @@ builder.Services
 builder.Services
     .AddApplication()
     .AddInfrastructure(config.GetConnectionString("Database"), builder.Environment.IsDevelopment())
+    .AddMemoryCache()
     .AddScoped<IRenderService, RenderService>();
 
 // add GraphQL support using HotChocolate

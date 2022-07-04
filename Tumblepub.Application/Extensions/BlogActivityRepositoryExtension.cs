@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Interfaces;
-using Tumblepub.Application.Models;
 
 namespace Tumblepub.Application.Extensions;
 

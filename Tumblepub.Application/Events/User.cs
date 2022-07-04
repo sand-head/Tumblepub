@@ -1,6 +1,4 @@
-﻿using Tumblepub.Application.Models;
-
-namespace Tumblepub.Application.Events;
+﻿namespace Tumblepub.Application.Events;
 
 /// <summary>
 /// A <see cref="Projections.User"/> has been created.
