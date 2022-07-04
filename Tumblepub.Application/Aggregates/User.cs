@@ -16,22 +16,21 @@ public class User : Aggregate<Guid>
     {
         var passwordHash = Argon2.Hash(password).TrimEnd('\0');
         var postCreated = new UserCreated(Guid.NewGuid(), email, passwordHash, DateTimeOffset.UtcNow);
-        
         Enqueue(postCreated);
-        Initialize(postCreated);
+        
+        Id = postCreated.UserId;
+        Email = postCreated.Email;
+        PasswordHash = postCreated.PasswordHash;
+        UpdatedAt = CreatedAt = postCreated.At;
     }
 
     public User(UserCreated e)
-    {
-        Initialize(e);
-    }
-    
-    private void Initialize(UserCreated e)
     {
         Id = e.UserId;
         Email = e.Email;
         PasswordHash = e.PasswordHash;
         UpdatedAt = CreatedAt = e.At;
     }
+    
     internal bool ShouldDelete(UserDeleted e) => true;
 }

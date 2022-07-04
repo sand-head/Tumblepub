@@ -36,14 +36,24 @@ public class Blog : Aggregate<Guid>
             $"-----BEGIN RSA PRIVATE KEY-----\n{string.Join('\n', privateKeyChunked)}\n-----END RSA PRIVATE KEY-----\n";
         
         var blogCreated = new BlogCreated(Guid.NewGuid(), userId, name, publicKey, privateKey, DateTimeOffset.UtcNow);
-        
         Enqueue(blogCreated);
-        Initialize(blogCreated);
+        
+        Id = blogCreated.BlogId;
+        UserId = blogCreated.UserId;
+        Name = blogCreated.BlogName;
+        PublicKey = blogCreated.PublicKey;
+        PrivateKey = blogCreated.PrivateKey;
+        UpdatedAt = CreatedAt = blogCreated.At;
     }
 
     public Blog(BlogCreated e)
     {
-        Initialize(e);
+        Id = e.BlogId;
+        UserId = e.UserId;
+        Name = e.BlogName;
+        PublicKey = e.PublicKey;
+        PrivateKey = e.PrivateKey;
+        UpdatedAt = CreatedAt = e.At;
     }
     public Blog(BlogDiscovered e)
     {
@@ -53,15 +63,6 @@ public class Blog : Aggregate<Guid>
         UpdatedAt = CreatedAt = e.At;
     }
 
-    private void Initialize(BlogCreated e)
-    {
-        Id = e.BlogId;
-        UserId = e.UserId;
-        Name = e.BlogName;
-        PublicKey = e.PublicKey;
-        PrivateKey = e.PrivateKey;
-        UpdatedAt = CreatedAt = e.At;
-    }
     internal void Apply(BlogMetadataUpdated e)
     {
         Title = e.Title ?? Title;

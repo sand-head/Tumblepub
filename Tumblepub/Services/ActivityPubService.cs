@@ -154,7 +154,7 @@ public class ActivityPubService : IActivityPubService
 
         return post.Content switch
         {
-            PostContent.Markdown textContent => postObject with
+            PostContent.Internal textContent => postObject with
             {
                 Content = textContent.Content
             },

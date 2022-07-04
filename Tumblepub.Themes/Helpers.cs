@@ -53,6 +53,7 @@ public static class Helpers
             var date = args[0] switch
             {
                 DateTime d => d,
+                DateTimeOffset dto => dto.DateTime,
                 string s => DateTime.Parse(s),
                 _ => throw new HandlebarsException("Helper \"formatDate\" requires the first argument be a valid date")
             };

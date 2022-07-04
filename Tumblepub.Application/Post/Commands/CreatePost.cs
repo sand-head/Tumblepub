@@ -18,7 +18,7 @@ internal class CreatePostCommandHandler : ICommandHandler<CreatePostCommand, Agg
     {
         var (blogId, content, tags) = command;
         
-        var postContent = new PostContent.Markdown(content)
+        var postContent = new PostContent.Internal(content)
         {
             Tags = tags
         };

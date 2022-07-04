@@ -20,14 +20,14 @@
       </div>
       <h1 class="my-2 text-2xl font-bold">{{Title}}</h1>
       {{#if Description}}
-      <p>{{Description}}</p>
+      <p>{{{Description}}}</p>
       {{/if}}
     </header>
     <main class="flex flex-col col-span-2 items-center">
       {{#each Posts}}
       <article class="prose prose-sm w-full p-4 border border-gray-100 shadow-md flex flex-col lg:prose lg:rounded-xl"
         data-created-at="{{this.CreatedAt}}">
-        {{this.Content}}
+        {{{this.Content}}}
         <!-- todo: tags go here -->
         <div class="flex justify-between">
           <time datetime="{{this.CreatedAt}}" title="{{formatDate this.CreatedAt '%A, %B %-d, %Y %-I:%M %p %Z'}}">

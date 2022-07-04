@@ -4,11 +4,11 @@ namespace Tumblepub.Application.User.Queries;
 
 public sealed record GetUserByEmailQuery(string Email) : IQuery<Aggregates.User?>;
 
-internal class GetUserByEmail : IQueryHandler<GetUserByEmailQuery, Aggregates.User?>
+internal class GetUserByEmailQueryHandler : IQueryHandler<GetUserByEmailQuery, Aggregates.User?>
 {
     private readonly IRepository<Aggregates.User, Guid> _userRepository;
 
-    public GetUserByEmail(IRepository<Aggregates.User, Guid> userRepository)
+    public GetUserByEmailQueryHandler(IRepository<Aggregates.User, Guid> userRepository)
     {
         _userRepository = userRepository;
     }

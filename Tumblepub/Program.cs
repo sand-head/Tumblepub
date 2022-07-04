@@ -40,6 +40,9 @@ builder.Services
     .AddMemoryCache()
     .AddScoped<IRenderService, RenderService>();
 
+// add AutoMapper configuration
+builder.Services.AddAutoMapper(typeof(GraphQLProfile));
+
 // add GraphQL support using HotChocolate
 builder.Services
     .AddGraphQLServer()
@@ -48,9 +51,7 @@ builder.Services
     .AddMutationType<Mutation>()
     .AddUnionType<PostContent>()
     .AddType<PostContent.External>()
-    .AddType<PostContent.Markdown>()
-    .AddTypeExtension<UserTypeExtensions>()
-    .AddTypeExtension<BlogTypeExtensions>()
+    .AddType<PostContent.Internal>()
     .BindRuntimeType<JsonDocument, AnyType>();
 
 builder.Services

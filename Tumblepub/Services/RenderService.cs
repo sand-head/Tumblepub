@@ -15,6 +15,14 @@ public interface IRenderService
 
 public class RenderService : IRenderService
 {
+    private static readonly HtmlSanitizer Sanitizer = new(
+        allowedCssProperties: HtmlSanitizer.DefaultAllowedCssProperties.Concat(new[]
+        {
+            "-webkit-text-stroke",
+            "-webkit-text-stroke-color",
+            "-webkit-text-stroke-width",
+        }));
+    
     private readonly IQueryHandler<GetBlogByNameQuery, Blog?> _getBlogByNameQueryHandler;
     private readonly IQueryHandler<GetPostsByBlogIdQuery, IEnumerable<Post>> _getPostsByBlogIdQueryHandler;
 
@@ -53,7 +61,7 @@ public class RenderService : IRenderService
     private Task<RenderedPost> RenderPostAsync(Post post, CancellationToken token = default)
     {
         // todo: resolve all external posts (using additional service)
-        if (post.Content is not PostContent.Markdown markdown)
+        if (post.Content is not PostContent.Internal markdown)
         {
             throw new Exception("Post content is not Markdown");
         }
@@ -65,8 +73,8 @@ public class RenderService : IRenderService
         var html = Markdown.ToHtml(markdown.Content, pipeline);
         
         // sanitize the resulting HTML
-        var sanitizedHtml = new HtmlSanitizer().Sanitize(html);
+        var sanitizedHtml = Sanitizer.Sanitize(html);
         
-        return Task.FromResult(new RenderedPost(sanitizedHtml, post.CreatedAt.UtcDateTime, post.BlogId.ToString()));
+        return Task.FromResult(new RenderedPost(sanitizedHtml, post.CreatedAt.DateTime, post.BlogId.ToString()));
     }
 }

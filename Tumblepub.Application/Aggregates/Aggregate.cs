@@ -14,7 +14,7 @@ public interface ISelfAggregate<out TId> : IAggregate<TId>
 public class ReadOnlyAggregate<TId> : IAggregate<TId>
     where TId : notnull
 {
-    public TId Id { get; protected set; } = default!;
+    public TId Id { get; init; } = default!;
     public int Version { get; protected set; }
 }
 
