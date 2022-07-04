@@ -11,7 +11,6 @@ using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Extensions;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Configuration;
-using Tumblepub.Extensions;
 using Tumblepub.Infrastructure;
 using Tumblepub.Infrastructure.Extensions;
 using Tumblepub.Services;
@@ -121,17 +120,31 @@ app.UseAuthorization();
 
 app.UseActivityPub();
 
+app.Use(async (context, next) =>
+{
+    var requestPath = context.Request.Path.Value;
+    var singleUserConfig = context.RequestServices.GetService<IOptions<SingleUserConfiguration>>()?.Value;
+    
+    // if "single user" is enabled, redirect all requests to "/" to the single user's blog
+    if (singleUserConfig != null && !(requestPath.StartsWith("/@") || requestPath.StartsWith("/api")))
+    {
+        var newPath = $"/@{singleUserConfig.Username}{requestPath}";
+        if (newPath.EndsWith("/"))
+        {
+            newPath = newPath[..^1];
+        }
+        
+        context.Request.Path = newPath;
+    }
+    
+    await next();
+});
+
+app.UseRouting();
+
 app.MapGet("/@{name}", async (string name, IRenderService renderService) =>
 {
     return await renderService.RenderBlogAsync(name);
-});
-
-// show blog in "single user" mode
-app.MapGet("/", async (IOptions<SingleUserConfiguration> singleUserConfig, IRenderService renderService) =>
-{
-    return singleUserConfig.Value is not null
-        ? await renderService.RenderBlogAsync(singleUserConfig.Value.Username)
-        : Results.NotFound();
 });
 
 // maps "/graphql" to the GraphQL API endpoint
