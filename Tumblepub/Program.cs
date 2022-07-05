@@ -36,6 +36,7 @@ builder.Services
 builder.Services
     .AddApplication()
     .AddInfrastructure(config.GetConnectionString("Database"), builder.Environment.IsDevelopment())
+    .AddActivityPub()
     .AddMemoryCache()
     .AddScoped<IRenderService, RenderService>();
 
@@ -78,11 +79,6 @@ builder.Services
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
-
-builder.Services.AddActivityPub<ActivityPubService>(options =>
-{
-    options.MapActorProfileUrl = (actor) => $"/@{actor.Name}";
-});
 
 builder.Services.AddControllers();
 

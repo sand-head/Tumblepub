@@ -10,4 +10,8 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Tumblepub.Application\Tumblepub.Application.csproj" />
+  </ItemGroup>
+
 </Project>
