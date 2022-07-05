@@ -95,6 +95,15 @@ public class ActivityPubService : IActivityPubService
         };
     }
 
+    public Task<Collection> GetActorFollowers(Guid actorId, CancellationToken token = default)
+    {
+        var followersUrl = string.Format(_options.ActorFollowersRouteTemplate, actorId);
+        return Task.FromResult(new Collection()
+        {
+            Id = new(followersUrl, UriKind.Relative),
+        });
+    }
+
     private Actor MapBlogToActor(Blog blog)
     {
         var actorId = string.Format(_options.ActorRouteTemplate, blog.Id);

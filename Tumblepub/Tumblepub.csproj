@@ -10,8 +10,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-		<PackageReference Include="HotChocolate.AspNetCore" Version="12.11.1" />
-		<PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.11.1" />
+		<PackageReference Include="HotChocolate.AspNetCore" Version="12.12.0" />
+		<PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.12.0" />
 		<PackageReference Include="HtmlSanitizer" Version="7.1.512" />
 		<PackageReference Include="Isopoh.Cryptography.Argon2" Version="1.1.12" />
 		<PackageReference Include="Jdenticon.AspNetCore" Version="3.1.2" />

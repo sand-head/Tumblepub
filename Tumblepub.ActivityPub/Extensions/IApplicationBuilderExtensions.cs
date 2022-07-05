@@ -66,8 +66,9 @@ public static class IApplicationBuilderExtensions
                 using var scope = context.RequestServices.CreateScope();
                 var activityPubService = scope.ServiceProvider.GetRequiredService<IActivityPubService>();
 
-                // get userId from route values
-                var userId = Guid.Parse(context.GetRouteData().Values["userId"]!.ToString()!);
+                // get user ID from route values
+                var routeValues = context.GetRouteData().Values;
+                var userId = Guid.Parse(routeValues["0"]!.ToString()!);
                 var actor = await activityPubService.GetActor(userId, context.RequestAborted);
                 if (actor == null)
                 {
@@ -163,7 +164,7 @@ public static class IApplicationBuilderExtensions
         }
 
         // if it's an ActivityPub header value, don't filter
-        if (!header.Any(v => IsActivityPubHeaderValue(v)))
+        if (!header.SelectMany(h => h.Split(',')).Any(v => IsActivityPubHeaderValue(v.Trim())))
         {
             return false;
         }
