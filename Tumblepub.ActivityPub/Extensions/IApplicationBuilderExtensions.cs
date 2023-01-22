@@ -7,6 +7,9 @@ using Microsoft.Extensions.Primitives;
 using System.Net;
 using Tumblepub.ActivityPub.Endpoints;
 using Tumblepub.ActivityPub.Webfinger;
+using Tumblepub.Application.Aggregates;
+using Tumblepub.Application.Blog.Queries;
+using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.ActivityPub.Extensions;
 
@@ -14,8 +17,6 @@ public static class IApplicationBuilderExtensions
 {
     public static IApplicationBuilder UseActivityPub(this IApplicationBuilder app)
     {
-        var options = app.ApplicationServices.GetRequiredService<ActivityPubOptions>();
-
         // map ActivityPub endpoints
         // we only want to route to these if the client supports some specific content types
         // otherwise, ideally, it'll fall back to other routes
@@ -59,26 +60,25 @@ public static class IApplicationBuilderExtensions
             .MapWellKnownWebfingerEndpoint()
             .MapWellKnownNodeInfoEndpoint();
 
-        if (options.MapActorProfileUrl != null)
+        builder.MapGet(ActivityPubConstants.ActorRoute, async context =>
         {
-            builder.MapGet(options.ActorRouteTemplate, async context =>
+            using var scope = context.RequestServices.CreateScope();
+            var queryHandler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetBlogByIdQuery, Blog?>>();
+
+            // get blog ID from route values
+            var routeValues = context.GetRouteData().Values;
+            var blogId = Guid.Parse(routeValues["0"]!.ToString()!);
+
+            var query = new GetBlogByIdQuery(blogId);
+            var blog = await queryHandler.Handle(query, context.RequestAborted);
+            if (blog == null)
             {
-                using var scope = context.RequestServices.CreateScope();
-                var activityPubService = scope.ServiceProvider.GetRequiredService<IActivityPubService>();
+                return;
+            }
 
-                // get userId from route values
-                var userId = Guid.Parse(context.GetRouteData().Values["userId"]!.ToString()!);
-                var actor = await activityPubService.GetActor(userId, context.RequestAborted);
-                if (actor == null)
-                {
-                    return;
-                }
-
-                // redirect to the generated URL
-                var redirectUrl = options.MapActorProfileUrl(actor);
-                context.Response.Redirect(redirectUrl);
-            });
-        }
+            // redirect to the generated URL
+            context.Response.Redirect($"/@{blog.Name}");
+        });
 
         return app.UseRouter(builder.Build());
     }
@@ -112,9 +112,11 @@ public static class IApplicationBuilderExtensions
 
             // get the actor by their name
             using var scope = context.RequestServices.CreateScope();
-            var activityPubContext = scope.ServiceProvider.GetRequiredService<IActivityPubService>();
-            var actor = await activityPubContext.GetActorByName(name, context.RequestAborted);
-            if (actor == null)
+            var queryHandler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetBlogByNameQuery, Blog?>>();
+            
+            var query = new GetBlogByNameQuery(name);
+            var blog = await queryHandler.Handle(query, context.RequestAborted);
+            if (blog == null)
             {
                 return;
             }
@@ -129,7 +131,7 @@ public static class IApplicationBuilderExtensions
                     {
                         Rel = "self",
                         Type = "application/activity+json",
-                        Href = domainWithSchemeAndPort + actor.Id
+                        Href = domainWithSchemeAndPort + blog.Id
                     }
                 }
             });
@@ -163,7 +165,7 @@ public static class IApplicationBuilderExtensions
         }
 
         // if it's an ActivityPub header value, don't filter
-        if (!header.Any(v => IsActivityPubHeaderValue(v)))
+        if (!header.SelectMany(h => h.Split(',')).Any(v => IsActivityPubHeaderValue(v.Trim())))
         {
             return false;
         }
