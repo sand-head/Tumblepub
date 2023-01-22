@@ -1,4 +1,4 @@
-﻿using Ganss.XSS;
+﻿using Ganss.Xss;
 using Markdig;
 using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Queries;
@@ -15,16 +15,18 @@ public interface IRenderService
 
 public class RenderService : IRenderService
 {
-    private static readonly HtmlSanitizer Sanitizer = new(
-        allowedCssProperties: HtmlSanitizer.DefaultAllowedCssProperties.Concat(new[]
-        {
-            "-webkit-text-stroke",
-            "-webkit-text-stroke-color",
-            "-webkit-text-stroke-width",
-        }));
+    private static readonly HtmlSanitizer Sanitizer;
     
     private readonly IQueryHandler<GetBlogByNameQuery, Blog?> _getBlogByNameQueryHandler;
     private readonly IQueryHandler<GetPostsByBlogIdQuery, IEnumerable<Post>> _getPostsByBlogIdQueryHandler;
+    
+    static RenderService()
+    {
+        Sanitizer = new();
+        Sanitizer.AllowedCssProperties.Add("-webkit-text-stroke");
+        Sanitizer.AllowedCssProperties.Add("-webkit-text-stroke-color");
+        Sanitizer.AllowedCssProperties.Add("-webkit-text-stroke-width");
+    }
 
     public RenderService(
         IQueryHandler<GetBlogByNameQuery, Blog?> getBlogByNameQueryHandler,
