@@ -16,12 +16,12 @@ public static class IServiceCollectionExtensions
     internal static IServiceCollection AddDefaultEndpoints(this IServiceCollection services)
     {
         return services
-            .AddEndpoint<GetActorActivityEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorActivityRoute, "{userId}", "{activityId}"))
-            .AddEndpoint<GetActorEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorRoute, "{userId}"))
-            .AddEndpoint<GetActorFollowersEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorFollowersRoute, "{userId}"))
-            .AddEndpoint<GetActorObjectEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorObjectRoute, "{userId}", "{objectId}"))
-            .AddEndpoint<GetActorOutboxEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorOutboxRoute, "{userId}"))
-            .AddEndpoint<PostActorInboxEndpoint>(HttpMethod.Post, string.Format(ActivityPubConstants.ActorInboxRoute, "{userId}"));
+            .AddEndpoint<GetActorActivityEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorActivityRoute, "{actorId}", "{activityId}"))
+            .AddEndpoint<GetActorEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorRoute, "{actorId}"))
+            .AddEndpoint<GetActorFollowersEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorFollowersRoute, "{actorId}"))
+            .AddEndpoint<GetActorObjectEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorObjectRoute, "{actorId}", "{objectId}"))
+            .AddEndpoint<GetActorOutboxEndpoint>(HttpMethod.Get, string.Format(ActivityPubConstants.ActorOutboxRoute, "{actorId}"))
+            .AddEndpoint<PostActorInboxEndpoint>(HttpMethod.Post, string.Format(ActivityPubConstants.ActorInboxRoute, "{actorId}"));
     }
 
     public static IServiceCollection AddEndpoint<TEndpoint>(this IServiceCollection services, HttpMethod method, string path)

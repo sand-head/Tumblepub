@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.Application", "Tu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.Infrastructure", "Tumblepub.Infrastructure\Tumblepub.Infrastructure.csproj", "{B40F45EF-F3D1-4F97-861B-E8A967C130F7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ActivityPub", "ActivityPub", "{F6321A8E-F118-4FDC-9F66-571A37061226}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{F6321A8E-F118-4FDC-9F66-571A37061226}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

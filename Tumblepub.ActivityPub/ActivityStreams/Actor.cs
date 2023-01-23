@@ -9,7 +9,7 @@ public record PublicKey
     public string PublicKeyPem { get; init; } = string.Empty;
 }
 
-public record Actor(string Type) : Object(Type)
+public record Actor(string Type) : ActivityStreamsObject(Type)
 {
     public static new readonly string[] Types = new[]
     {

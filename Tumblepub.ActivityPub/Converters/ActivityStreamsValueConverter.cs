@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Tumblepub.ActivityPub.ActivityStreams;
-using Object = Tumblepub.ActivityPub.ActivityStreams.Object;
 
 namespace Tumblepub.ActivityPub.Converters;
 
@@ -39,9 +38,9 @@ internal class ActivityStreamsValueConverter : JsonConverter<ActivityStreamsValu
         {
             type = typeof(Link);
         }
-        else if (Object.Types.Contains(activityStreamsType))
+        else if (ActivityStreamsObject.Types.Contains(activityStreamsType))
         {
-            type = typeof(Object);
+            type = typeof(ActivityStreamsObject);
         }
         else if (OrderedCollection.Types.Contains(activityStreamsType))
         {

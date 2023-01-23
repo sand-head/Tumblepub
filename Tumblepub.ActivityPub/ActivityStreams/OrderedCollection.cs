@@ -2,7 +2,7 @@
 
 namespace Tumblepub.ActivityPub.ActivityStreams;
 
-public record OrderedCollection() : Object(Types[0])
+public record OrderedCollection() : ActivityStreamsObject(Types[0])
 {
     public static new readonly string[] Types = new[] { "OrderedCollection" };
 
@@ -11,7 +11,7 @@ public record OrderedCollection() : Object(Types[0])
     public Uri FirstUrl { get; init; } = default!;
 }
 
-public record OrderedCollection<T>() : Object(Types[0])
+public record OrderedCollection<T>() : ActivityStreamsObject(Types[0])
 {
     public static new readonly string[] Types = new[] { "OrderedCollectionPage" };
 

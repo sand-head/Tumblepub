@@ -3,7 +3,7 @@ using Tumblepub.ActivityPub.Converters;
 
 namespace Tumblepub.ActivityPub.ActivityStreams;
 
-public record Activity(string Type) : Object(Type)
+public record Activity(string Type) : ActivityStreamsObject(Type)
 {
     public static new readonly string[] Types = new[]
     {
