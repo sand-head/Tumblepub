@@ -1,5 +1,8 @@
 ﻿using HandlebarsDotNet;
 using System.Reflection;
+using AngleSharp;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 
 namespace Tumblepub.Themes;
 
@@ -19,7 +22,19 @@ public static class DefaultTheme
             throw new InvalidOperationException("Could not load default theme as embedded resource.");
         }
 
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
+        var parser = new HtmlParser();
+        var document = parser.ParseDocument(stream);
+        var body = document.Body;
+        
+        // inject Blazor stuff into the document
+        var blazorCustomElementScript = document.CreateElement("script");
+        blazorCustomElementScript.SetAttribute("src", "_content/Microsoft.AspNetCore.Components.CustomElements/BlazorCustomElements.js");
+        body.AppendChild(blazorCustomElementScript);
+        
+        var blazorScript = document.CreateElement("script");
+        blazorScript.SetAttribute("src", "_framework/blazor.webassembly.js");
+        body.AppendChild(blazorScript);
+        
+        return document.DocumentElement.ToHtml();
     }
 }

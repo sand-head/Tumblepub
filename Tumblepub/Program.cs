@@ -109,10 +109,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseWebAssemblyDebugging();
 app.UseSerilogRequestLogging();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseActivityPub();
 
@@ -122,7 +120,7 @@ app.Use(async (context, next) =>
     var singleUserConfig = context.RequestServices.GetService<IOptions<SingleUserConfiguration>>()?.Value;
     
     // if "single user" is enabled, redirect all requests to "/" to the single user's blog
-    if (singleUserConfig != null && !(requestPath.StartsWith("/@") || requestPath.StartsWith("/api")))
+    if (singleUserConfig != null && !(requestPath.StartsWith("/@") || requestPath.StartsWith("/api") || requestPath.StartsWith("/_")))
     {
         var newPath = $"/@{singleUserConfig.Username}{requestPath}";
         if (newPath.EndsWith("/"))
@@ -136,7 +134,13 @@ app.Use(async (context, next) =>
     await next();
 });
 
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
+
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGet("/@{name}", async (string name, IRenderService renderService) =>
 {

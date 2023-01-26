@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.Infrastructure", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{F6321A8E-F118-4FDC-9F66-571A37061226}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tumblepub.Components", "Tumblepub.Components\Tumblepub.Components.csproj", "{C28E1C56-27E0-4A07-8A9C-AAA3D09A03D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{B40F45EF-F3D1-4F97-861B-E8A967C130F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B40F45EF-F3D1-4F97-861B-E8A967C130F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B40F45EF-F3D1-4F97-861B-E8A967C130F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C28E1C56-27E0-4A07-8A9C-AAA3D09A03D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C28E1C56-27E0-4A07-8A9C-AAA3D09A03D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C28E1C56-27E0-4A07-8A9C-AAA3D09A03D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C28E1C56-27E0-4A07-8A9C-AAA3D09A03D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
