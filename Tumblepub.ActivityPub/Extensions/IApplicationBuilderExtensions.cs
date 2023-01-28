@@ -5,12 +5,11 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Net;
-using MediatR;
+using Mediator;
 using Tumblepub.ActivityPub.Endpoints;
 using Tumblepub.ActivityPub.Webfinger;
 using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Queries;
-using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.ActivityPub.Extensions;
 
@@ -113,10 +112,10 @@ public static class IApplicationBuilderExtensions
 
             // get the actor by their name
             using var scope = context.RequestServices.CreateScope();
-            var queryHandler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetBlogByNameQuery, Blog?>>();
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
             
             var query = new GetBlogByNameQuery(name);
-            var blog = await queryHandler.Handle(query, context.RequestAborted);
+            var blog = await mediator.Send(query, context.RequestAborted);
             if (blog == null)
             {
                 return;

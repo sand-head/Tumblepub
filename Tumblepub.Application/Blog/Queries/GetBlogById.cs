@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using Mediator;
 using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.Blog.Queries;
 
 public record GetBlogByIdQuery(Guid Id) : IRequest<Aggregates.Blog?>;
 
-internal class GetBlogByIdQueryHandler : IRequestHandler<GetBlogByIdQuery, Aggregates.Blog?>
+public class GetBlogByIdQueryHandler : IRequestHandler<GetBlogByIdQuery, Aggregates.Blog?>
 {
     private readonly IReadOnlyRepository<Aggregates.Blog, Guid> _blogRepository;
 
@@ -14,7 +14,7 @@ internal class GetBlogByIdQueryHandler : IRequestHandler<GetBlogByIdQuery, Aggre
         _blogRepository = blogRepository;
     }
     
-    public async Task<Aggregates.Blog?> Handle(GetBlogByIdQuery query, CancellationToken token = default)
+    public async ValueTask<Aggregates.Blog?> Handle(GetBlogByIdQuery query, CancellationToken token = default)
     {
         return await _blogRepository.GetByIdAsync(query.Id, token);
     }

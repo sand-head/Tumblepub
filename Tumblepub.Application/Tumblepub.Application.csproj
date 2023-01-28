@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="Isopoh.Cryptography.Argon2" Version="1.1.12" />
-      <PackageReference Include="MediatR" Version="11.1.0" />
+      <PackageReference Include="Mediator.Abstractions" Version="2.0.30" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
       <PackageReference Include="Scrutor" Version="4.2.0" />

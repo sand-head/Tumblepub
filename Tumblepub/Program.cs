@@ -5,7 +5,6 @@ using Serilog;
 using Serilog.Events;
 using System.Text;
 using System.Text.Json;
-using MediatR;
 using Tumblepub;
 using Tumblepub.ActivityPub.Extensions;
 using Tumblepub.Application.Aggregates;
@@ -40,7 +39,7 @@ builder.Services
     .AddActivityPub()
     .AddMemoryCache()
     .AddScoped<IRenderService, RenderService>()
-    .AddMediatR();
+    .AddMediator();
 
 // add AutoMapper configuration
 builder.Services.AddAutoMapper(typeof(GraphQLProfile));

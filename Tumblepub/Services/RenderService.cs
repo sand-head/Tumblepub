@@ -1,5 +1,6 @@
 ﻿using Ganss.Xss;
 using Markdig;
+using Mediator;
 using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Interfaces;
@@ -16,9 +17,7 @@ public interface IRenderService
 public class RenderService : IRenderService
 {
     private static readonly HtmlSanitizer Sanitizer;
-    
-    private readonly IQueryHandler<GetBlogByNameQuery, Blog?> _getBlogByNameQueryHandler;
-    private readonly IQueryHandler<GetPostsByBlogIdQuery, IEnumerable<Post>> _getPostsByBlogIdQueryHandler;
+    private readonly IMediator _mediator;
     
     static RenderService()
     {
@@ -28,25 +27,22 @@ public class RenderService : IRenderService
         Sanitizer.AllowedCssProperties.Add("-webkit-text-stroke-width");
     }
 
-    public RenderService(
-        IQueryHandler<GetBlogByNameQuery, Blog?> getBlogByNameQueryHandler,
-        IQueryHandler<GetPostsByBlogIdQuery, IEnumerable<Post>> getPostsByBlogIdQueryHandler)
+    public RenderService(IMediator mediator)
     {
-        _getBlogByNameQueryHandler = getBlogByNameQueryHandler;
-        _getPostsByBlogIdQueryHandler = getPostsByBlogIdQueryHandler;
+        _mediator = mediator;
     }
 
     public async Task<IResult> RenderBlogAsync(string name, CancellationToken token = default)
     {
         var blogQuery = new GetBlogByNameQuery(name);
-        var blog = await _getBlogByNameQueryHandler.Handle(blogQuery, token);
+        var blog = await _mediator.Send(blogQuery, token);
         if (blog == null)
         {
             return Results.NotFound();
         }
         
         var postsQuery = new GetPostsByBlogIdQuery(blog.Id, 0, 25);
-        var posts = await _getPostsByBlogIdQueryHandler.Handle(postsQuery, token);
+        var posts = await _mediator.Send(postsQuery, token);
 
         var renderedPosts = await Task.WhenAll(posts.Select(p => RenderPostAsync(p, token)));
         var data = new ThemeVariables(

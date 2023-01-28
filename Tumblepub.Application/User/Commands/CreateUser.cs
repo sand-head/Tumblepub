@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using Mediator;
 using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.User.Commands;
 
-public record CreateUserCommand(string Email, string Username, string Password) : IRequest<Aggregates.User>;
+public record CreateUserCommand(string Email, string Username, string Password) : ICommand<Aggregates.User>;
 
-internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Aggregates.User>
+public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, Aggregates.User>
 {
     private readonly IRepository<Aggregates.User, Guid> _userRepository;
     private readonly IRepository<Aggregates.Blog, Guid> _blogRepository;
@@ -16,7 +16,7 @@ internal class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Agg
         _blogRepository = blogRepository;
     }
     
-    public async Task<Aggregates.User> Handle(CreateUserCommand command, CancellationToken token = default)
+    public async ValueTask<Aggregates.User> Handle(CreateUserCommand command, CancellationToken token = default)
     {
         var (email, name, password) = command;
         

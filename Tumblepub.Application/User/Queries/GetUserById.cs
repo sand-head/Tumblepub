@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using Mediator;
 using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.User.Queries;
 
-public sealed record GetUserByIdQuery(Guid Id) : IRequest<Aggregates.User?>;
+public sealed record GetUserByIdQuery(Guid Id) : IQuery<Aggregates.User?>;
 
-internal class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Aggregates.User?>
+public class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, Aggregates.User?>
 {
     private readonly IRepository<Aggregates.User, Guid> _userRepository;
 
@@ -14,7 +14,7 @@ internal class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Aggre
         _userRepository = userRepository;
     }
     
-    public async Task<Aggregates.User?> Handle(GetUserByIdQuery query, CancellationToken token = default)
+    public async ValueTask<Aggregates.User?> Handle(GetUserByIdQuery query, CancellationToken token = default)
     {
         return await _userRepository.GetByIdAsync(query.Id, token);
     }

@@ -1,6 +1,7 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
 using AutoMapper;
+using Mediator;
 using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Commands;
 using Tumblepub.Application.Blog.Queries;
@@ -21,31 +22,30 @@ public class Mutation
         string email,
         string password,
         string name,
-        [Service] ICommandHandler<CreateUserCommand, User> createUserCommandHandler,
+        [Service] IMediator mediator,
         [Service] JwtAuthenticationManager authenticationManager,
         CancellationToken token)
     {
         var command = new CreateUserCommand(email, name, password);
-        var user = await createUserCommandHandler.Handle(command, token);
+        var user = await mediator.Send(command, token);
 
         var result = authenticationManager.GenerateTokens(user);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
 
     public async Task<AuthResult> Login(string email, string password,
-        [Service] ICommandHandler<ValidateUserCredentialsCommand, bool> validateCommandHandler,
-        [Service] IQueryHandler<GetUserByEmailQuery, User?> getByEmailQueryHandler,
+        [Service] IMediator mediator,
         [Service] JwtAuthenticationManager authenticationManager,
         CancellationToken token)
     {
         var validateCommand = new ValidateUserCredentialsCommand(email, password);
-        if (!await validateCommandHandler.Handle(validateCommand, token))
+        if (!await mediator.Send(validateCommand, token))
         {
             throw new Exception("bad");
         }
 
         var query = new GetUserByEmailQuery(email);
-        var user = await getByEmailQueryHandler.Handle(query, token);
+        var user = await mediator.Send(query, token);
         var result = authenticationManager.GenerateTokens(user!);
         return new AuthResult(result.AccessToken, result.RefreshToken.Token);
     }
@@ -58,13 +58,12 @@ public class Mutation
     [Authorize]
     public async Task<BlogDto> CreateBlog(ClaimsPrincipal claimsPrincipal, string name,
         [Service] IMapper mapper,
-        [Service] IQueryHandler<GetUserByIdQuery, User?> getByIdQueryHandler,
-        [Service] ICommandHandler<CreateBlogCommand, Blog> createBlogCommandHandler,
+        [Service] IMediator mediator,
         CancellationToken token)
     {
         var userId = claimsPrincipal.GetUserId();
         var query = new GetUserByIdQuery(userId);
-        var user = await getByIdQueryHandler.Handle(query, token);
+        var user = await mediator.Send(query, token);
         
         if (user == null)
         {
@@ -72,7 +71,7 @@ public class Mutation
         }
 
         var command = new CreateBlogCommand(userId, name);
-        var blog = await createBlogCommandHandler.Handle(command, token);
+        var blog = await mediator.Send(command, token);
         return mapper.Map<BlogDto>(blog);
     }
 
@@ -81,22 +80,21 @@ public class Mutation
         string blogName, string content, List<string> tags,
         [Service] ILogger<Mutation> logger,
         [Service] IMapper mapper,
-        [Service] IQueryHandler<GetBlogByNameQuery, Blog?> getBlogByNameQueryHandler,
-        [Service] ICommandHandler<CreatePostCommand, Post> createPostCommandHandler,
+        [Service] IMediator mediator,
         CancellationToken token)
     {
         var userId = claimsPrincipal.GetUserId();
 
         logger.LogInformation("Creating post for blog {BlogName}", blogName);
         var query = new GetBlogByNameQuery(blogName);
-        var blog = await getBlogByNameQueryHandler.Handle(query, token);
+        var blog = await mediator.Send(query, token);
         if (blog == null || blog.UserId != userId)
         {
             throw new Exception("bad");
         }
 
         var command = new CreatePostCommand(blog.Id, content, tags);
-        var post = await createPostCommandHandler.Handle(command, token);
+        var post = await mediator.Send(command, token);
         return mapper.Map<PostDto>(post);
     }
 }

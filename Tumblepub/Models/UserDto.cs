@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotChocolate.Resolvers;
+using Mediator;
 using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Queries;
 using Tumblepub.Application.Interfaces;
@@ -20,7 +21,7 @@ public class UserDto
     public async Task<IEnumerable<BlogDto>> GetBlogs(
         IResolverContext context,
         [Service] IMapper mapper,
-        [Service] IQueryHandler<GetBlogsByUserIdQuery, IEnumerable<Blog>> queryHandler)
+        [Service] IMediator mediator)
     {
         return await context.GroupDataLoader<Guid, BlogDto>(
                 async (userIds, token) =>
@@ -28,7 +29,7 @@ public class UserDto
                     var getBlogsResults = await Task.WhenAll(userIds.Select(async id =>
                     {
                         var query = new GetBlogsByUserIdQuery(id);
-                        return await queryHandler.Handle(query, token);
+                        return await mediator.Send(query, token);
                     }));
                     
                     return getBlogsResults

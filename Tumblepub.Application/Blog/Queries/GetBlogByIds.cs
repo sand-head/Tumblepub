@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using Mediator;
 using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.Blog.Queries;
 
 public record GetBlogByIdsQuery(IEnumerable<Guid> Ids) : IRequest<IEnumerable<Aggregates.Blog>>;
 
-internal class GetBlogByIdsQueryHandler : IRequestHandler<GetBlogByIdsQuery, IEnumerable<Aggregates.Blog>>
+public class GetBlogByIdsQueryHandler : IRequestHandler<GetBlogByIdsQuery, IEnumerable<Aggregates.Blog>>
 {
     private readonly IQueryableRepository<Aggregates.Blog, Guid> _blogRepository;
 
@@ -14,9 +14,9 @@ internal class GetBlogByIdsQueryHandler : IRequestHandler<GetBlogByIdsQuery, IEn
         _blogRepository = blogRepository;
     }
 
-    public Task<IEnumerable<Aggregates.Blog>> Handle(GetBlogByIdsQuery query, CancellationToken token = default)
+    public ValueTask<IEnumerable<Aggregates.Blog>> Handle(GetBlogByIdsQuery query, CancellationToken token = default)
     {
-        return Task.FromResult<IEnumerable<Aggregates.Blog>>(_blogRepository.Query()
+        return ValueTask.FromResult<IEnumerable<Aggregates.Blog>>(_blogRepository.Query()
             .Where(b => query.Ids.Contains(b.Id))
             .ToList());
     }
