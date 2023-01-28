@@ -1,6 +1,7 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using System.Security.Claims;
 using AutoMapper;
+using HotChocolate.Subscriptions;
 using Mediator;
 using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Commands;
@@ -81,6 +82,7 @@ public class Mutation
         [Service] ILogger<Mutation> logger,
         [Service] IMapper mapper,
         [Service] IMediator mediator,
+        [Service] ITopicEventSender sender,
         CancellationToken token)
     {
         var userId = claimsPrincipal.GetUserId();
@@ -95,6 +97,9 @@ public class Mutation
 
         var command = new CreatePostCommand(blog.Id, content, tags);
         var post = await mediator.Send(command, token);
-        return mapper.Map<PostDto>(post);
+        var postDto = mapper.Map<PostDto>(post);
+
+        await sender.SendAsync($"{blogName}_{nameof(Subscription.PostCreated)}", postDto, token);
+        return postDto;
     }
 }
