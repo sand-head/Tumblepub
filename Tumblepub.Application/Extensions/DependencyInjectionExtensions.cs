@@ -7,15 +7,6 @@ public static class DependencyInjectionExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // register all command/query handlers
-        return services
-            .Scan(scan => scan
-                .FromAssembliesOf(typeof(Aggregates.Blog))
-                .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<,>)))
-                    .AsImplementedInterfaces()
-                    .WithScopedLifetime()
-                .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
-                    .AsImplementedInterfaces()
-                    .WithScopedLifetime());
+        return services;
     }
 }

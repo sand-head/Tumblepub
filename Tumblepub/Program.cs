@@ -5,6 +5,7 @@ using Serilog;
 using Serilog.Events;
 using System.Text;
 using System.Text.Json;
+using MediatR;
 using Tumblepub;
 using Tumblepub.ActivityPub.Extensions;
 using Tumblepub.Application.Aggregates;
@@ -38,7 +39,8 @@ builder.Services
     .AddInfrastructure(config.GetConnectionString("Database"), builder.Environment.IsDevelopment())
     .AddActivityPub()
     .AddMemoryCache()
-    .AddScoped<IRenderService, RenderService>();
+    .AddScoped<IRenderService, RenderService>()
+    .AddMediatR();
 
 // add AutoMapper configuration
 builder.Services.AddAutoMapper(typeof(GraphQLProfile));
@@ -49,10 +51,12 @@ builder.Services
     .AddAuthorization()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
+    .AddSubscriptionType<Subscription>()
     .AddUnionType<PostContent>()
     .AddType<PostContent.External>()
     .AddType<PostContent.Internal>()
     .BindRuntimeType<JsonDocument, AnyType>();
+builder.Services.AddInMemorySubscriptions();
 
 builder.Services
     .AddSingleton(new JwtTokenConfig(
@@ -138,6 +142,7 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseWebSockets();
 
 app.UseAuthentication();
 app.UseAuthorization();

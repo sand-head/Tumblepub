@@ -13,7 +13,7 @@ public class BlogActivityProjection : EventProjection
         return new BlogActivity(e.PostId)
         {
             BlogId = e.BlogId,
-            Type = "Create",
+            Type = BlogActivityType.Create,
             PublishedAt = e.At,
 
             ObjectType = new ObjectType.Post(e.PostId),
@@ -31,7 +31,7 @@ public class BlogActivityProjection : EventProjection
         ops.Store(new BlogActivity(e.Id)
         {
             BlogId = createActivity.BlogId,
-            Type = "Update",
+            Type = BlogActivityType.Update,
             PublishedAt = e.Data.At,
 
             ObjectType = new ObjectType.Post(e.Data.PostId),

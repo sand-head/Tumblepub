@@ -1,16 +1,17 @@
 ﻿using Isopoh.Cryptography.Argon2;
+using MediatR;
 using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.User.Queries;
 
 namespace Tumblepub.Application.User.Commands;
 
-public record ValidateUserCredentialsCommand(string Email, string Password) : ICommand<bool>;
+public record ValidateUserCredentialsCommand(string Email, string Password) : IRequest<bool>;
 
-internal class ValidateUserCredentials : ICommandHandler<ValidateUserCredentialsCommand, bool>
+internal class ValidateUserCredentials : IRequestHandler<ValidateUserCredentialsCommand, bool>
 {
-    private readonly IQueryHandler<GetUserByEmailQuery, Aggregates.User?> _getUserByEmailQuery;
+    private readonly IRequestHandler<GetUserByEmailQuery, Aggregates.User?> _getUserByEmailQuery;
 
-    public ValidateUserCredentials(IQueryHandler<GetUserByEmailQuery, Aggregates.User?> getUserByEmailQuery)
+    public ValidateUserCredentials(IRequestHandler<GetUserByEmailQuery, Aggregates.User?> getUserByEmailQuery)
     {
         _getUserByEmailQuery = getUserByEmailQuery;
     }

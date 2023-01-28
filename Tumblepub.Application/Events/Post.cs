@@ -16,6 +16,7 @@ public record PostDiscovered(
 
 public record PostUpdated(
     Guid PostId,
+    Guid BlogId,
     DateTimeOffset At);
 
 public record PostLiked(
@@ -31,4 +32,5 @@ public record PostShared(
 
 public record PostDeleted(
     Guid PostId,
+    Guid BlogId,
     DateTimeOffset At);

@@ -1,10 +1,11 @@
-﻿using Tumblepub.Application.Interfaces;
+﻿using MediatR;
+using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.User.Queries;
 
-public sealed record GetUserByEmailQuery(string Email) : IQuery<Aggregates.User?>;
+public sealed record GetUserByEmailQuery(string Email) : IRequest<Aggregates.User?>;
 
-internal class GetUserByEmailQueryHandler : IQueryHandler<GetUserByEmailQuery, Aggregates.User?>
+internal class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, Aggregates.User?>
 {
     private readonly IRepository<Aggregates.User, Guid> _userRepository;
 

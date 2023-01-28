@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Net;
+using MediatR;
 using Tumblepub.ActivityPub.Endpoints;
 using Tumblepub.ActivityPub.Webfinger;
 using Tumblepub.Application.Aggregates;
@@ -63,14 +64,14 @@ public static class IApplicationBuilderExtensions
         builder.MapGet(ActivityPubConstants.ActorRoute, async context =>
         {
             using var scope = context.RequestServices.CreateScope();
-            var queryHandler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetBlogByIdQuery, Blog?>>();
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
             // get blog ID from route values
             var routeValues = context.GetRouteData().Values;
             var blogId = Guid.Parse(routeValues["0"]!.ToString()!);
 
             var query = new GetBlogByIdQuery(blogId);
-            var blog = await queryHandler.Handle(query, context.RequestAborted);
+            var blog = await mediator.Send(query, context.RequestAborted);
             if (blog == null)
             {
                 return;

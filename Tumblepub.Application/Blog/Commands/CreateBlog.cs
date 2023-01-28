@@ -1,10 +1,11 @@
-﻿using Tumblepub.Application.Interfaces;
+﻿using MediatR;
+using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.Blog.Commands;
 
-public record CreateBlogCommand(Guid UserId, string Name) : ICommand<Aggregates.Blog>;
+public record CreateBlogCommand(Guid UserId, string Name) : IRequest<Aggregates.Blog>;
 
-internal class CreateBlogCommandHandler : ICommandHandler<CreateBlogCommand, Aggregates.Blog>
+internal class CreateBlogCommandHandler : IRequestHandler<CreateBlogCommand, Aggregates.Blog>
 {
     private readonly IRepository<Aggregates.Blog, Guid> _blogRepository;
 

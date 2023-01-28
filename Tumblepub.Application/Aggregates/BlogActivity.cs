@@ -6,6 +6,13 @@ public abstract record ObjectType()
     public record Post(Guid BlogId) : ObjectType();
 }
 
+public enum BlogActivityType
+{
+    Create,
+    Update,
+    Delete,
+}
+
 public class BlogActivity : ReadOnlyAggregate<Guid>
 {
     public BlogActivity() { }
@@ -16,7 +23,7 @@ public class BlogActivity : ReadOnlyAggregate<Guid>
     }
     
     public Guid BlogId { get; set; }
-    public string Type { get; set; } = string.Empty;
+    public BlogActivityType Type { get; set; }
     public DateTimeOffset PublishedAt { get; set; }
 
     public ObjectType? ObjectType { get; set; }

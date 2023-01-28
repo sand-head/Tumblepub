@@ -1,10 +1,11 @@
-﻿using Tumblepub.Application.Interfaces;
+﻿using MediatR;
+using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.User.Queries;
 
-public sealed record GetUserByIdQuery(Guid Id) : IQuery<Aggregates.User?>;
+public sealed record GetUserByIdQuery(Guid Id) : IRequest<Aggregates.User?>;
 
-internal class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, Aggregates.User?>
+internal class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Aggregates.User?>
 {
     private readonly IRepository<Aggregates.User, Guid> _userRepository;
 

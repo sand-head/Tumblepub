@@ -12,7 +12,7 @@ internal static class BlogActivityExtensions
         IReadOnlyRepository<Post, Guid> postRepository,
         CancellationToken token = default)
     {
-        return new(blogActivity.Type)
+        return new(blogActivity.Type.ToString())
         {
             Context = new List<string>()
             {

@@ -1,10 +1,11 @@
-﻿using Tumblepub.Application.Interfaces;
+﻿using MediatR;
+using Tumblepub.Application.Interfaces;
 
 namespace Tumblepub.Application.Blog.Queries;
 
-public record GetBlogByNameQuery(string Name, string? Domain = null) : IQuery<Aggregates.Blog?>;
+public record GetBlogByNameQuery(string Name, string? Domain = null) : IRequest<Aggregates.Blog?>;
 
-internal class GetBlogByNameQueryHandler : IQueryHandler<GetBlogByNameQuery, Aggregates.Blog?>
+internal class GetBlogByNameQueryHandler : IRequestHandler<GetBlogByNameQuery, Aggregates.Blog?>
 {
     private readonly IReadOnlyRepository<Aggregates.Blog, Guid> _blogRepository;
 
