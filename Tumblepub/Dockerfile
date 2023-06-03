@@ -21,6 +21,7 @@ COPY ["Tumblepub.Infrastructure/Tumblepub.Infrastructure.csproj", "Tumblepub.Inf
 COPY ["Tumblepub.ActivityPub/Tumblepub.ActivityPub.csproj", "Tumblepub.ActivityPub/"]
 COPY ["Tumblepub.Themes/Tumblepub.Themes.csproj", "Tumblepub.Themes/"]
 COPY ["theme", "theme/"]
+COPY ["Tumblepub.Components/Tumblepub.Components.csproj", "Tumblepub.Components/"]
 COPY ["Tumblepub/Tumblepub.csproj", "Tumblepub/"]
 RUN dotnet restore "Tumblepub/Tumblepub.csproj"
 COPY . .
