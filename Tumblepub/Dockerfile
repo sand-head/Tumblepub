@@ -23,13 +23,10 @@ COPY ["Tumblepub/Tumblepub.csproj", "Tumblepub/"]
 RUN dotnet restore "Tumblepub/Tumblepub.csproj" -a $TARGETARCH
 COPY . .
 WORKDIR "/src/Tumblepub"
-RUN dotnet build "Tumblepub.csproj" -a $TARGETARCH -c Release --no-restore
-
-FROM build AS publish
-RUN dotnet publish "Tumblepub.csproj" -a $TARGETARCH -c Release -o /app/publish --no-build
+RUN dotnet publish "Tumblepub.csproj" -a $TARGETARCH -c Release -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app .
 EXPOSE 80
 ENTRYPOINT ["dotnet", "Tumblepub.dll"]
