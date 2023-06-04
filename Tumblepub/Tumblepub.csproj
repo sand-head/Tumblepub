@@ -33,7 +33,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Tumblepub.ActivityPub\Tumblepub.ActivityPub.csproj" />
-		<ProjectReference Include="..\Tumblepub.Components\Tumblepub.Components.csproj" />
+    <ProjectReference Include="..\Tumblepub.Components\Tumblepub.Components.csproj">
+      <GlobalPropertiesToRemove>SelfContained</GlobalPropertiesToRemove>
+    </ProjectReference>
 		<ProjectReference Include="..\Tumblepub.Infrastructure\Tumblepub.Infrastructure.csproj" />
 		<ProjectReference Include="..\Tumblepub.Themes\Tumblepub.Themes.csproj" />
 	</ItemGroup>
