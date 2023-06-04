@@ -1,9 +1,5 @@
 # See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
-WORKDIR /app
-EXPOSE 80
-
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG TARGETARCH
 WORKDIR /src
@@ -27,9 +23,13 @@ COPY ["Tumblepub/Tumblepub.csproj", "Tumblepub/"]
 RUN dotnet restore "Tumblepub/Tumblepub.csproj" -a $TARGETARCH
 COPY . .
 WORKDIR "/src/Tumblepub"
-RUN dotnet publish "Tumblepub.csproj" -a $TARGETARCH -c Release -o /app
+RUN dotnet build "Tumblepub.csproj" -a $TARGETARCH -c Release --no-restore
 
-FROM base AS final
+FROM build AS publish
+RUN dotnet publish "Tumblepub.csproj" -a $TARGETARCH -c Release -o /app/publish --no-build
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS final
 WORKDIR /app
-COPY --from=publish /app .
+COPY --from=publish /app/publish .
+EXPOSE 80
 ENTRYPOINT ["dotnet", "Tumblepub.dll"]
