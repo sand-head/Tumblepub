@@ -4,7 +4,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+ARG TARGETARCH
 WORKDIR /src
 
 # Prevent 'Warning: apt-key output should not be parsed (stdout is not a terminal)'
@@ -23,15 +24,12 @@ COPY ["Tumblepub.Themes/Tumblepub.Themes.csproj", "Tumblepub.Themes/"]
 COPY ["theme", "theme/"]
 COPY ["Tumblepub.Components/Tumblepub.Components.csproj", "Tumblepub.Components/"]
 COPY ["Tumblepub/Tumblepub.csproj", "Tumblepub/"]
-RUN dotnet restore "Tumblepub/Tumblepub.csproj"
+RUN dotnet restore "Tumblepub/Tumblepub.csproj" -a $TARGETARCH
 COPY . .
 WORKDIR "/src/Tumblepub"
-RUN dotnet build "Tumblepub.csproj" -c Release --no-restore
-
-FROM build AS publish
-RUN dotnet publish "Tumblepub.csproj" -c Release -o /app/publish --no-build
+RUN dotnet publish "Tumblepub.csproj" -a $TARGETARCH -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "Tumblepub.dll"]
