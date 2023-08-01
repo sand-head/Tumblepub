@@ -13,8 +13,8 @@
     <ItemGroup>
       <PackageReference Include="Isopoh.Cryptography.Argon2" Version="1.1.12" />
       <PackageReference Include="Marten" Version="5.11.0" />
-      <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="7.0.5" />
-      <PackageReference Include="Scrutor" Version="4.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="7.0.9" />
+      <PackageReference Include="Scrutor" Version="4.2.2" />
     </ItemGroup>
 
 </Project>

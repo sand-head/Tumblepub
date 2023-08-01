@@ -47,6 +47,7 @@ builder.Services.AddAutoMapper(typeof(GraphQLProfile));
 // add GraphQL support using HotChocolate
 builder.Services
     .AddGraphQLServer()
+    .AddInMemorySubscriptions()
     .AddAuthorization()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
@@ -55,7 +56,6 @@ builder.Services
     .AddType<PostContent.External>()
     .AddType<PostContent.Internal>()
     .BindRuntimeType<JsonDocument, AnyType>();
-builder.Services.AddInMemorySubscriptions();
 
 builder.Services
     .AddSingleton(new JwtTokenConfig(

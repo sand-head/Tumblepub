@@ -6,10 +6,12 @@ namespace Tumblepub;
 
 public class Subscription
 {
-    [SubscribeAndResolve]
-    public ValueTask<ISourceStream<PostDto>> PostCreated(string blogName, [Service] ITopicEventReceiver receiver)
+    public ValueTask<ISourceStream<PostDto>> SubscribeToCreatedPosts(string blogName, ITopicEventReceiver receiver)
     {
-        var topic = $"{blogName}_{nameof(PostCreated)}";
-        return receiver.SubscribeAsync<string, PostDto>(topic);
+        var topic = $"{blogName}_CreatedPost";
+        return receiver.SubscribeAsync<PostDto>(topic);
     }
+
+    [Subscribe(With = nameof(SubscribeToCreatedPosts))]
+    public PostDto PostCreated(string blogName, [EventMessage] PostDto postDto) => postDto;
 }

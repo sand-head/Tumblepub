@@ -1,9 +1,7 @@
-﻿using HotChocolate.AspNetCore.Authorization;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using AutoMapper;
+using HotChocolate.Authorization;
 using Mediator;
-using Tumblepub.Application.Aggregates;
-using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.User.Queries;
 using Tumblepub.Models;
 

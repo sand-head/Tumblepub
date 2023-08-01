@@ -1,13 +1,10 @@
-﻿using HotChocolate.AspNetCore.Authorization;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using AutoMapper;
+using HotChocolate.Authorization;
 using HotChocolate.Subscriptions;
 using Mediator;
-using Tumblepub.Application.Aggregates;
 using Tumblepub.Application.Blog.Commands;
 using Tumblepub.Application.Blog.Queries;
-using Tumblepub.Application.Extensions;
-using Tumblepub.Application.Interfaces;
 using Tumblepub.Application.Post.Commands;
 using Tumblepub.Application.User.Commands;
 using Tumblepub.Application.User.Queries;
@@ -99,7 +96,7 @@ public class Mutation
         var post = await mediator.Send(command, token);
         var postDto = mapper.Map<PostDto>(post);
 
-        await sender.SendAsync($"{blogName}_{nameof(Subscription.PostCreated)}", postDto, token);
+        await sender.SendAsync($"{blogName}_{nameof(Subscription.SubscribeToCreatedPosts)}", postDto, token);
         return postDto;
     }
 }
